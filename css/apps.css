@@ -665,6 +665,558 @@
     border: none;
 }
 
+/* Firefox Browser Styles */
+.browser.firefox {
+    background: #1c1b22;
+}
+
+.firefox-tabbar {
+    display: flex;
+    align-items: flex-end;
+    background: #1c1b22;
+    padding: 8px 8px 0 8px;
+    min-height: 40px;
+}
+
+.firefox-tabs {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    flex: 1;
+}
+
+.firefox-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #42414d;
+    border-radius: 8px 8px 0 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    max-width: 200px;
+    min-width: 100px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.firefox-tab:hover {
+    background: #52515d;
+}
+
+.firefox-tab.active {
+    background: #2b2a33;
+    color: white;
+}
+
+.firefox-tab-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.firefox-tab-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.firefox-tab-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+}
+
+.firefox-tab-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+.firefox-new-tab {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 18px;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    margin-left: 4px;
+}
+
+.firefox-new-tab:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.firefox-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #2b2a33;
+}
+
+.firefox-nav-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.firefox-nav-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.firefox-nav-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.firefox-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.firefox-nav-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.firefox-urlbar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #42414d;
+    border-radius: 8px;
+    padding: 6px 12px;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+}
+
+.firefox-urlbar:focus-within {
+    background: #1c1b22;
+    border-color: #0060df;
+}
+
+.firefox-urlbar-icon {
+    font-size: 14px;
+    color: #3fe1b0;
+}
+
+.firefox-url-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 14px;
+    outline: none;
+}
+
+.firefox-url-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.firefox-urlbar-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.15s;
+}
+
+.firefox-urlbar-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffbd4f;
+}
+
+.firefox-toolbar-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.firefox-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.15s;
+}
+
+.firefox-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.browser.firefox .browser-content {
+    background: #ffffff;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Firefox New Tab Page */
+.firefox-newtab {
+    height: 100%;
+    background: linear-gradient(180deg, #1c1b22 0%, #2b2a33 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+}
+
+.firefox-newtab-logo {
+    margin-bottom: 30px;
+    opacity: 0.8;
+}
+
+.firefox-search-container {
+    width: 100%;
+    max-width: 580px;
+    margin-bottom: 40px;
+}
+
+.firefox-search-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #42414d;
+    border-radius: 8px;
+    padding: 12px 16px;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.firefox-search-box:focus-within {
+    border-color: #0060df;
+    box-shadow: 0 0 0 3px rgba(0, 96, 223, 0.3);
+}
+
+.firefox-search-icon {
+    color: rgba(255, 255, 255, 0.6);
+    flex-shrink: 0;
+}
+
+.firefox-search-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 15px;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.firefox-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.firefox-search-engine {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.firefox-search-engine img {
+    width: 16px;
+    height: 16px;
+}
+
+/* Firefox Shortcuts */
+.firefox-shortcuts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    max-width: 580px;
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+.firefox-shortcut {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.firefox-shortcut:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.firefox-shortcut-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.firefox-shortcut span {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 12px;
+    text-align: center;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Firefox Pocket Section */
+.firefox-pocket-section {
+    width: 100%;
+    max-width: 800px;
+}
+
+.firefox-pocket-section h3 {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.firefox-pocket-section h3::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    background: #ef4056;
+    border-radius: 4px;
+}
+
+.firefox-pocket-stories {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.firefox-pocket-card {
+    background: #42414d;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.firefox-pocket-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.firefox-pocket-thumb {
+    height: 100px;
+    background-size: cover;
+    background-position: center;
+}
+
+.firefox-pocket-info {
+    padding: 12px;
+}
+
+.firefox-pocket-title {
+    display: block;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.firefox-pocket-source {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 11px;
+}
+
+/* Firefox Find Bar */
+.firefox-findbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #2b2a33;
+    border-top: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.firefox-findbar.hidden {
+    display: none;
+}
+
+.firefox-find-input {
+    flex: 1;
+    max-width: 240px;
+    padding: 6px 10px;
+    background: #42414d;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: white;
+    font-size: 13px;
+    outline: none;
+}
+
+.firefox-find-input:focus {
+    border-color: #0060df;
+}
+
+.firefox-find-status {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    min-width: 40px;
+}
+
+.firefox-find-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.firefox-find-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.firefox-find-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-left: auto;
+}
+
+.firefox-find-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Firefox Tab Favicon */
+.firefox-tab-favicon {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+/* Firefox Window Controls in Tab Bar */
+.firefox-window-controls {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+    padding-right: 8px;
+}
+
+.firefox-window-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.15s;
+}
+
+.firefox-window-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.firefox-window-btn.close:hover {
+    background: #e74c3c;
+    color: white;
+}
+
+/* Enhanced URL Bar */
+.firefox-urlbar-icon.secure svg {
+    vertical-align: middle;
+}
+
+.firefox-urlbar-action {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.firefox-urlbar-action:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Responsive Firefox New Tab */
+@media (max-width: 700px) {
+    .firefox-shortcuts {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .firefox-pocket-stories {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .firefox-shortcuts {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .firefox-pocket-stories {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Project Card */
 
 .project-card {

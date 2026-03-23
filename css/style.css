@@ -105,7 +105,8 @@ body {
 #desktop {
     width: 100%;
     height: 100%;
-    background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80');
+    /* Official Ubuntu gradient wallpaper */
+    background: linear-gradient(135deg, #E95420 0%, #772953 50%, #2C001E 100%);
     background-size: cover;
     background-position: center;
     position: relative;
@@ -1332,6 +1333,194 @@ body {
     color: white;
     font-size: 12px;
     text-align: center;
+}
+
+/* Ubuntu App Grid Overlay - Real Ubuntu Style */
+.ubuntu-app-grid-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: ubuntuGridIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes ubuntuGridIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.ubuntu-app-grid-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 60px;
+}
+
+.ubuntu-search-container {
+    display: flex;
+    justify-content: center;
+    padding: 20px 40px 30px;
+}
+
+.ubuntu-search-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 500px;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 28px;
+    transition: all 0.2s;
+}
+
+.ubuntu-search-box:focus-within {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 2px rgba(233, 84, 32, 0.3);
+}
+
+.ubuntu-search-icon {
+    color: rgba(255, 255, 255, 0.6);
+    flex-shrink: 0;
+}
+
+.ubuntu-search-box input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 16px;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.ubuntu-search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.ubuntu-app-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 120px);
+    gap: 12px;
+    justify-content: center;
+    align-content: start;
+    padding: 20px 80px;
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+}
+
+.ubuntu-app-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 12px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ubuntu-app-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+}
+
+.ubuntu-app-item:active {
+    transform: scale(0.95);
+}
+
+.ubuntu-app-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    transition: transform 0.2s ease;
+}
+
+.ubuntu-app-item:hover .ubuntu-app-icon {
+    transform: translateY(-2px);
+}
+
+.ubuntu-app-icon svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.ubuntu-app-name {
+    color: white;
+    font-size: 13px;
+    font-weight: 400;
+    text-align: center;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.ubuntu-app-grid-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+}
+
+.ubuntu-pagination-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ubuntu-pagination-dot:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.ubuntu-pagination-dot.active {
+    background: white;
+    width: 24px;
+    border-radius: 4px;
+}
+
+/* Ubuntu App Grid Scrollbar */
+.ubuntu-app-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ubuntu-app-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ubuntu-app-grid::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.ubuntu-app-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 /* Empty state */
