@@ -421,7 +421,25 @@ const FileSystem = {
                                 'Music': {
                                     type: 'folder',
                                     icon: '🎵',
-                                    children: {}
+                                    children: {
+                                        'aeron fav songs': {
+                                            type: 'folder',
+                                            icon: '🎧',
+                                            children: {
+                                                '23 - Cheema Y.mp3': { type: 'audio', icon: '🎵', file: 'assets/songs/23 - Cheema Y.mp3' },
+                                                '52 Bars.mp3': { type: 'audio', icon: '🎵', file: 'assets/songs/52 Bars.mp3' },
+                                                '5_7_1.mp3': { type: 'audio', icon: '🎵', file: 'assets/songs/5_7_1.mp3' },
+                                                '7_7_Magnitude_1.mp3': { type: 'audio', icon: '🎵', file: 'assets/songs/7_7_Magnitude_1.mp3' },
+                                                'At_Peace_1.mp3': { type: 'audio', icon: '🎵', file: 'assets/songs/At_Peace_1.mp3' },
+                                                'Daytona_1.mp3': { type: 'audio', icon: '🎵', file: 'assets/songs/Daytona_1.mp3' },
+                                                'Excuse Me - Cheema Y.mp3': { type: 'audio', icon: '🎵', file: 'assets/songs/Excuse Me - Cheema Y.mp3' },
+                                                'I Really Do.mp3': { type: 'audio', icon: '🎵', file: 'assets/songs/I Really Do.mp3' },
+                                                'Nanak_Niva_Jo_Challe_1.mp3': { type: 'audio', icon: '🎵', file: 'assets/songs/Nanak_Niva_Jo_Challe_1.mp3' },
+                                                'Soch.mp3': { type: 'audio', icon: '🎵', file: 'assets/songs/Soch.mp3' },
+                                                'Wavy_1.mp3': { type: 'audio', icon: '🎵', file: 'assets/songs/Wavy_1.mp3' }
+                                            }
+                                        }
+                                    }
                                 },
                                 'Pictures': {
                                     type: 'folder',

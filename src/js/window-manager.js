@@ -129,6 +129,14 @@ const WindowManager = {
                 getContent: (options) => TextEditor.getEditorHTML(options),
                 onInit: (windowEl, options) => TextEditor.initEditor(windowEl, options)
             },
+            'music-player': {
+                title: 'Aeron Fav Songs',
+                icon: '🎧',
+                width: 450,
+                height: 650,
+                getContent: () => MusicPlayer.getWindowContent(),
+                onInit: (windowEl) => MusicPlayer.initWindow(windowEl)
+            },
             browser: {
                 title: 'Firefox',
                 icon: '🦊',

@@ -87,6 +87,10 @@ const FileManager = {
                             <span class="fm-sidebar-icon">💼</span>
                             <span>Projects</span>
                         </div>
+                        <div class="fm-sidebar-item fm-sidebar-music" data-app="music-player">
+                            <span class="fm-sidebar-icon">🎧</span>
+                            <span>Aeron Fav Songs</span>
+                        </div>
                         <div class="fm-sidebar-divider"></div>
                         <div class="fm-sidebar-section">
                             <span class="fm-sidebar-title">Devices</span>
@@ -154,6 +158,7 @@ const FileManager = {
         if (item.icon) return item.icon;
         if (item.type === 'folder' || item.type === 'link-folder') return '📁';
         if (item.type === 'link') return '🔗';
+        if (item.type === 'audio') return '🎵';
         
         // Check extension
         const ext = item.name.split('.').pop().toLowerCase();
@@ -384,9 +389,17 @@ const FileManager = {
             case 'folder':
             case 'link-folder':
                 const targetPath = fileEl.dataset.target || path;
-                if (navigateTo) {
+                // Check if it's the music folder
+                if (path.includes('aeron fav songs') || targetPath.includes('aeron fav songs')) {
+                    WindowManager.openApp('music-player');
+                } else if (navigateTo) {
                     navigateTo(targetPath);
                 }
+                break;
+
+            case 'audio':
+                // Open music player for audio files
+                WindowManager.openApp('music-player');
                 break;
 
             case 'file':
