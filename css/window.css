@@ -1,0 +1,208 @@
+/* Window Styles */
+
+.window {
+    position: absolute;
+    min-width: 400px;
+    min-height: 300px;
+    background: var(--window-bg);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: windowOpen 0.2s ease;
+}
+
+.window.closing {
+    animation: windowClose 0.15s ease forwards;
+}
+
+.window.maximized {
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0;
+}
+
+.window.focused {
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+.window-header {
+    height: 40px;
+    background: linear-gradient(to bottom, #3D3D3D 0%, #353535 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    cursor: move;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.3);
+    position: relative;
+}
+
+.window:not(.focused) .window-header {
+    background: linear-gradient(to bottom, #323232 0%, #2C2C2C 100%);
+}
+
+/* Terminal window specific styling */
+.window[data-app="terminal"] .window-header {
+    background: linear-gradient(to bottom, #3D2833 0%, #300A24 100%);
+}
+
+.window[data-app="terminal"]:not(.focused) .window-header {
+    background: linear-gradient(to bottom, #2D1A25 0%, #251018 100%);
+}
+
+.window-title {
+    color: rgba(255,255,255,0.9);
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.window:not(.focused) .window-title {
+    color: rgba(255,255,255,0.5);
+}
+
+.window-controls {
+    display: flex;
+    gap: 8px;
+    position: absolute;
+    left: 10px;
+}
+
+.window-btn {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 0;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.window-btn:hover {
+    font-size: 9px;
+}
+
+.window-btn.close {
+    background: #E95420;
+    color: #300A24;
+}
+
+.window-btn.close:hover {
+    background: #FF6B3D;
+}
+
+.window-btn.minimize {
+    background: #FABD2F;
+    color: #5C4800;
+}
+
+.window-btn.minimize:hover {
+    background: #FFCC47;
+}
+
+.window-btn.maximize {
+    background: #26A269;
+    color: #0A3A24;
+}
+
+.window-btn.maximize:hover {
+    background: #33D17A;
+}
+
+.window-content {
+    flex: 1;
+    overflow: auto;
+    background: var(--window-bg);
+}
+
+.window .resize-handle {
+    position: absolute;
+    background: transparent;
+}
+
+.resize-handle.right {
+    right: 0;
+    top: 38px;
+    width: 5px;
+    height: calc(100% - 38px);
+    cursor: ew-resize;
+}
+
+.resize-handle.bottom {
+    bottom: 0;
+    left: 0;
+    height: 5px;
+    width: 100%;
+    cursor: ns-resize;
+}
+
+.resize-handle.corner {
+    right: 0;
+    bottom: 0;
+    width: 15px;
+    height: 15px;
+    cursor: nwse-resize;
+}
+
+.window-toolbar {
+    height: 36px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.toolbar-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all var(--transition-fast);
+}
+
+.toolbar-btn:hover {
+    background: var(--hover-bg);
+    color: white;
+}
+
+.toolbar-path {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 4px 10px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+}
+
+.window-statusbar {
+    height: 24px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.window.minimized {
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+}

@@ -1,0 +1,91 @@
+/* Ubuntu Theme Variables and Overrides */
+
+:root {
+    --ubuntu-orange: #E95420;
+    --ubuntu-orange-light: #F47B56;
+    --ubuntu-orange-dark: #C34113;
+    --ubuntu-aubergine: #300A24;
+    --ubuntu-aubergine-light: #5E2750;
+    --ubuntu-warm-grey: #AEA79F;
+    --ubuntu-cool-grey: #333333;
+    --ubuntu-text-grey: #111111;
+    --ubuntu-white: #FFFFFF;
+    
+    --window-bg: #2D2D2D;
+    --window-header: #3D3D3D;
+    --window-header-inactive: #2D2D2D;
+    --window-border: #1A1A1A;
+    --text-primary: #FFFFFF;
+    --text-secondary: #AAAAAA;
+    --accent: var(--ubuntu-orange);
+    --hover-bg: rgba(255, 255, 255, 0.08);
+    --active-bg: rgba(233, 84, 32, 0.3);
+    
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+    
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.25s ease;
+}
+
+.ubuntu-btn {
+    background: var(--ubuntu-orange);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.ubuntu-btn:hover {
+    background: var(--ubuntu-orange-light);
+}
+
+.ubuntu-btn:active {
+    background: var(--ubuntu-orange-dark);
+    transform: scale(0.98);
+}
+
+.ubuntu-input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 8px 12px;
+    color: white;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 14px;
+    transition: border-color var(--transition-fast);
+}
+
+.ubuntu-input:focus {
+    outline: none;
+    border-color: var(--ubuntu-orange);
+}
+
+:focus-visible {
+    outline: 2px solid var(--ubuntu-orange);
+    outline-offset: 2px;
+}
+
+@keyframes windowOpen {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes windowClose {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.9); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.mono {
+    font-family: 'Ubuntu Mono', monospace;
+}
