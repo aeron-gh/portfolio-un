@@ -3,6 +3,9 @@
 const Desktop = {
   // Use CONFIG values if available, fallback to defaults
   backgrounds: typeof CONFIG !== 'undefined' ? CONFIG.backgrounds : [
+    "assets/wallpapers/wallpaperflare.com_wallpaper.jpg",
+    "assets/wallpapers/wallpaperflare.com_wallpaper-un.jpg",
+    "assets/wallpapers/wallpaperflare.com_wallpaper .jpg",
     "https://ubuntucommunity.s3.us-east-2.amazonaws.com/original/3X/7/6/76e37f6ab91c7e4ef2b4e0c4d84fc0063da6f4cc.jpeg",
     "https://raw.githubusercontent.com/ubuntu/yaru/master/backgrounds/Jammy-Jellyfish_WP_1920x1080.png",
     "https://512pixels.net/downloads/macos-wallpapers-thumbs/10-14-Day-Thumb.jpg",
@@ -25,6 +28,7 @@ const Desktop = {
     this.initDesktopIcons();
     this.initDraggableIcons();
     this.initKeyboardShortcuts();
+    this.initIconContextMenu();
     this.initActivitiesButton();
     this.initShowAppsButton();
     this.positionIcons();
@@ -549,13 +553,54 @@ const Desktop = {
   },
 
   changeBackground() {
-    this.currentBgIndex = (this.currentBgIndex + 1) % this.backgrounds.length;
+    this.currentBgIndex++;
     const desktop = document.getElementById("desktop");
-    if (this.currentBgIndex === -1) {
+    
+    // Cycle through: wallpapers -> default gradient -> wallpapers...
+    if (this.currentBgIndex >= this.backgrounds.length) {
+      // Show default gradient, then reset
       desktop.style.backgroundImage = this.defaultWallpaper;
+      this.currentBgIndex = -1;
     } else {
       desktop.style.backgroundImage = `url('${this.backgrounds[this.currentBgIndex]}')`;
     }
+  },
+
+  createNewFolder() {
+    const desktopArea = document.getElementById("desktop-area");
+    const folderCount = document.querySelectorAll('.desktop-icon[data-type="folder"]').length;
+    const folderName = `New Folder${folderCount > 0 ? ` (${folderCount})` : ''}`;
+    
+    // Create new folder icon
+    const newFolder = document.createElement("div");
+    newFolder.className = "desktop-icon";
+    newFolder.dataset.type = "folder";
+    newFolder.dataset.path = `/home/abhishek/${folderName.replace(/\s/g, '_')}`;
+    newFolder.innerHTML = `
+      <div class="icon">📁</div>
+      <span class="icon-label">${folderName}</span>
+    `;
+    
+    desktopArea.appendChild(newFolder);
+    
+    // Add click handlers
+    newFolder.addEventListener("click", (e) => {
+      e.stopPropagation();
+      App.playSound("sound-click");
+      this.selectIcon(newFolder);
+    });
+    
+    newFolder.addEventListener("dblclick", () => {
+      App.playSound("sound-open");
+      this.openIcon(newFolder);
+    });
+    
+    // Reposition all icons
+    this.positionIcons();
+    this.initDraggableIcons();
+    
+    // Show notification
+    App.showNotification('📁', 'Folder Created', folderName);
   },
 
   initKeyboardShortcuts() {
@@ -570,17 +615,170 @@ const Desktop = {
         this.openIcon(this.selectedIcon);
       }
 
-      // Delete - just deselect (no actual delete in portfolio)
+      // Delete to remove selected icon
       if (e.key === "Delete" && this.selectedIcon) {
-        this.deselectAll();
+        this.deleteIcon(this.selectedIcon);
+      }
+
+      // F2 to rename selected icon
+      if (e.key === "F2" && this.selectedIcon) {
+        this.renameIcon(this.selectedIcon);
       }
 
       // Escape to deselect
       if (e.key === "Escape") {
         this.deselectAll();
         document.getElementById("context-menu").classList.add("hidden");
+        document.getElementById("icon-context-menu").classList.add("hidden");
         document.getElementById("system-menu").classList.add("hidden");
         document.getElementById("calendar-dropdown").classList.add("hidden");
+      }
+    });
+  },
+
+  initIconContextMenu() {
+    const iconContextMenu = document.getElementById("icon-context-menu");
+    
+    // Right-click on desktop icons
+    document.getElementById("desktop-area").addEventListener("contextmenu", (e) => {
+      const icon = e.target.closest(".desktop-icon");
+      if (icon) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.selectIcon(icon);
+        
+        // Hide other menus
+        document.getElementById("context-menu").classList.add("hidden");
+        
+        // Position and show icon context menu
+        iconContextMenu.style.left = e.clientX + "px";
+        iconContextMenu.style.top = e.clientY + "px";
+        iconContextMenu.classList.remove("hidden");
+      }
+    });
+    
+    // Handle icon context menu actions
+    iconContextMenu.querySelectorAll(".context-item").forEach(item => {
+      item.addEventListener("click", () => {
+        const action = item.dataset.action;
+        App.playSound("sound-click");
+        
+        if (this.selectedIcon) {
+          switch(action) {
+            case "open":
+              this.openIcon(this.selectedIcon);
+              break;
+            case "rename":
+              this.renameIcon(this.selectedIcon);
+              break;
+            case "delete":
+              this.deleteIcon(this.selectedIcon);
+              break;
+          }
+        }
+        iconContextMenu.classList.add("hidden");
+      });
+    });
+    
+    // Hide menu on click outside
+    document.addEventListener("click", () => {
+      iconContextMenu.classList.add("hidden");
+    });
+  },
+
+  renameIcon(icon) {
+    const label = icon.querySelector(".icon-label");
+    const currentName = label.textContent;
+    
+    // Create rename dialog (Ubuntu style)
+    const dialog = document.createElement("div");
+    dialog.className = "rename-dialog-overlay";
+    dialog.innerHTML = `
+      <div class="rename-dialog">
+        <div class="rename-dialog-title">Rename</div>
+        <input type="text" class="rename-input" value="${currentName}" />
+        <div class="rename-dialog-buttons">
+          <button class="rename-btn cancel">Cancel</button>
+          <button class="rename-btn confirm">Rename</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(dialog);
+    
+    const input = dialog.querySelector(".rename-input");
+    input.focus();
+    input.select();
+    
+    const closeDialog = () => {
+      dialog.remove();
+    };
+    
+    const confirmRename = () => {
+      const newName = input.value.trim();
+      if (newName && newName !== currentName) {
+        label.textContent = newName;
+        icon.dataset.path = `/home/abhishek/${newName.replace(/\s/g, '_')}`;
+        App.showNotification('✏️', 'Renamed', `"${currentName}" → "${newName}"`);
+      }
+      closeDialog();
+    };
+    
+    dialog.querySelector(".cancel").addEventListener("click", closeDialog);
+    dialog.querySelector(".confirm").addEventListener("click", confirmRename);
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) closeDialog();
+    });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") confirmRename();
+      if (e.key === "Escape") closeDialog();
+    });
+  },
+
+  deleteIcon(icon) {
+    const label = icon.querySelector(".icon-label");
+    const name = label.textContent;
+    
+    // Create delete confirmation dialog (Ubuntu style)
+    const dialog = document.createElement("div");
+    dialog.className = "rename-dialog-overlay";
+    dialog.innerHTML = `
+      <div class="rename-dialog">
+        <div class="rename-dialog-title">Move to Trash?</div>
+        <div class="delete-message">"${name}" will be moved to the Trash.</div>
+        <div class="rename-dialog-buttons">
+          <button class="rename-btn cancel">Cancel</button>
+          <button class="rename-btn confirm delete">Move to Trash</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(dialog);
+    
+    const closeDialog = () => {
+      dialog.remove();
+    };
+    
+    const confirmDelete = () => {
+      icon.style.transform = "scale(0)";
+      icon.style.opacity = "0";
+      icon.style.transition = "all 0.2s ease";
+      setTimeout(() => {
+        icon.remove();
+        this.selectedIcon = null;
+        this.positionIcons();
+      }, 200);
+      App.showNotification('🗑️', 'Moved to Trash', name);
+      closeDialog();
+    };
+    
+    dialog.querySelector(".cancel").addEventListener("click", closeDialog);
+    dialog.querySelector(".confirm").addEventListener("click", confirmDelete);
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) closeDialog();
+    });
+    document.addEventListener("keydown", function handler(e) {
+      if (e.key === "Escape") {
+        closeDialog();
+        document.removeEventListener("keydown", handler);
       }
     });
   },

@@ -303,12 +303,7 @@ const App = {
         shutdownScreen.innerHTML = `
             <div class="shutdown-content">
                 <div class="ubuntu-logo">
-                    <svg viewBox="0 0 100 100" width="80" height="80">
-                        <circle cx="50" cy="50" r="45" fill="none" stroke="#E95420" stroke-width="8"/>
-                        <circle cx="50" cy="10" r="8" fill="#E95420"/>
-                        <circle cx="15" cy="70" r="8" fill="#E95420"/>
-                        <circle cx="85" cy="70" r="8" fill="#E95420"/>
-                    </svg>
+                    <img src="assets/icons/ubuntu-logo.svg" alt="Ubuntu" width="80" height="80">
                 </div>
                 <div class="shutdown-text">Shutting down...</div>
             </div>
@@ -340,12 +335,18 @@ const App = {
                 const action = item.dataset.action;
                 this.playSound('sound-click');
                 switch(action) {
+                    case 'new-folder':
+                        Desktop.createNewFolder();
+                        break;
                     case 'open-terminal':
                         WindowManager.openApp('terminal');
                         break;
                     case 'change-bg':
                         Desktop.changeBackground();
                         this.showNotification('🖼️', 'Wallpaper Changed', 'Desktop background updated');
+                        break;
+                    case 'settings':
+                        WindowManager.openApp('settings');
                         break;
                 }
                 contextMenu.classList.add('hidden');

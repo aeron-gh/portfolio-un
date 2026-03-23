@@ -688,6 +688,7 @@ body {
     right: 0;
     bottom: 0;
     padding: 20px;
+    z-index: 1;
 }
 
 /* Desktop Icons Grid for dragging */
@@ -769,6 +770,112 @@ body {
     height: 1px;
     background: rgba(255, 255, 255, 0.1);
     margin: 4px 0;
+}
+
+/* Icon Context Menu */
+#icon-context-menu {
+    position: fixed;
+    background: rgba(40, 40, 40, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    padding: 6px 0;
+    min-width: 180px;
+    z-index: 2000;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* Rename/Delete Dialog - Ubuntu Style */
+.rename-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.rename-dialog {
+    background: #3d3d3d;
+    border-radius: 12px;
+    padding: 24px;
+    min-width: 320px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.rename-dialog-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.rename-input {
+    width: 100%;
+    padding: 10px 12px;
+    background: #2a2a2a;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.rename-input:focus {
+    border-color: #E95420;
+}
+
+.delete-message {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.rename-dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.rename-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.rename-btn.cancel {
+    background: #4a4a4a;
+    color: white;
+}
+
+.rename-btn.cancel:hover {
+    background: #5a5a5a;
+}
+
+.rename-btn.confirm {
+    background: #E95420;
+    color: white;
+}
+
+.rename-btn.confirm:hover {
+    background: #f56a30;
+}
+
+.rename-btn.confirm.delete {
+    background: #c01c28;
+}
+
+.rename-btn.confirm.delete:hover {
+    background: #e01b24;
 }
 
 /* Windows Container */
