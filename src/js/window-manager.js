@@ -124,16 +124,10 @@ const WindowManager = {
             'text-editor': {
                 title: 'Text Editor',
                 icon: '📝',
-                width: 600,
-                height: 500,
-                getContent: (options) => `
-                    <div class="text-editor">
-                        <div class="window-toolbar">
-                            <span style="color: rgba(255,255,255,0.6);">${options.filename || 'Untitled'}</span>
-                        </div>
-                        <div class="text-editor-content">${options.content || ''}</div>
-                    </div>
-                `
+                width: 800,
+                height: 600,
+                getContent: (options) => TextEditor.getEditorHTML(options),
+                onInit: (windowEl, options) => TextEditor.initEditor(windowEl, options)
             },
             browser: {
                 title: 'Firefox',

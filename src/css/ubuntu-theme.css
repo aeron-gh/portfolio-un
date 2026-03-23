@@ -29,6 +29,13 @@
     --transition-normal: 0.25s ease;
 }
 
+/* Tray SVG Icons */
+.tray-svg {
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) invert(1);
+}
+
 .ubuntu-btn {
     background: var(--ubuntu-orange);
     color: white;
