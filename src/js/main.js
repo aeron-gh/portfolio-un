@@ -618,23 +618,23 @@ const FileSystem = {
 const FileContents = {
     readme: `
 ╔══════════════════════════════════════════════════════════════╗
-║                    Welcome to My Portfolio                     ║
-║                                                                ║
-║  Hey! I'm Abhishek Agarwal                                    ║
-║  A Developer who loves building things                        ║
-║                                                                ║
-║  Navigate around this Ubuntu-style desktop to learn more!     ║
-║                                                                ║
-║  📂 Open "about_abhishek" folder to explore my work           ║
-║  ⬛ Try the Terminal - type 'help' for commands               ║
-║  🐙 Click GitHub icon to visit my profile                     ║
-║                                                                ║
+║                    Welcome to My Portfolio                         ║
+║                                                                    ║
+║  Hey! I'm Abhishek Agarwal                                         ║
+║  A Developer who loves building things                             ║
+║                                                                    ║
+║  Navigate around this Ubuntu-style desktop to learn more!          ║
+║                                                                    ║
+║  => Open "about_abhishek" folder to explore my work                ║
+║  => Try the Terminal - type 'help' for commands                    ║
+║  => Click GitHub icon to visit my profile                          ║
+║                                                                    ║  
 ╚══════════════════════════════════════════════════════════════╝
     `,
 
     about: `
 ┌─────────────────────────────────────┐
-│         ABOUT ME                    │
+│         ABOUT ME                        │
 └─────────────────────────────────────┘
 
 👋 Hi, I'm Abhishek Agarwal!
@@ -658,7 +658,7 @@ Feel free to explore my projects and reach out!
 
     skills: `
 ┌─────────────────────────────────────┐
-│         TECHNICAL SKILLS            │
+│         TECHNICAL SKILLS                │
 └─────────────────────────────────────┘
 
 💻 Languages:
@@ -686,16 +686,16 @@ Feel free to explore my projects and reach out!
 
     contact: `
 ┌─────────────────────────────────────┐
-│         GET IN TOUCH                │
+│         GET IN TOUCH                    │
 └─────────────────────────────────────┘
 
-📧 Email: [Your Email Here]
+📧 Email: agab0323@gmail.com
 
 🐙 GitHub: https://github.com/aeron-gh
 
-💼 LinkedIn: [Your LinkedIn Here]
+💼 LinkedIn: https://linkedin.com/in/aeron-li
 
-🐦 Twitter: [Your Twitter Here]
+🐦 Twitter: https://x.com/aeron_tw
 
 Feel free to reach out for:
    • Collaboration opportunities

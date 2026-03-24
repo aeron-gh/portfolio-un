@@ -17,7 +17,8 @@
     --window-border: #1A1A1A;
     --text-primary: #FFFFFF;
     --text-secondary: #AAAAAA;
-    --accent: var(--ubuntu-orange);
+    --accent-color: #E95420;
+    --accent: var(--accent-color);
     --hover-bg: rgba(255, 255, 255, 0.08);
     --active-bg: rgba(233, 84, 32, 0.3);
     

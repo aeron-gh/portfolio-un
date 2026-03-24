@@ -552,9 +552,18 @@ const Desktop = {
     }
   },
 
-  changeBackground() {
-    this.currentBgIndex++;
+  changeBackground(index) {
     const desktop = document.getElementById("desktop");
+    
+    // If index is provided, use it directly
+    if (typeof index === 'number' && index >= 0 && index < this.backgrounds.length) {
+      this.currentBgIndex = index;
+      desktop.style.backgroundImage = `url('${this.backgrounds[index]}')`;
+      return;
+    }
+    
+    // Otherwise cycle through
+    this.currentBgIndex++;
     
     // Cycle through: wallpapers -> default gradient -> wallpapers...
     if (this.currentBgIndex >= this.backgrounds.length) {
