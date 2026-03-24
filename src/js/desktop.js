@@ -32,6 +32,18 @@ const Desktop = {
     this.initActivitiesButton();
     this.initShowAppsButton();
     this.positionIcons();
+    this.setDefaultWallpaper();
+  },
+
+  setDefaultWallpaper() {
+    const desktop = document.getElementById("desktop");
+    if (desktop) {
+      // Set the default wallpaper (first in the list - Ubuntu Magenta)
+      desktop.style.backgroundImage = `url('${this.backgrounds[0]}')`;
+      desktop.style.backgroundSize = 'cover';
+      desktop.style.backgroundPosition = 'center';
+      this.currentBgIndex = 0;
+    }
   },
 
   positionIcons() {

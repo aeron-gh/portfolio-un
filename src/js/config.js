@@ -20,27 +20,21 @@ const CONFIG = {
     audio: "assets/audio/",
   },
 
-  // Desktop Backgrounds - Ubuntu 24.04 LTS and community wallpapers
+  // Desktop Backgrounds - Local Ubuntu wallpapers only
   backgrounds: [
+    "assets/wallpapers/ubuntu-logo-magenta-3840x2160-18138.png",
+    "assets/wallpapers/wp12561378-4k-ubuntu-wallpapers.jpg",
+    "assets/wallpapers/wp12561483-4k-ubuntu-wallpapers.jpg",
+    "assets/wallpapers/wp8398476-ubuntu-2004-wallpapers.jpg",
+    "assets/wallpapers/wp8398504-ubuntu-2004-wallpapers.jpg",
+    "assets/wallpapers/wp10240930-ubuntu-mate-wallpapers.jpg",
     "assets/wallpapers/wallpaperflare.com_wallpaper.jpg",
     "assets/wallpapers/wallpaperflare.com_wallpaper-un.jpg",
     "assets/wallpapers/wallpaperflare.com_wallpaper .jpg",
-    "https://raw.githubusercontent.com/ubuntu/wallpapers/main/Noble/Noble%20Numbat.png",
-    "https://i.imgur.com/Qn8LGZR.jpeg",
-    "https://raw.githubusercontent.com/ubuntu/yaru/master/backgrounds/Jammy-Jellyfish_WP_1920x1080.png",
-    "https://i.imgur.com/YQ8VWXK.jpeg",
-    "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80",
-    "https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=1920&q=80",
-    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80",
-    "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&q=80",
-    "https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=1920&q=80",
-    "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80",
-    "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=1920&q=80",
   ],
 
-  // Default Ubuntu gradient
-  defaultWallpaper:
-    "linear-gradient(135deg, #E95420 0%, #772953 50%, #2C001E 100%)",
+  // Default wallpaper - Ubuntu Magenta
+  defaultWallpaper: "url('assets/wallpapers/ubuntu-logo-magenta-3840x2160-18138.png')",
 
   // Audio URLs (external)
   audio: {
