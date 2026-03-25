@@ -23,7 +23,7 @@ const Terminal = {
             about: {
                 description: 'About me',
                 run: () => `<span class="terminal-success">╔══════════════════════════════════════════╗
-║          ABHISHEK AGARWAL                ║
+║          ABHISHEK AGARWAL                        ║
 ╚══════════════════════════════════════════╝</span>
 
 👋 Hey there! I'm a developer who loves building things.
@@ -41,9 +41,9 @@ Type <span class="terminal-highlight">skills</span> to see my skills, <span clas
 
 <span class="terminal-highlight">Languages:</span>
    JavaScript ████████████████░░░░ 80%
-   Python     ██████████████░░░░░░ 70%
    C++        ████████████░░░░░░░░ 60%
    TypeScript ██████████████░░░░░░ 70%
+   Python     █████░░░░░░░░░░░░░░░ 30%
 
 <span class="terminal-highlight">Frameworks & Tools:</span>
    • React.js / Node.js
