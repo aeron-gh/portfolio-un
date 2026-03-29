@@ -634,18 +634,7 @@ const Firefox = {
         return `
             <div class="ff-newtab">
                 <div class="ff-newtab-header">
-                    <svg class="ff-newtab-logo" viewBox="0 0 512 512" width="80" height="80">
-                        <defs>
-                            <linearGradient id="ff-grad-${Date.now()}" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#FF980E"/>
-                                <stop offset="30%" style="stop-color:#FF3647"/>
-                                <stop offset="60%" style="stop-color:#E31587"/>
-                                <stop offset="100%" style="stop-color:#9059FF"/>
-                            </linearGradient>
-                        </defs>
-                        <circle cx="256" cy="256" r="220" fill="url(#ff-grad-${Date.now()})"/>
-                        <path d="M256 100c-86.2 0-156 69.8-156 156 0 86.2 69.8 156 156 156V100z" fill="rgba(255,255,255,0.15)"/>
-                    </svg>
+                    <img class="ff-newtab-logo" src="assets/icons/Firefox.svg" width="80" height="80" alt="Firefox">
                 </div>
                 <div class="ff-search-wrapper">
                     <div class="ff-search-box">
