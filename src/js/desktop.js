@@ -226,10 +226,24 @@ const Desktop = {
                     </div>
                     <div class="ubuntu-app-item" data-app="browser">
                         <div class="ubuntu-app-icon ubuntu-icon-firefox">
-                            <svg viewBox="0 0 48 48" width="48" height="48">
-                                <circle cx="24" cy="24" r="20" fill="#FF7139"/>
-                                <circle cx="24" cy="24" r="14" fill="#FF9F5A"/>
-                                <path d="M24 10c-7.7 0-14 6.3-14 14s6.3 14 14 14c1.5 0 3-.2 4.4-.7-3.4-1.2-6.4-5.6-6.4-10.3 0-6 4-11 9.5-12.3-2.2-.5-4.5-.7-7.5-.7z" fill="#FF3B30"/>
+                            <svg viewBox="0 0 512 512" width="48" height="48">
+                                <defs>
+                                    <radialGradient id="app-globe" cx="30%" cy="30%" r="70%">
+                                        <stop offset="0%" stop-color="#00CDFF"/>
+                                        <stop offset="40%" stop-color="#0099FF"/>
+                                        <stop offset="100%" stop-color="#003EAA"/>
+                                    </radialGradient>
+                                    <linearGradient id="app-fox" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#FFBD4F"/>
+                                        <stop offset="50%" stop-color="#FF980E"/>
+                                        <stop offset="100%" stop-color="#FF3700"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="256" cy="256" r="180" fill="url(#app-globe)"/>
+                                <path d="M480 180C490 130 470 80 420 55C400 45 370 40 340 50C310 60 290 80 280 95C270 85 250 75 220 80C180 88 150 110 135 145C115 190 120 250 150 310C175 360 210 400 260 430C300 455 350 465 400 455C450 442 485 400 495 340C505 280 495 220 480 180Z" fill="url(#app-fox)"/>
+                                <path d="M135 145C100 110 60 95 30 100C15 102 5 115 10 135C20 170 55 200 100 230C130 250 145 270 150 310C120 250 100 210 90 180C75 140 95 130 135 145Z" fill="#FFBD4F"/>
+                                <path d="M340 50C370 40 400 45 420 55C445 68 465 90 470 120C475 150 465 175 445 195C420 220 385 230 350 225C320 220 295 200 285 170C275 140 285 100 310 70C320 58 330 52 340 50Z" fill="#FFF44F"/>
+                                <ellipse cx="420" cy="115" rx="12" ry="14" fill="#2D1F00"/>
                             </svg>
                         </div>
                         <span class="ubuntu-app-name">Firefox</span>
