@@ -1,0 +1,24 @@
+{
+  "name": "mraeron-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "GITHUB_DATA=snapshot bun scripts/build-desktop.ts && astro dev",
+    "build": "bun scripts/build-desktop.ts && astro build",
+    "preview": "astro preview --port 4321",
+    "desktop": "bun scripts/build-desktop.ts",
+    "test": "bun test tests/unit",
+    "test:build": "GITHUB_DATA=snapshot bun run build && bun test tests/build",
+    "test:e2e": "GITHUB_DATA=snapshot bun run build && playwright test",
+    "github:snapshot": "bun scripts/github-snapshot.ts"
+  },
+  "dependencies": {
+    "astro": "^7.3.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/bun": "^1.4.2",
+    "esbuild": "^0.28.2",
+    "linkedom": "^0.18.13"
+  }
+}

@@ -1,0 +1,11 @@
+---
+import { formatRich } from '../lib/rich';
+
+interface Props {
+  text: string;
+  vars?: Record<string, string>;
+}
+const { text, vars = {} } = Astro.props;
+const tokens = formatRich(text, vars);
+---
+{tokens.map((t) => (t.kind === 'text' ? t.text : t.kind === 'strong' ? <strong>{t.text}</strong> : <a href={t.href}>{t.text}</a>))}

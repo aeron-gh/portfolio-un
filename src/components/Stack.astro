@@ -1,0 +1,19 @@
+---
+import { profile } from '../content/profile';
+---
+<section id="stack" class="sec rv" aria-labelledby="stack-h">
+  <h2 class="label" id="stack-h"><span>Stack</span></h2>
+  <dl class="stack">
+    {profile.stack.map((g) => <><dt>{g.label}</dt><dd>{g.items.join(', ')}</dd></>)}
+  </dl>
+</section>
+
+<style is:global>
+  .stack { display: grid; grid-template-columns: 120px 1fr; gap: 10px 16px; font-size: 14px; }
+  .stack dt { color: var(--mut); }
+  .stack dd { color: var(--fg2); }
+  @media (max-width: 480px) {
+    .stack { grid-template-columns: 1fr; row-gap: 2px; }
+    .stack dd { margin-bottom: 10px; }
+  }
+</style>

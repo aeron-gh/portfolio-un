@@ -1,0 +1,50 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Machine from '../components/Machine.astro';
+import Now from '../components/Now.astro';
+import OpenSource from '../components/OpenSource.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+import Previews from '../components/Previews.astro';
+import CommandMenu from '../components/CommandMenu.astro';
+import Desk from '../components/Desk.astro';
+import Building from '../components/Building.astro';
+import Earlier from '../components/Earlier.astro';
+import Education from '../components/Education.astro';
+import Experience from '../components/Experience.astro';
+import Stack from '../components/Stack.astro';
+import { profile } from '../content/profile';
+import { roundedTotal, sinceLabel } from '../lib/github';
+import { formatRich, toPlainText } from '../lib/rich';
+import { loadGithub } from '../lib/site-data';
+
+const { data } = await loadGithub();
+const asOf = new Date(data.fetchedAt);
+const vars = {
+  total: roundedTotal(data.total),
+  since: sinceLabel(data.firstMergedAt, asOf) || String(asOf.getUTCFullYear()),
+};
+const description = toPlainText(formatRich(profile.lede, vars));
+const month = asOf.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+---
+<Base title={`${profile.name} · Compilers & cloud-native`} description={description}>
+  <Header />
+  <main id="main" class="col">
+    <Hero vars={vars} />
+    <Machine />
+    <Now month={month} />
+    <OpenSource data={data} vars={vars} />
+    {profile.experience.length > 0 && <Experience />}
+    <Building />
+    <Earlier />
+    {profile.education.length > 0 && <Education />}
+    <Stack />
+    <Contact latest={data.latest} />
+  </main>
+  <Footer />
+  <Previews />
+  <CommandMenu />
+  <Desk />
+</Base>

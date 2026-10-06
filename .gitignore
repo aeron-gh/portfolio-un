@@ -2,8 +2,8 @@
 node_modules/
 
 # Build output
-dist/
-build/
+/dist/
+/build/
 
 # IDE
 .vscode/
@@ -29,3 +29,14 @@ npm-debug.log*
 .env
 .env.local
 .env.*.local
+
+
+# Astro
+.astro/
+
+# Built copy of the Ubuntu desktop (Plan 2)
+public/desktop/
+
+# Playwright
+test-results/
+playwright-report/

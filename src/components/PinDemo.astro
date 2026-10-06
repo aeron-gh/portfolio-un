@@ -1,0 +1,55 @@
+---
+// Facts checked on 2026-10-06 against the ESP32 Series Datasheet (sections 2 and 3)
+// and the ESP-IDF GPIO docs ("GPIO Summary": "ADC2 pins cannot be used when Wi-Fi is used").
+const DATASHEET = { href: 'https://documentation.espressif.com/esp32_datasheet_en.pdf', label: 'ESP32 Series Datasheet' };
+const IDF_GPIO = {
+  href: 'https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/gpio.html',
+  label: 'ESP-IDF GPIO docs',
+};
+const PINS = [
+  { id: 'gpio0', label: 'GPIO0', fact: 'Strapping pin. Held low at reset (with GPIO2 low), the chip enters download (flashing) mode.', src: DATASHEET },
+  { id: 'gpio2', label: 'GPIO2', fact: 'Strapping pin. Must be low at reset to enter download mode.', src: DATASHEET },
+  { id: 'gpio12', label: 'GPIO12', fact: 'Strapping pin. High at reset switches the flash supply to 1.8 V, so a board with 3.3 V flash may not boot.', src: DATASHEET },
+  { id: 'gpio15', label: 'GPIO15', fact: 'Strapping pin. Low at reset silences the boot log on UART0.', src: DATASHEET },
+  { id: 'flash', label: 'GPIO6–11', fact: 'Used to talk to the flash. Not recommended for anything else.', src: DATASHEET },
+  { id: 'input', label: 'GPIO34–39', fact: 'Input only. No output driver and no internal pull-up or pull-down.', src: DATASHEET },
+  { id: 'adc2', label: 'ADC2', fact: "Can't be read while Wi-Fi is on. Use ADC1 pins instead.", src: IDF_GPIO },
+];
+const first = PINS[0];
+---
+<div class="pins" data-pins>
+  <p class="pins-cap">Try it: pick a pin on this ESP32.</p>
+  <div class="board">
+    <span class="chip" aria-hidden="true">ESP32</span>
+    <div class="pin-row" role="group" aria-label="ESP32 pins">
+      {PINS.map((p, i) => <button class="pin" type="button" data-pin={p.id} data-fact={p.fact} data-src={p.src.href} data-src-label={p.src.label} aria-pressed={i === 0 ? 'true' : 'false'}>{p.label}</button>)}
+    </div>
+  </div>
+  <p class="pin-card" aria-live="polite"><strong data-pin-label>{first.label}</strong> <span data-pin-fact>{first.fact}</span> <a class="src" href={first.src.href} data-pin-src>Source: {first.src.label}</a></p>
+  <ul class="pins-list">{PINS.map((p) => <li><strong>{p.label}</strong> {p.fact} <a class="u" href={p.src.href}>Source</a></li>)}</ul>
+</div>
+
+<script>
+  import '../scripts/pins';
+</script>
+
+<style is:global>
+  .pins { margin: 0 0 16px; }
+  .pins-cap { margin: 0 0 8px; color: var(--mut); font-size: 12.5px; }
+  .board { padding: 16px; border-radius: 12px; background: #13201a; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .06); }
+  .chip { display: grid; place-items: center; width: 120px; height: 56px; margin: 0 auto 14px; border-radius: 6px; background: #1b1b1b; box-shadow: inset 0 0 0 1px #2c2c2c; color: #8f8f8f; font: 400 11px var(--font-mono), ui-monospace, monospace; letter-spacing: .1em; }
+  .pin-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+  .pin { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px 4px 7px; border-radius: 999px; background: rgb(255 255 255 / .06); color: #cfd8d3; font: 400 11.5px var(--font-mono), ui-monospace, monospace; transition: background-color .2s, color .2s, transform .15s; }
+  .pin::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #c9a227; box-shadow: inset 0 0 0 2px #8a6d12; }
+  .pin:hover, .pin[aria-pressed="true"] { background: rgb(201 162 39 / .18); color: #fff; }
+  .pin:active { transform: scale(.96); }
+  .pin-card { margin-top: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; color: var(--fg2); font-size: 13.5px; }
+  .pin-card.flash { animation: pin-flash .3s var(--ease-out); }
+  @keyframes pin-flash { from { opacity: .35; } to { opacity: 1; } }
+  .pin-card strong { margin-right: 6px; color: var(--fg); font-family: var(--font-mono), ui-monospace, monospace; font-weight: 400; }
+  .pin-card .src { display: block; margin-top: 6px; color: var(--mut); font-size: 12px; }
+  .pins-list { display: grid; gap: 6px; color: var(--fg2); font-size: 13.5px; }
+  .pins-list strong { font-family: var(--font-mono), ui-monospace, monospace; font-weight: 400; }
+  .js .pins-list { display: none; }
+  html:not(.js) .board, html:not(.js) .pin-card, html:not(.js) .pins-cap { display: none; }
+</style>

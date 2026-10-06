@@ -1,0 +1,9 @@
+---
+import { profile } from '../content/profile';
+---
+<section id="experience" class="sec rv" aria-labelledby="experience-h">
+  <h2 class="label" id="experience-h"><span>Experience</span></h2>
+  <ul class="list">
+    {profile.experience.map((e) => <li class="row"><span><span class="t">{e.role} · {e.company}</span><span class="s">{e.impact}</span></span><span class="r">{e.dates}</span></li>)}
+  </ul>
+</section>

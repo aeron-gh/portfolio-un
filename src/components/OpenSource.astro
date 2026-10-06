@@ -1,0 +1,35 @@
+---
+import ActivityGraph from './ActivityGraph.astro';
+import ProjectBlock from './ProjectBlock.astro';
+import Rich from './Rich.astro';
+import { profile } from '../content/profile';
+import { buildWeeks, findPr, type GithubData } from '../lib/github';
+
+interface Props {
+  data: GithubData;
+  vars: { total: string; since: string };
+}
+const { data, vars } = Astro.props;
+// Half a year at most, so the dots stay readable (narrow screens show fewer, see ActivityGraph).
+const weeks = buildWeeks(data.perDay, data.firstMergedAt, new Date(data.fetchedAt), 26);
+---
+<section id="oss" class="sec rv" aria-labelledby="oss-h">
+  <h2 class="label" id="oss-h"><span>Open source</span><span>{vars.total} merged since {vars.since}</span></h2>
+  <ActivityGraph weeks={weeks} />
+  <div class="acc">
+    {profile.oss.map((b) => (
+      <ProjectBlock id={b.id} title={b.title} tag={b.tag} meta={b.meta} open={b.open}>
+        <p class="acc-desc"><Rich text={b.description} /></p>
+        <ul class="prs">
+          {b.featured.map((f, i) => {
+            const pr = findPr(data, f.repo, f.number);
+            return pr && (
+              <li style={`--i:${i}`}><a href={pr.url}><span class="num">#{pr.number}</span><span>{pr.title}</span><span class="ar" aria-hidden="true">↗</span></a></li>
+            );
+          })}
+        </ul>
+        <a class="all" href={b.all.href}>{b.all.label} ↗</a>
+      </ProjectBlock>
+    ))}
+  </div>
+</section>

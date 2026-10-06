@@ -1,0 +1,44 @@
+---
+import { profile } from '../content/profile';
+import type { RawPr } from '../lib/github';
+import { hasResume } from '../lib/site-data';
+
+interface Props {
+  latest: RawPr | null;
+}
+const { latest } = Astro.props;
+const resume = hasResume();
+const shortDate = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+---
+<section id="contact" class="sec rv" aria-labelledby="contact-h">
+  <h2 class="label" id="contact-h"><span>Contact</span></h2>
+  <p class="c-head">{profile.contactHeading}</p>
+  <button class="mail" type="button" data-copy={profile.email} aria-label={`Copy email address ${profile.email}`}><span class="mail-a">{profile.email}</span><span class="mail-b" aria-hidden="true">Copied to clipboard ✓</span></button>
+  <p class="c-links">
+    {profile.links.map((l) => <a class="u" href={l.href}>{l.label} ↗</a>)}
+    <a class="u" href={`mailto:${profile.email}`}>Email</a>
+    {resume && <a class="u" href={profile.resume} download>Resume ↓</a>}
+  </p>
+  <p class="c-status">
+    {latest && <span>Latest merge · <a class="u" href={latest.url}>{latest.repo}#{latest.number}</a> · {shortDate(latest.mergedAt)}</span>}
+    <span class="clock-line"><span data-clock data-tz={profile.timeZone}></span> {profile.timeZoneLabel}, my local time</span>
+  </p>
+</section>
+
+<script>
+  import '../scripts/copy';
+  import '../scripts/clock';
+</script>
+
+<style is:global>
+  .c-head { margin: 0 0 14px; font-size: 24px; font-weight: 500; line-height: 1.25; letter-spacing: -.02em; }
+  .mail { position: relative; display: inline-flex; max-width: 100%; height: 30px; overflow: hidden; font-size: 20px; text-align: left; }
+  .mail span { display: block; line-height: 30px; transition: transform .45s var(--ease-out); }
+  .mail-a { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: transform .45s var(--ease-out), background-size .35s; }
+  .mail:hover .mail-a { background-size: 100% 1px; }
+  .mail-b { position: absolute; left: 0; top: 100%; color: var(--ok); white-space: nowrap; }
+  .mail.copied span { transform: translateY(-100%); }
+  .c-links { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 18px; font-size: 14px; }
+  .c-status { display: grid; margin-top: 28px; color: var(--mut); font: 400 12px/1.9 var(--font-mono), ui-monospace, monospace; }
+  html:not(.js) .clock-line { display: none; }
+</style>

@@ -1,0 +1,3181 @@
+/* File Manager Styles - Ubuntu Nautilus */
+
+.file-manager.nautilus {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #1e1e1e;
+}
+
+/* Header Bar */
+.fm-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: #303030;
+    border-bottom: 1px solid rgba(0,0,0,0.3);
+}
+
+.fm-nav-buttons {
+    display: flex;
+    gap: 2px;
+}
+
+.fm-nav-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.8);
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.fm-nav-btn:hover:not(:disabled) {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.fm-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.fm-breadcrumb {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.breadcrumb-item {
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+}
+
+.breadcrumb-item:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.breadcrumb-item.current {
+    color: white;
+    font-weight: 500;
+}
+
+.breadcrumb-sep {
+    color: rgba(255,255,255,0.3);
+    font-size: 12px;
+}
+
+.fm-header-actions {
+    display: flex;
+    gap: 2px;
+}
+
+.fm-action-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.8);
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.fm-action-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+/* Search Bar */
+.fm-search-bar {
+    padding: 8px;
+    background: #303030;
+    border-bottom: 1px solid rgba(0,0,0,0.3);
+}
+
+.fm-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: white;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.15s;
+}
+
+.fm-search-input:focus {
+    border-color: #E95420;
+    background: rgba(0,0,0,0.4);
+}
+
+.fm-search-input::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+/* Body Layout */
+.fm-body {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.fm-sidebar {
+    width: 200px;
+    background: #252525;
+    border-right: 1px solid rgba(0,0,0,0.3);
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.fm-sidebar-section {
+    padding: 4px 12px;
+}
+
+.fm-sidebar-title {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.fm-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    color: rgba(255,255,255,0.85);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.1s;
+    border-radius: 0;
+    margin: 1px 0;
+}
+
+.fm-sidebar-item:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.fm-sidebar-item.active {
+    background: rgba(233, 84, 32, 0.25);
+    color: white;
+}
+
+.fm-sidebar-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.fm-sidebar-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 8px 12px;
+}
+
+/* File Content Area */
+.fm-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.fm-files {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+    align-content: start;
+}
+
+/* Grid View */
+.fm-files.fm-view-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 8px;
+}
+
+.fm-view-grid .fm-file {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.1s;
+}
+
+.fm-view-grid .fm-file:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.fm-view-grid .fm-file.selected {
+    background: rgba(233, 84, 32, 0.3);
+}
+
+.fm-view-grid .fm-file-icon {
+    font-size: 40px;
+    margin-bottom: 6px;
+    transition: transform 0.1s;
+}
+
+.fm-view-grid .fm-file:hover .fm-file-icon {
+    transform: scale(1.05);
+}
+
+.fm-view-grid .fm-file-name {
+    color: white;
+    font-size: 11px;
+    word-break: break-word;
+    max-width: 100%;
+    line-height: 1.3;
+}
+
+/* List View */
+.fm-files.fm-view-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.fm-view-list .fm-file {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.fm-view-list .fm-file:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.fm-view-list .fm-file.selected {
+    background: rgba(233, 84, 32, 0.3);
+}
+
+.fm-view-list .fm-file-icon {
+    font-size: 24px;
+    width: 32px;
+    text-align: center;
+}
+
+.fm-view-list .fm-file-name {
+    color: white;
+    font-size: 13px;
+    flex: 1;
+}
+
+/* Empty State */
+.fm-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: rgba(255,255,255,0.4);
+    padding: 40px;
+}
+
+.fm-empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.fm-empty-text {
+    font-size: 14px;
+}
+
+/* Status Bar */
+.fm-statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    background: #252525;
+    border-top: 1px solid rgba(0,0,0,0.3);
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+}
+
+.fm-status-path {
+    font-family: 'Ubuntu Mono', monospace;
+    color: rgba(255,255,255,0.4);
+}
+
+/* Terminal Styles - Ubuntu GNOME Terminal */
+
+.terminal-window {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #300A24;
+}
+
+.terminal-header-bar {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    background: #241F31;
+    border-bottom: 1px solid rgba(0,0,0,0.3);
+}
+
+.terminal-tabs {
+    display: flex;
+    gap: 2px;
+}
+
+.terminal-tab {
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px 6px 0 0;
+    color: rgba(255,255,255,0.8);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.terminal-tab.active {
+    background: #300A24;
+}
+
+.terminal-tab-close {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.terminal-tab-close:hover {
+    background: rgba(255,255,255,0.2);
+    opacity: 1;
+}
+
+.terminal {
+    flex: 1;
+    background: #300A24;
+    padding: 8px 12px;
+    font-family: 'Ubuntu Mono', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #EEEEEC;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.terminal:focus {
+    outline: none;
+}
+
+.terminal-line {
+    min-height: 20px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.terminal-input-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Ubuntu Terminal Colors */
+.terminal-prompt {
+    color: #8AE234;
+    font-weight: bold;
+}
+
+.terminal-user {
+    color: #8AE234;
+    font-weight: bold;
+}
+
+.terminal-at {
+    color: #EEEEEC;
+    font-weight: bold;
+}
+
+.terminal-host {
+    color: #8AE234;
+    font-weight: bold;
+}
+
+.terminal-colon {
+    color: #EEEEEC;
+}
+
+.terminal-path {
+    color: #729FCF;
+    font-weight: bold;
+}
+
+.terminal-dollar {
+    color: #EEEEEC;
+}
+
+.terminal-command {
+    color: #EEEEEC;
+}
+
+.terminal-output {
+    color: #EEEEEC;
+}
+
+.terminal-error {
+    color: #EF2929;
+}
+
+.terminal-success {
+    color: #8AE234;
+}
+
+.terminal-highlight {
+    color: #FCE94F;
+}
+
+.terminal-link {
+    color: #729FCF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.terminal-link:hover {
+    color: #8AAED6;
+}
+
+.terminal-input {
+    flex: 1;
+    min-width: 50%;
+    background: transparent;
+    border: none;
+    color: #EEEEEC;
+    font-family: 'Ubuntu Mono', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    outline: none;
+    caret-color: #EEEEEC;
+    padding: 0;
+    margin: 0;
+}
+
+.terminal-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 17px;
+    background: #EEEEEC;
+    animation: terminalBlink 1s step-end infinite;
+    vertical-align: text-bottom;
+}
+
+@keyframes terminalBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Scrollbar for terminal */
+.terminal::-webkit-scrollbar {
+    width: 12px;
+}
+
+.terminal::-webkit-scrollbar-track {
+    background: #300A24;
+}
+
+.terminal::-webkit-scrollbar-thumb {
+    background: #5C3D4E;
+    border-radius: 6px;
+    border: 3px solid #300A24;
+}
+
+.terminal::-webkit-scrollbar-thumb:hover {
+    background: #7A5568;
+}
+
+.terminal-success {
+    color: #8AE234;
+}
+
+.terminal-highlight {
+    color: #FCE94F;
+}
+
+.terminal-link {
+    color: #729FCF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.terminal-link:hover {
+    color: #8AAED6;
+}
+
+.terminal-input-line {
+    display: flex;
+    align-items: center;
+}
+
+.terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #C5C8C6;
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    caret-color: #26A269;
+}
+
+.terminal-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background: #26A269;
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+/* Text Editor Styles */
+
+.text-editor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.text-editor-content {
+    flex: 1;
+    padding: 20px;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #E0E0E0;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+.text-editor-content h1 {
+    color: var(--ubuntu-orange);
+    font-size: 24px;
+    margin-bottom: 16px;
+}
+
+.text-editor-content h2 {
+    color: #26A269;
+    font-size: 18px;
+    margin: 20px 0 10px 0;
+}
+
+.text-editor-content p {
+    margin-bottom: 12px;
+}
+
+.text-editor-content a {
+    color: #3584E4;
+}
+
+.text-editor-content ul {
+    margin-left: 20px;
+    margin-bottom: 12px;
+}
+
+/* Browser Styles */
+
+.browser {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.browser-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.browser-nav-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: var(--hover-bg);
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background var(--transition-fast);
+}
+
+.browser-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.browser-url {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 6px 16px;
+    color: white;
+    font-size: 13px;
+}
+
+.browser-content {
+    flex: 1;
+    background: white;
+}
+
+.browser-content iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Firefox Browser Styles */
+.browser.firefox {
+    background: #1c1b22;
+}
+
+.firefox-tabbar {
+    display: flex;
+    align-items: flex-end;
+    background: #1c1b22;
+    padding: 8px 8px 0 8px;
+    min-height: 40px;
+}
+
+.firefox-tabs {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    flex: 1;
+}
+
+.firefox-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #42414d;
+    border-radius: 8px 8px 0 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    max-width: 200px;
+    min-width: 100px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.firefox-tab:hover {
+    background: #52515d;
+}
+
+.firefox-tab.active {
+    background: #2b2a33;
+    color: white;
+}
+
+.firefox-tab-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.firefox-tab-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.firefox-tab-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+}
+
+.firefox-tab-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+.firefox-new-tab {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 18px;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    margin-left: 4px;
+}
+
+.firefox-new-tab:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.firefox-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #2b2a33;
+}
+
+.firefox-nav-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.firefox-nav-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.firefox-nav-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.firefox-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.firefox-nav-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.firefox-urlbar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #42414d;
+    border-radius: 8px;
+    padding: 6px 12px;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+}
+
+.firefox-urlbar:focus-within {
+    background: #1c1b22;
+    border-color: #0060df;
+}
+
+.firefox-urlbar-icon {
+    font-size: 14px;
+    color: #3fe1b0;
+}
+
+.firefox-url-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 14px;
+    outline: none;
+}
+
+.firefox-url-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.firefox-urlbar-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.15s;
+}
+
+.firefox-urlbar-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffbd4f;
+}
+
+.firefox-toolbar-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.firefox-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.15s;
+}
+
+.firefox-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.browser.firefox .browser-content {
+    background: #ffffff;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Firefox New Tab Page */
+.firefox-newtab {
+    height: 100%;
+    background: linear-gradient(180deg, #1c1b22 0%, #2b2a33 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+}
+
+.firefox-newtab-logo {
+    margin-bottom: 30px;
+    opacity: 0.8;
+}
+
+.firefox-search-container {
+    width: 100%;
+    max-width: 580px;
+    margin-bottom: 40px;
+}
+
+.firefox-search-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #42414d;
+    border-radius: 8px;
+    padding: 12px 16px;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.firefox-search-box:focus-within {
+    border-color: #0060df;
+    box-shadow: 0 0 0 3px rgba(0, 96, 223, 0.3);
+}
+
+.firefox-search-icon {
+    color: rgba(255, 255, 255, 0.6);
+    flex-shrink: 0;
+}
+
+.firefox-search-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 15px;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.firefox-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.firefox-search-engine {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.firefox-search-engine img {
+    width: 16px;
+    height: 16px;
+}
+
+/* Firefox Shortcuts */
+.firefox-shortcuts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    max-width: 580px;
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+.firefox-shortcut {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.firefox-shortcut:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.firefox-shortcut-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.firefox-shortcut span {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 12px;
+    text-align: center;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Firefox Pocket Section */
+.firefox-pocket-section {
+    width: 100%;
+    max-width: 800px;
+}
+
+.firefox-pocket-section h3 {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.firefox-pocket-section h3::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    background: #ef4056;
+    border-radius: 4px;
+}
+
+.firefox-pocket-stories {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.firefox-pocket-card {
+    background: #42414d;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.firefox-pocket-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.firefox-pocket-thumb {
+    height: 100px;
+    background-size: cover;
+    background-position: center;
+}
+
+.firefox-pocket-info {
+    padding: 12px;
+}
+
+.firefox-pocket-title {
+    display: block;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.firefox-pocket-source {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 11px;
+}
+
+/* Firefox Find Bar */
+.firefox-findbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #2b2a33;
+    border-top: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.firefox-findbar.hidden {
+    display: none;
+}
+
+.firefox-find-input {
+    flex: 1;
+    max-width: 240px;
+    padding: 6px 10px;
+    background: #42414d;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: white;
+    font-size: 13px;
+    outline: none;
+}
+
+.firefox-find-input:focus {
+    border-color: #0060df;
+}
+
+.firefox-find-status {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    min-width: 40px;
+}
+
+.firefox-find-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.firefox-find-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.firefox-find-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-left: auto;
+}
+
+.firefox-find-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Firefox Tab Favicon */
+.firefox-tab-favicon {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+/* Firefox Window Controls in Tab Bar */
+.firefox-window-controls {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+    padding-right: 8px;
+}
+
+.firefox-window-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.15s;
+}
+
+.firefox-window-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.firefox-window-btn.close:hover {
+    background: #e74c3c;
+    color: white;
+}
+
+/* Enhanced URL Bar */
+.firefox-urlbar-icon.secure svg {
+    vertical-align: middle;
+}
+
+.firefox-urlbar-action {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.firefox-urlbar-action:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* ===== NEW FIREFOX PROTON UI STYLES ===== */
+
+/* Firefox Browser Container */
+.browser.firefox {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #1c1b22;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    position: relative;
+}
+
+.browser.firefox.private-mode {
+    background: #25003e;
+}
+
+/* Tab Bar */
+.ff-tabbar {
+    display: flex;
+    background: #1c1b22;
+    padding: 8px 8px 0;
+    min-height: 44px;
+}
+
+.browser.firefox.private-mode .ff-tabbar {
+    background: #25003e;
+}
+
+.ff-tabs-container {
+    flex: 1;
+    overflow: hidden;
+}
+
+.ff-tabs-wrapper {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+/* Tab Styles */
+.ff-tab {
+    display: flex;
+    align-items: center;
+    background: #42414d;
+    border-radius: 8px 8px 0 0;
+    min-width: 76px;
+    max-width: 220px;
+    height: 36px;
+    padding: 0 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.ff-tab:hover {
+    background: #52515d;
+}
+
+.ff-tab.active {
+    background: #2b2a33;
+}
+
+.browser.firefox.private-mode .ff-tab {
+    background: #3d1a5c;
+}
+
+.browser.firefox.private-mode .ff-tab:hover {
+    background: #4d2a6c;
+}
+
+.browser.firefox.private-mode .ff-tab.active {
+    background: #321a46;
+}
+
+.ff-tab.pinned {
+    min-width: 40px;
+    max-width: 40px;
+    padding: 0;
+    justify-content: center;
+}
+
+.ff-tab-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    padding: 0 4px;
+}
+
+.ff-tab-favicon {
+    font-size: 14px;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ff-tab-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.ff-tab.active .ff-tab-title {
+    color: white;
+}
+
+/* Tab Loading Spinner */
+.ff-tab-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: #0060df;
+    border-radius: 50%;
+    animation: ff-spin 0.8s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes ff-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Tab Audio Indicator */
+.ff-tab-audio {
+    background: none;
+    border: none;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.ff-tab-audio:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.ff-tab-audio.muted {
+    opacity: 0.6;
+}
+
+/* Tab Close Button */
+.ff-tab-close {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: all 0.15s;
+}
+
+.ff-tab:hover .ff-tab-close,
+.ff-tab.active .ff-tab-close {
+    opacity: 1;
+}
+
+.ff-tab-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+/* New Tab Button */
+.ff-new-tab-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    flex-shrink: 0;
+    transition: all 0.15s;
+}
+
+.ff-new-tab-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Toolbar */
+.ff-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: #2b2a33;
+}
+
+.browser.firefox.private-mode .ff-toolbar {
+    background: #321a46;
+}
+
+/* Navigation Group */
+.ff-nav-group {
+    display: flex;
+    gap: 4px;
+}
+
+.ff-nav-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.ff-nav-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.ff-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.ff-nav-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* URL Bar */
+.ff-urlbar-container {
+    flex: 1;
+}
+
+.ff-urlbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #42414d;
+    border-radius: 8px;
+    padding: 0 12px;
+    height: 36px;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+}
+
+.ff-urlbar:focus-within {
+    border-color: #0060df;
+    background: #1c1b22;
+}
+
+.ff-security-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ff-security-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.ff-url-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 14px;
+}
+
+.ff-url-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.ff-urlbar-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.ff-urlbar-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.ff-urlbar-btn.bookmarked {
+    color: #0060df;
+}
+
+.ff-urlbar-btn.bookmarked svg path {
+    fill: #0060df;
+}
+
+/* Toolbar Actions */
+.ff-toolbar-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.ff-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.15s;
+}
+
+.ff-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.ff-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 8px;
+    color: #0060df;
+}
+
+/* Bookmarks Bar */
+.ff-bookmarks-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: #2b2a33;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    overflow-x: auto;
+}
+
+.browser.firefox.private-mode .ff-bookmarks-bar {
+    background: #321a46;
+}
+
+.ff-bookmark-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+}
+
+.ff-bookmark-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.ff-bookmark-favicon {
+    font-size: 12px;
+}
+
+.ff-bookmark-more {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ff-bookmark-more:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Browser Content */
+.ff-content {
+    flex: 1;
+    background: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.ff-page-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.ff-loading-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: #0060df;
+    width: 0;
+    transition: width 0.3s;
+    z-index: 10;
+}
+
+.ff-loading-bar.loading {
+    animation: ff-loading 2s infinite;
+}
+
+@keyframes ff-loading {
+    0% { width: 0; }
+    50% { width: 70%; }
+    100% { width: 100%; opacity: 0; }
+}
+
+.ff-content iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* New Tab Page */
+.ff-newtab {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #2b2a33 0%, #1c1b22 100%);
+    padding: 40px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.browser.firefox.private-mode .ff-newtab {
+    background: linear-gradient(180deg, #321a46 0%, #25003e 100%);
+}
+
+.ff-newtab-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.ff-newtab-logo {
+    width: 80px;
+    height: 80px;
+}
+
+/* Search Box */
+.ff-search-wrapper {
+    max-width: 600px;
+    margin: 0 auto 48px;
+}
+
+.ff-search-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #42414d;
+    border-radius: 8px;
+    padding: 0 16px;
+    height: 48px;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+}
+
+.ff-search-box:focus-within {
+    border-color: #0060df;
+    background: #2b2a33;
+}
+
+.ff-search-icon {
+    color: rgba(255, 255, 255, 0.6);
+    flex-shrink: 0;
+}
+
+.ff-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 15px;
+}
+
+.ff-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Shortcuts Section */
+.ff-shortcuts-section {
+    max-width: 700px;
+    margin: 0 auto 48px;
+}
+
+.ff-shortcuts-section h3 {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.ff-shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.ff-shortcut {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.ff-shortcut:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.ff-shortcut-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+}
+
+.ff-shortcut-label {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 12px;
+    text-align: center;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Pocket Section */
+.ff-pocket-section {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.ff-pocket-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.ff-pocket-logo {
+    font-size: 16px;
+}
+
+.ff-pocket-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.ff-pocket-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.ff-pocket-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+}
+
+.ff-pocket-image {
+    width: 100%;
+    height: 100px;
+}
+
+.ff-pocket-info {
+    padding: 12px;
+}
+
+.ff-pocket-title {
+    display: block;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.ff-pocket-source {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 11px;
+}
+
+/* Find Bar */
+.ff-findbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #2b2a33;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.ff-findbar.hidden {
+    display: none;
+}
+
+.ff-find-input-container {
+    display: flex;
+    align-items: center;
+    background: #42414d;
+    border-radius: 4px;
+    padding: 0 8px;
+    height: 28px;
+}
+
+.ff-find-input {
+    width: 200px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 13px;
+}
+
+.ff-find-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.ff-find-count {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.ff-find-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ff-find-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.ff-find-option {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.ff-find-option input {
+    margin: 0;
+}
+
+.ff-find-close {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+
+.ff-find-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Downloads Panel */
+.ff-downloads-panel {
+    position: absolute;
+    top: 80px;
+    right: 8px;
+    width: 350px;
+    background: #2b2a33;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    z-index: 100;
+    overflow: hidden;
+}
+
+.ff-downloads-panel.hidden {
+    display: none;
+}
+
+.ff-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    font-weight: 500;
+}
+
+.ff-panel-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.ff-downloads-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.ff-empty-message {
+    padding: 32px;
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+}
+
+.ff-download-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.ff-download-icon {
+    font-size: 24px;
+}
+
+.ff-download-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.ff-download-name {
+    color: white;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+}
+
+.ff-download-status {
+    font-size: 12px;
+}
+
+.ff-download-progress {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.ff-download-bar {
+    height: 100%;
+    background: #0060df;
+    transition: width 0.2s;
+}
+
+.ff-download-complete {
+    color: #30e60b;
+}
+
+.ff-download-action {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.ff-download-action:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.ff-panel-footer {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.ff-show-all-downloads {
+    color: #0060df;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.ff-show-all-downloads:hover {
+    text-decoration: underline;
+}
+
+/* Firefox Main Menu */
+.ff-main-menu {
+    position: absolute;
+    top: 80px;
+    right: 8px;
+    width: 280px;
+    background: #2b2a33;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    z-index: 100;
+    padding: 8px 0;
+}
+
+.ff-main-menu.hidden {
+    display: none;
+}
+
+.ff-menu-section {
+    padding: 4px 0;
+}
+
+.ff-menu-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 4px 0;
+}
+
+.ff-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.9);
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.ff-menu-item:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.ff-menu-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.ff-menu-shortcut {
+    margin-left: auto;
+    color: rgba(255,255,255,0.4);
+    font-size: 11px;
+}
+
+.ff-menu-zoom {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    color: rgba(255,255,255,0.9);
+    font-size: 13px;
+}
+
+.ff-zoom-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.ff-zoom-btn:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.ff-zoom-level {
+    width: 40px;
+    text-align: center;
+}
+
+/* Sidebar */
+.ff-sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 320px;
+    background: #2b2a33;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+}
+
+.ff-sidebar.hidden {
+    display: none;
+}
+
+.ff-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.ff-sidebar-tabs {
+    display: flex;
+    gap: 4px;
+}
+
+.ff-sidebar-tab {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.ff-sidebar-tab:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.ff-sidebar-tab.active {
+    background: rgba(255,255,255,0.12);
+    color: white;
+}
+
+.ff-sidebar-close {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.ff-sidebar-close:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.ff-sidebar-content {
+    flex: 1;
+    overflow: hidden;
+}
+
+.ff-sidebar-panel {
+    display: none;
+    height: 100%;
+    flex-direction: column;
+}
+
+.ff-sidebar-panel.active {
+    display: flex;
+}
+
+.ff-sidebar-search {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.ff-sidebar-search input {
+    width: 100%;
+    padding: 8px 12px;
+    background: #42414d;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 13px;
+    outline: none;
+}
+
+.ff-sidebar-search input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+.ff-sidebar-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.ff-sidebar-group {
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 8px 12px 4px;
+}
+
+.ff-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ff-sidebar-item:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.ff-sidebar-favicon {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.ff-sidebar-title {
+    flex: 1;
+    color: rgba(255,255,255,0.9);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Tab Context Menu */
+.ff-tab-context-menu {
+    position: fixed;
+    background: #2b2a33;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    z-index: 1000;
+    padding: 8px 0;
+    min-width: 200px;
+}
+
+.ff-tab-context-menu.hidden {
+    display: none;
+}
+
+.ff-context-item {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.9);
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ff-context-item:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.ff-context-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 4px 0;
+}
+
+/* Responsive Styles */
+@media (max-width: 700px) {
+    .ff-shortcuts-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .ff-pocket-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .ff-sidebar {
+        width: 100%;
+    }
+}
+
+@media (max-width: 500px) {
+    .ff-shortcuts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .ff-pocket-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .ff-bookmarks-bar {
+        display: none;
+    }
+}
+
+/* Hide old Firefox styles - they're replaced by new .ff-* styles */
+.firefox-tabbar,
+.firefox-tabs,
+.firefox-tab,
+.firefox-toolbar,
+.firefox-urlbar,
+.firefox-newtab,
+.firefox-shortcuts,
+.firefox-pocket-section {
+    /* Old styles preserved for backward compatibility but not used */
+}
+
+/* Project Card */
+
+.project-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.project-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.project-title {
+    font-size: 16px;
+    color: var(--ubuntu-orange);
+    margin-bottom: 8px;
+}
+
+.project-description {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 12px;
+}
+
+.project-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.project-tag {
+    background: rgba(233, 84, 32, 0.2);
+    color: var(--ubuntu-orange);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+}
+
+.project-links {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.project-link {
+    color: #3584E4;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.project-link:hover {
+    text-decoration: underline;
+}
+
+/* About Section */
+.about-content {
+    padding: 30px;
+    max-width: 600px;
+}
+
+.about-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.about-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #E95420, #C34113);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+}
+
+.about-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent-color, #E95420);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.about-name {
+    font-size: 28px;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.about-title {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+.about-section {
+    margin-bottom: 25px;
+}
+
+.about-section-title {
+    color: var(--ubuntu-orange);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.about-text {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+}
+
+.skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-tag {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.social-links {
+    display: flex;
+    gap: 12px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.social-link:hover {
+    background: var(--ubuntu-orange);
+}
+
+/* Settings App */
+.settings-app {
+    display: flex;
+    height: 100%;
+    background: #1e1e1e;
+}
+
+.settings-sidebar {
+    width: 220px;
+    background: #2d2d2d;
+    padding: 12px 0;
+    border-right: 1px solid rgba(0,0,0,0.3);
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: rgba(255,255,255,0.85);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s;
+}
+
+.settings-item:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.settings-item.active {
+    background: rgba(233, 84, 32, 0.25);
+    color: white;
+}
+
+.settings-item span {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+.settings-content {
+    flex: 1;
+    padding: 24px 32px;
+    overflow-y: auto;
+}
+
+.settings-content h2 {
+    color: white;
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 24px;
+}
+
+.settings-section {
+    margin-bottom: 32px;
+}
+
+.settings-section h3 {
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+.theme-selector {
+    display: flex;
+    gap: 16px;
+}
+
+.theme-option {
+    text-align: center;
+    cursor: pointer;
+}
+
+.theme-preview {
+    width: 100px;
+    height: 70px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 3px solid transparent;
+    transition: all 0.15s;
+}
+
+.theme-preview.dark {
+    background: linear-gradient(to bottom, #2d2d2d 30%, #1e1e1e 30%);
+}
+
+.theme-preview.light {
+    background: linear-gradient(to bottom, #e0e0e0 30%, #f5f5f5 30%);
+}
+
+.theme-option.active .theme-preview {
+    border-color: #E95420;
+}
+
+.theme-option span {
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+}
+
+/* Settings - Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255,255,255,0.15);
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--accent-color, #E95420);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+/* Settings - Row Layout */
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.settings-row:last-child {
+    border-bottom: none;
+}
+
+.settings-row-info {
+    flex: 1;
+    margin-right: 16px;
+}
+
+.settings-row-title {
+    color: rgba(255,255,255,0.95);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.settings-row-subtitle {
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+}
+
+/* Settings - Slider Rows */
+.settings-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+}
+
+.settings-slider-row.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.slider-icon {
+    font-size: 20px;
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.slider-container {
+    flex: 1;
+}
+
+.slider-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    color: rgba(255,255,255,0.85);
+    font-size: 13px;
+}
+
+.settings-slider {
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+    outline: none;
+}
+
+.settings-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-color, #E95420);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.settings-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-color, #E95420);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Settings - Select Dropdown */
+.settings-select {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    color: white;
+    padding: 8px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    min-width: 140px;
+}
+
+.settings-select:focus {
+    border-color: var(--accent-color, #E95420);
+}
+
+.settings-select option {
+    background: #2d2d2d;
+    color: white;
+}
+
+/* Settings - Accent Color Selector */
+.accent-color-selector {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.accent-color-option {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.accent-color-option:hover {
+    transform: scale(1.1);
+}
+
+.accent-color-option.active {
+    border-color: white;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+}
+
+/* Settings - Wallpaper Grid */
+.wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.wallpaper-item {
+    aspect-ratio: 16/10;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s;
+    background-color: #333;
+}
+
+.wallpaper-item:hover {
+    border-color: rgba(255,255,255,0.3);
+    transform: scale(1.02);
+}
+
+.wallpaper-item.active {
+    border-color: var(--accent-color, #E95420);
+    box-shadow: 0 0 0 2px rgba(233, 84, 32, 0.3);
+}
+
+/* Settings - Alert Sound Selector */
+.alert-sound-selector {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.alert-sound-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    min-width: 80px;
+}
+
+.alert-sound-option:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.alert-sound-option.active {
+    border-color: var(--accent-color, #E95420);
+    background: rgba(233, 84, 32, 0.15);
+}
+
+.alert-icon {
+    font-size: 24px;
+}
+
+.alert-sound-option span:last-child {
+    color: rgba(255,255,255,0.8);
+    font-size: 12px;
+}
+
+/* Settings - Power Mode Selector */
+.power-mode-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.power-mode-option {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.power-mode-option:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.power-mode-option.active {
+    border-color: var(--accent-color, #E95420);
+    background: rgba(233, 84, 32, 0.15);
+}
+
+.power-mode-icon {
+    font-size: 28px;
+}
+
+.power-mode-info {
+    flex: 1;
+}
+
+.power-mode-title {
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.power-mode-desc {
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+}
+
+/* Settings - Display Preview */
+.display-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.display-monitor {
+    position: relative;
+}
+
+.display-screen {
+    width: 180px;
+    height: 110px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    border: 3px solid #333;
+    overflow: hidden;
+}
+
+.display-wallpaper {
+    width: 100%;
+    height: 100%;
+    background: url('../../assets/wallpapers/wallpaper-01.avif') center/cover;
+}
+
+.display-stand {
+    width: 60px;
+    height: 24px;
+    background: linear-gradient(to bottom, #444, #333);
+    margin: 0 auto;
+    border-radius: 0 0 8px 8px;
+}
+
+.display-info {
+    margin-top: 12px;
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+}
+
+/* Settings - Info Grid */
+.info-grid {
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+}
+
+.info-value {
+    color: rgba(255,255,255,0.95);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* Settings - About Section */
+.about-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 24px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 16px;
+    margin-bottom: 16px;
+}
+
+.about-logo img {
+    display: block;
+}
+
+.about-title h3 {
+    color: white;
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 6px 0;
+}
+
+.about-title p {
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+    margin: 0;
+}
+
+.about-links {
+    display: flex;
+    gap: 12px;
+}
+
+.about-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.9);
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.about-link:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.about-link span {
+    font-size: 18px;
+}
+
+/* Night Light Effect */
+body.night-light::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 147, 41, 0.15);
+    pointer-events: none;
+    z-index: 99999;
+}
+
+/* Light Theme Support */
+body.light-theme {
+    --bg-primary: #f5f5f5;
+    --bg-secondary: #ffffff;
+    --text-primary: #2d2d2d;
+    --text-secondary: rgba(0,0,0,0.6);
+}
+
+body.light-theme .settings-app {
+    background: #f5f5f5;
+}
+
+body.light-theme .settings-sidebar {
+    background: #e8e8e8;
+    border-right-color: rgba(0,0,0,0.1);
+}
+
+body.light-theme .settings-item {
+    color: rgba(0,0,0,0.85);
+}
+
+body.light-theme .settings-item:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+body.light-theme .settings-item.active {
+    background: rgba(233, 84, 32, 0.2);
+    color: #c34113;
+}
+
+body.light-theme .settings-content {
+    background: #f5f5f5;
+}
+
+body.light-theme .settings-content h2 {
+    color: #2d2d2d;
+}
+
+body.light-theme .settings-section h3 {
+    color: rgba(0,0,0,0.6);
+}
+
+body.light-theme .settings-row-title {
+    color: rgba(0,0,0,0.95);
+}
+
+body.light-theme .settings-row-subtitle {
+    color: rgba(0,0,0,0.5);
+}
+
+body.light-theme .settings-row {
+    border-bottom-color: rgba(0,0,0,0.08);
+}
+
+body.light-theme .toggle-slider {
+    background-color: rgba(0,0,0,0.2);
+}
+
+body.light-theme .settings-slider {
+    background: rgba(0,0,0,0.15);
+}
+
+body.light-theme .slider-label {
+    color: rgba(0,0,0,0.85);
+}
+
+body.light-theme .info-grid {
+    background: rgba(0,0,0,0.03);
+}
+
+body.light-theme .info-row {
+    border-bottom-color: rgba(0,0,0,0.05);
+}
+
+body.light-theme .info-label {
+    color: rgba(0,0,0,0.6);
+}
+
+body.light-theme .info-value {
+    color: rgba(0,0,0,0.95);
+}
+
+body.light-theme .about-header,
+body.light-theme .display-preview {
+    background: rgba(0,0,0,0.03);
+}
+
+body.light-theme .about-title h3 {
+    color: #2d2d2d;
+}
+
+body.light-theme .about-link {
+    background: rgba(0,0,0,0.05);
+    color: rgba(0,0,0,0.9);
+}
+
+body.light-theme .about-link:hover {
+    background: rgba(0,0,0,0.08);
+}
+
+body.light-theme .power-mode-option,
+body.light-theme .alert-sound-option {
+    background: rgba(0,0,0,0.05);
+}
+
+body.light-theme .power-mode-option:hover,
+body.light-theme .alert-sound-option:hover {
+    background: rgba(0,0,0,0.08);
+}
+
+body.light-theme .power-mode-title {
+    color: #2d2d2d;
+}
+
+body.light-theme .power-mode-desc {
+    color: rgba(0,0,0,0.5);
+}
+
+body.light-theme .alert-sound-option span:last-child {
+    color: rgba(0,0,0,0.8);
+}
+
+body.light-theme .theme-option span {
+    color: rgba(0,0,0,0.8);
+}
+
+body.light-theme .settings-select {
+    background: rgba(0,0,0,0.05);
+    border-color: rgba(0,0,0,0.15);
+    color: #2d2d2d;
+}

@@ -1,0 +1,42 @@
+<div class="desk" data-desk role="dialog" aria-modal="true" aria-label="Ubuntu desktop" tabindex="-1" hidden>
+  <div class="desk-boot" data-desk-boot aria-hidden="true">
+    <div><div class="desk-logo"></div><div class="desk-dots"><i></i><i></i><i></i><i></i><i></i></div></div>
+  </div>
+  <p class="desk-hint" aria-live="polite">Press Esc to come back to the page</p>
+  <div class="desk-error" data-desk-error role="alert" hidden>
+    <p>Couldn't start the machine.</p>
+    <p class="desk-error-actions"><button type="button" data-desk-retry>Retry</button><button type="button" data-desk-close>Close</button></p>
+  </div>
+</div>
+
+<script>
+  import '../scripts/machine';
+</script>
+
+<style is:global>
+  .desk { position: fixed; inset: 0; z-index: 90; overflow: hidden; background: #000; transform-origin: 0 0; outline: none; }
+  .desk[hidden] { display: none; }
+  .desk-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #2c001e; }
+  .desk-boot { position: absolute; inset: 0; display: grid; place-items: center; background: #000; transition: opacity .35s; }
+  .desk.ready .desk-boot { opacity: 0; pointer-events: none; }
+  .desk-boot > div { opacity: 0; animation: desk-in .3s .65s forwards; }
+  @keyframes desk-in { to { opacity: 1; } }
+  .desk-logo { position: relative; width: 54px; height: 54px; margin: 0 auto 22px; border: 5px solid #fff; border-radius: 50%; }
+  .desk-logo::after { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: #e95420; }
+  .desk-dots { display: flex; gap: 8px; justify-content: center; }
+  .desk-dots i { width: 7px; height: 7px; border-radius: 50%; background: #555; animation: desk-dot 1.2s infinite; }
+  .desk-dots i:nth-child(2) { animation-delay: .15s; }
+  .desk-dots i:nth-child(3) { animation-delay: .3s; }
+  .desk-dots i:nth-child(4) { animation-delay: .45s; }
+  .desk-dots i:nth-child(5) { animation-delay: .6s; }
+  @keyframes desk-dot { 0%, 100% { background: #555; } 40% { background: #e95420; } }
+  .desk-hint { position: absolute; left: 50%; bottom: 22px; padding: 6px 12px; border-radius: 999px; background: rgb(0 0 0 / .72); color: #fff; font-size: 12px; pointer-events: none; opacity: 0; transform: translateX(-50%); transition: opacity .3s; }
+  .desk.hint .desk-hint { opacity: 1; }
+  .desk-error { position: absolute; inset: 0; display: grid; place-content: center; gap: 14px; background: #000; color: #eee; font-size: 15px; text-align: center; }
+  .desk-error[hidden] { display: none; }
+  .desk-error-actions { display: flex; gap: 10px; justify-content: center; }
+  .desk-error button { padding: 6px 14px; border: 1px solid #444; border-radius: 8px; color: #eee; }
+  .desk-error button:hover { border-color: #888; }
+  html.desk-open { overflow: hidden; }
+  html.desk-open .mini { visibility: hidden; }
+</style>

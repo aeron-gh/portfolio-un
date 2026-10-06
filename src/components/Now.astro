@@ -1,0 +1,19 @@
+---
+import Rich from './Rich.astro';
+import { profile } from '../content/profile';
+
+interface Props {
+  month: string;
+}
+const { month } = Astro.props;
+---
+<section id="now" class="sec rv" aria-labelledby="now-h">
+  <h2 class="label" id="now-h"><span>Now</span><span>{month}</span></h2>
+  <p class="now"><span class="now-d" aria-hidden="true"></span><span><Rich text={profile.now} /></span></p>
+</section>
+
+<style is:global>
+  .now { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--chip); color: var(--fg2); }
+  .now-d { width: 7px; height: 7px; margin-top: 9px; border-radius: 50%; background: var(--acc); animation: ring 2.2s infinite; }
+  .now strong { color: var(--fg); font-weight: 500; }
+</style>

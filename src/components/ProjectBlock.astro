@@ -1,0 +1,28 @@
+---
+import '../styles/blocks.css';
+
+interface Props {
+  id: string;
+  title: string;
+  tag?: string;
+  meta: string;
+  open?: boolean;
+  preview?: string;
+}
+const { id, title, tag, meta, open = false, preview } = Astro.props;
+---
+<div class={`acc-item${open ? ' open' : ''}`} data-acc>
+  <h3 class="acc-h">
+    <button class="acc-head" type="button" id={`${id}-head`} aria-expanded={open ? 'true' : 'false'} aria-controls={`${id}-body`} data-pv={preview}>
+      <span><span class="acc-t">{title}{tag && <span class="tag">{tag}</span>}</span><span class="acc-s">{meta}</span></span>
+      <span class="plus" aria-hidden="true">+</span>
+    </button>
+  </h3>
+  <div class="acc-body" id={`${id}-body`} role="region" aria-labelledby={`${id}-head`}>
+    <div class="acc-inner"><slot /></div>
+  </div>
+</div>
+
+<script>
+  import '../scripts/accordion';
+</script>

@@ -1,0 +1,9 @@
+---
+import { profile } from '../content/profile';
+---
+<section id="earlier" class="sec rv" aria-labelledby="earlier-h">
+  <h2 class="label" id="earlier-h"><span>Earlier</span></h2>
+  <ul class="list">
+    {profile.earlier.map((r) => <li><a class="row" href={r.href} data-pv={r.preview}><span class="t">{r.title}</span><span class="r">{r.description}</span></a></li>)}
+  </ul>
+</section>

@@ -1,0 +1,9 @@
+---
+import { profile } from '../content/profile';
+---
+<section id="education" class="sec rv" aria-labelledby="education-h">
+  <h2 class="label" id="education-h"><span>Education</span></h2>
+  <ul class="list">
+    {profile.education.map((e) => <li class="row"><span><span class="t">{e.degree} · {e.school}</span>{e.note && <span class="s">{e.note}</span>}</span><span class="r">{e.years}</span></li>)}
+  </ul>
+</section>

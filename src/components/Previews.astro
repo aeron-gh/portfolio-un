@@ -1,0 +1,46 @@
+<div class="prev" data-prev aria-hidden="true">
+  <div class="pv pv-trail" data-k="opentrail">
+    <svg viewBox="0 0 250 146" preserveAspectRatio="none"><polyline fill="none" stroke="#3ddc84" stroke-width="2" points="0,110 22,104 40,112 62,92 84,96 104,74 126,82 146,60 168,66 188,44 210,52 230,30 250,34"></polyline></svg>
+    <span class="pv-lbl">opentrail.mraeron.tech</span><span class="pv-tag">Follow real trades, in the open.</span>
+  </div>
+  <div class="pv pv-part" data-k="partlore">
+    <svg viewBox="0 0 250 146"><g stroke="#2a2620" stroke-width="2" fill="none"><rect x="90" y="42" width="70" height="50" rx="4"></rect><path d="M100 42v-10M115 42v-10M130 42v-10M145 42v-10M100 92v10M115 92v10M130 92v10M145 92v10"></path></g><circle cx="99" cy="51" r="3" fill="#2a2620"></circle></svg>
+    <span class="pv-lbl">PARTLORE</span><span class="pv-tag">What the datasheet doesn't tell you.</span>
+  </div>
+  <div class="pv pv-code" data-k="collab">
+    <s style="width:46%;background:#c678dd"></s><s style="width:78%;background:#3a3a44"></s><s style="width:62%;background:#61afef"></s>
+    <s style="width:84%;background:#3a3a44"></s><s style="width:40%;background:#e5c07b"></s><s style="width:70%;background:#3a3a44"></s>
+    <span class="pv-cur" style="left:132px;top:30px;background:#ff6b6b"><em style="background:#ff6b6b">A</em></span>
+    <span class="pv-cur" style="left:84px;top:78px;background:#4dabf7"><em style="background:#4dabf7">B</em></span>
+  </div>
+  <div class="pv pv-ttt" data-k="ttt"><pre> <span>X</span> │ O │ <span>X</span>
+───┼───┼───
+ O │ <span>X</span> │
+───┼───┼───
+   │ O │ <span>X</span></pre></div>
+</div>
+
+<script>
+  import '../scripts/preview';
+</script>
+
+<style is:global>
+  .prev { position: fixed; left: 0; top: 0; z-index: 50; width: 250px; height: 146px; overflow: hidden; border-radius: 10px; pointer-events: none; opacity: 0; scale: .9; box-shadow: 0 22px 50px -10px rgb(0 0 0 / .35); transition: opacity .2s, scale .35s var(--ease-out); will-change: transform; }
+  .prev.show { opacity: 1; scale: 1; }
+  .pv { position: absolute; inset: 0; opacity: 0; transition: opacity .18s; }
+  .pv.on { opacity: 1; }
+  .pv svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pv-trail { background: #0d1310; color: #cfe9d9; }
+  .pv-trail polyline { stroke-dasharray: 420; stroke-dashoffset: 420; transition: stroke-dashoffset 1.2s cubic-bezier(.4, 0, .2, 1); }
+  .pv-trail.on polyline { stroke-dashoffset: 0; }
+  .pv-part { background: #f3efe4; color: #2a2620; }
+  .pv-lbl { position: absolute; left: 12px; top: 10px; font: 400 10px var(--font-mono), ui-monospace, monospace; opacity: .75; }
+  .pv-tag { position: absolute; left: 12px; bottom: 10px; font-size: 12px; }
+  .pv-code { padding: 16px; background: #16161a; }
+  .pv-code s { display: block; height: 6px; margin: 0 0 10px; border-radius: 3px; text-decoration: none; }
+  .pv-cur { position: absolute; width: 2px; height: 12px; }
+  .pv-cur em { position: absolute; left: 0; top: -13px; padding: 1px 4px; border-radius: 3px; color: #fff; font: 500 8px var(--font-sans), system-ui, sans-serif; font-style: normal; }
+  .pv-ttt { display: grid; place-items: center; background: #0c0c0c; }
+  .pv-ttt pre { color: #d4d4d4; font: 400 15px/1.35 var(--font-mono), ui-monospace, monospace; }
+  .pv-ttt pre span { color: #3ddc84; }
+</style>

@@ -1,0 +1,38 @@
+---
+import { profile } from '../content/profile';
+---
+<section class="machine rv" aria-label="Ubuntu machine">
+  <button class="mini" type="button" data-boot data-mini aria-label="Boot my Ubuntu machine">
+    <span class="m-tb" aria-hidden="true"><span>Activities</span><span data-clock data-tz={profile.timeZone}></span><span>⏻</span></span>
+    <span class="m-dock" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="m-term" aria-hidden="true"><span class="m-term-bar"></span><span class="m-body"><span class="m-pre" data-term>{'$ whoami\naeron · compilers & cloud-native'}</span></span></span>
+    <span class="m-hint" aria-hidden="true">⏻ Click to boot</span>
+  </button>
+  <p class="m-cap"><span>My Ubuntu machine</span><span class="mut m-desk">runs in your browser · <kbd>U</kbd></span><span class="mut m-phone">Boot it on a laptop</span></p>
+</section>
+
+<script>
+  import '../scripts/terminal';
+  import '../scripts/clock';
+</script>
+
+<style is:global>
+  .machine { margin-top: 40px; }
+  .mini { position: relative; display: block; width: 100%; aspect-ratio: 16 / 8; overflow: hidden; border-radius: 12px; text-align: left; background: radial-gradient(circle at 26% 46%, #e95420 0, transparent 40%), radial-gradient(circle at 80% 76%, #8a2a7f 0, transparent 50%), #2c001e; box-shadow: 0 10px 30px -12px rgb(0 0 0 / .35); filter: saturate(.9) brightness(.9); transition: transform .5s var(--ease-out), box-shadow .5s, filter .5s; }
+  .mini:hover, .mini:focus-visible { transform: translateY(-3px); filter: none; box-shadow: 0 24px 48px -18px rgb(0 0 0 / .5); }
+  .m-tb { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; height: 15px; padding: 0 8px; background: rgb(0 0 0 / .75); color: #ddd; font-size: 8px; font-weight: 500; }
+  .m-dock { position: absolute; left: 7px; top: 26px; display: flex; flex-direction: column; gap: 5px; padding: 5px; border-radius: 7px; background: rgb(0 0 0 / .35); }
+  .m-dock i { display: block; width: 13px; height: 13px; border-radius: 3px; background: rgb(255 255 255 / .2); }
+  .m-dock i:first-child { background: #e95420; }
+  .m-term { position: absolute; left: 17%; top: 21%; display: flex; flex-direction: column; width: 60%; height: 68%; overflow: hidden; border-radius: 7px; background: rgb(18 18 18 / .94); box-shadow: 0 12px 30px rgb(0 0 0 / .4); }
+  .m-term-bar { display: block; flex: none; height: 12px; background: #2a2a2a; }
+  /* Like a real terminal: newest lines stay at the bottom, old ones slide off the top. */
+  .m-body { display: flex; flex: 1; flex-direction: column; justify-content: flex-end; min-height: 0; overflow: hidden; }
+  .m-pre { display: block; flex: none; padding: 7px 9px; color: #d4d4d4; font: 400 9px/1.6 var(--font-mono), ui-monospace, monospace; white-space: pre-wrap; }
+  .m-pre .pr { color: #3ddc84; }
+  .m-hint { position: absolute; left: 50%; top: 50%; padding: 6px 12px; border-radius: 999px; background: rgb(0 0 0 / .6); backdrop-filter: blur(6px); color: #fff; font-size: 12px; font-weight: 500; white-space: nowrap; opacity: 0; transform: translate(-50%, -50%) scale(.9); transition: opacity .3s, transform .4s var(--ease-out); }
+  .mini:hover .m-hint, .mini:focus-visible .m-hint { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .m-cap { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; font-size: 13px; }
+  .m-phone { display: none; }
+  @media (hover: none), (max-width: 719px) { .m-desk { display: none; } .m-phone { display: inline; } .m-hint { display: none; } }
+</style>

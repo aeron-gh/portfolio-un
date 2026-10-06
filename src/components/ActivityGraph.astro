@@ -1,0 +1,55 @@
+---
+import type { GraphWeek } from '../lib/github';
+
+interface Props {
+  weeks: GraphWeek[];
+}
+const { weeks } = Astro.props;
+// Narrow graphs (under 360px) show only the newest RECENT weeks; older ones get the `old` class.
+const RECENT = 17;
+const recent = Math.min(weeks.length, RECENT);
+const old = (wi: number) => weeks.length - 1 - wi >= RECENT;
+const label = (date: string, n: number) =>
+  `${n ? `${n} merged` : 'No merges'} · ${new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}`;
+---
+{weeks.length > 0 && (
+  <figure class="graph" style={`--weeks:${weeks.length};--recent:${recent}`} data-graph>
+    <span class="g-tip" data-tip-el aria-hidden="true"></span>
+    <div class="g-months" aria-hidden="true">{weeks.map((w, wi) => <span class={old(wi) ? 'old' : undefined}>{w.month ?? ''}</span>)}</div>
+    <div class="g-grid" role="img" aria-label={`Merged pull requests per day over the last ${weeks.length} weeks`}>
+      {weeks.map((w, wi) => w.days.map((d, di) => (
+        <i class={`l${d.level}${d.future ? ' fut' : ''}${old(wi) ? ' old' : ''}`} style={`--dl:${wi * 35 + di * 12}ms`} data-tip={d.future ? undefined : label(d.date, d.count)}></i>
+      )))}
+    </div>
+    <figcaption class="g-foot"><span>Merged pull requests, by day</span><span class="g-leg" aria-hidden="true">less <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i> more</span></figcaption>
+  </figure>
+)}
+
+<script>
+  import '../scripts/graph';
+</script>
+
+<style is:global>
+  .graph { container-type: inline-size; position: relative; margin: 0 0 18px; padding: 14px 16px 12px; border: 1px solid var(--line); border-radius: 12px; }
+  .g-months, .g-grid { display: grid; grid-template-columns: repeat(var(--weeks), minmax(0, 1fr)); gap: 4px; }
+  .g-months { height: 14px; margin-bottom: 6px; overflow: hidden; color: var(--mut); font-size: 11px; white-space: nowrap; }
+  .g-grid { grid-template-rows: repeat(7, auto); grid-auto-flow: column; }
+  .g-grid i { display: block; aspect-ratio: 1; border-radius: 3px; }
+  .graph .l0 { background: var(--line); }
+  .graph .l1 { background: color-mix(in srgb, var(--fg) 28%, var(--bg)); }
+  .graph .l2 { background: color-mix(in srgb, var(--fg) 55%, var(--bg)); }
+  .graph .l3 { background: var(--fg); }
+  .g-grid .fut { visibility: hidden; }
+  .js .g-grid i { opacity: 0; scale: .4; transition: opacity .4s, scale .5s var(--ease-out); transition-delay: var(--dl); }
+  .js .rv.in .g-grid i { opacity: 1; scale: 1; }
+  @media (hover: hover) { .g-grid i[data-tip]:hover { outline: 1.5px solid var(--acc); outline-offset: 1px; } }
+  .g-foot { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; color: var(--mut); font-size: 12px; }
+  .g-leg { display: flex; align-items: center; gap: 4px; }
+  .g-leg i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; }
+  .g-tip { position: absolute; left: 0; top: 0; z-index: 2; padding: 4px 8px; border-radius: 6px; background: var(--fg); color: var(--bg); font-size: 11px; white-space: nowrap; pointer-events: none; opacity: 0; transform: translateX(-50%); transition: opacity .15s; }
+  .g-tip.show { opacity: 1; }
+  @container (max-width: 360px) {
+    .g-months, .g-grid { grid-template-columns: repeat(var(--recent), minmax(0, 1fr)); }
+    .graph .old { display: none; }
+  }
+</style>

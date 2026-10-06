@@ -1,0 +1,23 @@
+---
+import { profile } from '../content/profile';
+
+const year = new Date().getUTCFullYear();
+---
+<footer class="col">
+  <div class="foot">
+    <span>© {year} {profile.name}</span>
+    <span class="foot-r"><button class="theme-t" type="button" data-theme-toggle>Theme: <span data-theme-label>System</span></button><span class="mono k-desk">U to boot · Ctrl K</span></span>
+  </div>
+</footer>
+
+<script>
+  import '../scripts/theme-toggle';
+</script>
+
+<style is:global>
+  .foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 56px; padding: 18px 0 28px; border-top: 1px solid var(--line); color: var(--mut); font-size: 12px; }
+  .foot-r { display: flex; gap: 16px; align-items: center; }
+  .theme-t { color: var(--mut); font-size: 12px; transition: color .2s; }
+  .theme-t:hover { color: var(--fg); }
+  @media (hover: none) { .k-desk { display: none; } }
+</style>

@@ -1,0 +1,18 @@
+---
+import PinDemo from './PinDemo.astro';
+import ProjectBlock from './ProjectBlock.astro';
+import Rich from './Rich.astro';
+import { profile } from '../content/profile';
+---
+<section id="building" class="sec rv" aria-labelledby="building-h">
+  <h2 class="label" id="building-h"><span>Building</span><a class="u" href="https://github.com/aeron-playground">aeron-playground</a></h2>
+  <div class="acc">
+    {profile.building.map((b) => (
+      <ProjectBlock id={b.id} title={b.title} meta={b.meta} open={b.open} preview={b.preview}>
+        <p class="acc-desc"><Rich text={b.description} /></p>
+        {b.pinDemo && <PinDemo />}
+        <p class="b-meta"><span class="status">{b.status}</span>{b.links.map((l) => <a class="u" href={l.href}>{l.label} ↗</a>)}</p>
+      </ProjectBlock>
+    ))}
+  </div>
+</section>

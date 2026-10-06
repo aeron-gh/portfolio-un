@@ -1,0 +1,27 @@
+---
+import { profile } from '../content/profile';
+import { hasResume } from '../lib/site-data';
+---
+<div class="pal" data-pal data-resume={hasResume() ? profile.resume : ''} hidden>
+  <div class="pal-box" role="dialog" aria-modal="true" aria-label="Command menu">
+    <input class="pal-in" data-pal-input type="text" placeholder="Type a command…" autocomplete="off" spellcheck="false" role="combobox" aria-label="Command" aria-expanded="true" aria-controls="pal-list" aria-autocomplete="list" />
+    <ul class="pal-list" id="pal-list" role="listbox" aria-label="Commands" data-pal-list></ul>
+  </div>
+</div>
+
+<script>
+  import '../scripts/shortcuts';
+</script>
+
+<style is:global>
+  .pal { position: fixed; inset: 0; z-index: 80; display: flex; justify-content: center; align-items: flex-start; padding: 14vh 16px 0; background: color-mix(in srgb, var(--bg) 40%, transparent); backdrop-filter: blur(3px); opacity: 0; transition: opacity .2s; }
+  .pal[hidden] { display: none; }
+  .pal.open { opacity: 1; }
+  .pal-box { width: 440px; max-width: 100%; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--bg); box-shadow: 0 30px 80px -20px rgb(0 0 0 / .4); transform: scale(.96) translateY(-6px); transition: transform .25s var(--ease-out); }
+  .pal.open .pal-box { transform: none; }
+  .pal-in { width: 100%; padding: 14px 16px; border: 0; border-bottom: 1px solid var(--line); outline: none; background: transparent; color: var(--fg); font: 400 15px var(--font-sans), system-ui, sans-serif; }
+  .pal-list { max-height: 50vh; overflow-y: auto; padding: 6px; }
+  .pal-list li { display: flex; justify-content: space-between; align-items: center; padding: 9px 10px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+  .pal-list li[aria-selected="true"] { background: var(--chip); }
+  .pal-empty { color: var(--mut); cursor: default; }
+</style>
