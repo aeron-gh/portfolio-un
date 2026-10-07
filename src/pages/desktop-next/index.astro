@@ -1,0 +1,49 @@
+---
+import { Font } from 'astro:assets';
+import Desktop from '../../desktop/Desktop.svelte';
+import '../../desktop/theme/base.css';
+import '../../desktop/theme/tokens.css';
+import { profile } from '../../content/profile';
+import { hasResume, loadGithub } from '../../lib/site-data';
+import { buildSeed } from '../../desktop/fs/seed';
+import type { Env } from '../../desktop/env';
+import osRelease from '../../desktop/fs/system/os-release?raw';
+import lsbRelease from '../../desktop/fs/system/lsb-release?raw';
+import issue from '../../desktop/fs/system/issue?raw';
+import bashrc from '../../desktop/fs/system/skel/bashrc?raw';
+import profileRc from '../../desktop/fs/system/skel/profile?raw';
+import bashLogout from '../../desktop/fs/system/skel/bash_logout?raw';
+import wallpaperLight from '../../desktop/assets/wallpapers/ubuntu-light.avif?url';
+import wallpaperDark from '../../desktop/assets/wallpapers/ubuntu-dark.avif?url';
+import avatar from '../../desktop/assets/avatar.avif?url';
+import placeholders from '../../desktop/assets/wallpapers/placeholders.json';
+
+const { data } = await loadGithub();
+const env: Env = { fullName: profile.name, avatar, wallpaperLight, wallpaperDark, placeholders };
+const seed = buildSeed({
+  profile,
+  github: data,
+  system: { osRelease, lsbRelease, issue, bashrc, profileRc, bashLogout },
+  assets: { avatar, wallpaperLight, wallpaperDark },
+  resume: hasResume() ? profile.resume : null,
+  now: data.fetchedAt,
+});
+---
+<!doctype html>
+<html lang="en" data-desktop="loading">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ubuntu</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <Font cssVariable="--font-ubuntu" preload />
+  </head>
+  <body>
+    <div class="plymouth" id="plymouth" role="status" aria-label="Starting Ubuntu">
+      <div class="plymouth-spinner" aria-hidden="true"></div>
+      <div class="plymouth-logo" aria-hidden="true"><span class="sym"></span>ubuntu</div>
+    </div>
+    <Desktop client:only="svelte" seed={seed} env={env} />
+  </body>
+</html>

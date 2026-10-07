@@ -103,6 +103,9 @@ export function close(): void {
   hideTimer = window.setTimeout(() => { root.hidden = true; }, 200);
   setPageInert(false); // before focusing: inert elements cannot take focus
   trigger?.focus();
+  // Opened with Ctrl K from nothing focused, the trigger is <body>, which cannot take focus.
+  // Leave the closing input anyway, or U would count as typing until the browser's next redraw.
+  if (root.contains(document.activeElement)) (document.activeElement as HTMLElement).blur();
 }
 
 async function run(i: number) {

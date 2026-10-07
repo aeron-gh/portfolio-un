@@ -24,12 +24,19 @@ async function openHarness(page: Page) {
   await desktop(page).locator('#desktop-area').click({ position: { x: 700, y: 400 } });
 }
 
-test('the embedded desktop says ready quickly, with no boot screen', async ({ page }) => {
+// The page's clock is frozen, so these check "no timed wait" instead of real speed:
+// a busy machine cannot fail them, and the old fake 3 s boot could not pass them.
+async function freezeClock(page: Page) {
+  await page.clock.install({ time: new Date('2026-10-07T10:00:00') });
+  // Pause a minute ahead: some real time passes after install(), and no page is loaded yet to fire timers.
+  await page.clock.pauseAt(new Date('2026-10-07T10:01:00'));
+}
+
+test('the embedded desktop says ready without waiting on a timer, with no boot screen', async ({ page }) => {
+  await freezeClock(page);
   await page.route('**/__harness', (r) => r.fulfill({ contentType: 'text/html', body: HARNESS }));
   await page.goto('/__harness');
   await expect.poll(() => msgs(page)).toContain('desktop:ready');
-  // Measured inside the harness page, so a busy test machine does not count. The old boot waited 3 s.
-  expect(await page.evaluate(() => (window as unknown as { readyAt: number }).readyAt)).toBeLessThan(2500);
   await expect(desktop(page).locator('#desktop')).toBeVisible();
   await expect(desktop(page).locator('#boot-screen')).toBeHidden();
 });
@@ -75,11 +82,9 @@ test('Restart also asks to exit', async ({ page }) => {
   await expect.poll(() => msgs(page)).toContain('desktop:exit');
 });
 
-test('the standalone desktop boots without the old 3-second wait', async ({ page }) => {
+test('the standalone desktop boots within 1 s of page time, not the old 3 s wait', async ({ page }) => {
+  await freezeClock(page);
   await page.goto('/desktop/');
+  await page.clock.runFor(1000);
   await expect(page.locator('#desktop')).toBeVisible();
-  // Measured inside the page (time since its own navigation started), so a busy test machine
-  // does not count. The old fake boot took at least 3000 ms.
-  const shownAt = await page.evaluate(() => performance.now());
-  expect(shownAt).toBeLessThan(2500);
 });

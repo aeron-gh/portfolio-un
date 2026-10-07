@@ -45,6 +45,15 @@ test('Escape closes the menu and gives focus back', async ({ page }) => {
   await expect(trigger).toBeFocused();
 });
 
+test('closing a keyboard-opened menu does not leave focus in its hidden input', async ({ page }) => {
+  await page.goto('/');
+  await page.keyboard.press('Control+k');
+  await expect(page.getByRole('combobox')).toBeFocused();
+  await page.keyboard.press('Escape');
+  // Checked at once: Chrome only moves focus off a hidden element at its next redraw, which is late on a busy machine.
+  expect(await page.evaluate(() => !!document.activeElement?.closest('[data-pal]'))).toBe(false);
+});
+
 test('U boots the machine, but not while typing', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(() => {

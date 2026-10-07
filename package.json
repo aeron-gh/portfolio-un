@@ -13,7 +13,9 @@
     "github:snapshot": "bun scripts/github-snapshot.ts"
   },
   "dependencies": {
-    "astro": "^7.3.5"
+    "@astrojs/svelte": "^9.0.1",
+    "astro": "^7.3.5",
+    "svelte": "^5.57.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

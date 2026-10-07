@@ -1,0 +1,40 @@
+/* GNOME Shell 50 and Yaru (Ubuntu 26.04) values. */
+:root {
+  --font: var(--font-ubuntu), 'Ubuntu Sans', sans-serif;
+  --pad: 6px;
+  --margin: 4px;
+  --radius: 8px;
+  --modal-radius: 16px;
+  --ease: cubic-bezier(.25, .46, .45, .94);
+  --dur: 250ms;
+  --accent: #E95420;
+
+  /* System surfaces: dark in every style (Yaru shell). */
+  --panel-bg: #131313; /* $yaru_panel_bg_color */
+  --panel-fg: #f2f2f2; /* $yaru_panel_fg_color */
+  --sys-bg: #222222; /* $system_base_color, GDM */
+  --sys-fg: #f2f2f2; /* $system_fg_color */
+  --sys-border: rgb(242 242 242 / .1);
+  --sys-hover: rgb(242 242 242 / .1);
+
+  /* App surfaces (libadwaita dialogs): follow the style. */
+  --bg: #fafafb;
+  --fg: #222226;
+  --card: #fff;
+  --hover: rgb(34 34 38 / .08);
+  --dim-fg: rgb(34 34 38 / .55);
+  --border: rgb(34 34 38 / .15);
+  --shadow: 0 2px 8px rgb(0 0 0 / .2), 0 0 0 1px rgb(0 0 0 / .05);
+  color-scheme: light;
+}
+
+:root[data-style="dark"] {
+  --bg: #36363a;
+  --fg: #fff;
+  --card: #49494e;
+  --hover: rgb(255 255 255 / .08);
+  --dim-fg: rgb(255 255 255 / .55);
+  --border: rgb(255 255 255 / .12);
+  --shadow: 0 2px 8px rgb(0 0 0 / .45), 0 0 0 1px rgb(255 255 255 / .06);
+  color-scheme: dark;
+}

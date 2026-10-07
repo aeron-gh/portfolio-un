@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
+import svelte from '@astrojs/svelte';
 
 // Dev only: Astro's dev server does not serve public/desktop/index.html for "/desktop/",
 // so map it by hand (the built site and Cloudflare already do this).
@@ -14,7 +15,9 @@ const desktopIndex = {
 };
 
 export default defineConfig({
-  vite: { plugins: [desktopIndex] },
+  integrations: [svelte()],
+  // Icons must stay separate files: inlining dozens of them as base64 would blow the JS budget.
+  vite: { plugins: [desktopIndex], build: { assetsInlineLimit: 0 } },
   site: 'https://mraeron.tech',
   // Astro 7 defaults to 'jsx' whitespace rules, which can eat spaces between
   // inline elements. `true` collapses whitespace but keeps single spaces.
@@ -38,6 +41,15 @@ export default defineConfig({
       styles: ['normal'],
       subsets: ['latin'],
       fallbacks: ['ui-monospace', 'monospace'],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: 'Ubuntu Sans',
+      cssVariable: '--font-ubuntu',
+      weights: [400, 700, 800],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['sans-serif'],
     },
   ],
 });

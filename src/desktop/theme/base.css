@@ -1,0 +1,44 @@
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: #000; color: #fff; }
+body {
+  font-family: var(--font-ubuntu), 'Ubuntu Sans', sans-serif;
+  font-size: 11pt;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: default; }
+input { font: inherit; }
+img { display: block; }
+
+/* Symbolic icon: a gray Yaru SVG used as a mask, painted in the current text colour (as GTK does). */
+.sym {
+  display: inline-block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--icon) center / contain no-repeat;
+  mask: var(--icon) center / contain no-repeat;
+}
+
+/* Plymouth: black, spinner, Ubuntu wordmark at the bottom. Pure HTML/CSS so it paints at once. */
+.plymouth { position: fixed; inset: 0; z-index: 1000; background: #000; transition: opacity .3s; }
+.plymouth.done { opacity: 0; pointer-events: none; }
+.plymouth-spinner {
+  position: absolute; left: 50%; top: 62%; width: 30px; height: 30px; margin-left: -15px;
+  border: 3px solid rgb(255 255 255 / .18); border-top-color: #fff; border-radius: 50%;
+  animation: plymouth-spin .9s linear infinite;
+}
+@keyframes plymouth-spin { to { transform: rotate(360deg); } }
+.plymouth-logo {
+  position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px; color: #fff; font-size: 30px; font-weight: 500; letter-spacing: -.01em;
+}
+.plymouth-logo .sym { width: 30px; height: 30px; --icon: url(../assets/icons/places/distributor-logo-symbolic.svg); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
