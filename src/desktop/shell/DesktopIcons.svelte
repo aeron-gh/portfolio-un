@@ -34,9 +34,9 @@
   let RenamePopover = $state.raw<typeof RenamePopoverView | null>(null);
   let Dialog = $state.raw<typeof DialogView | null>(null);
   $effect(() => {
-    if (menu && !GtkMenu) loadGtkMenu().then((m) => (GtkMenu = m.default));
-    if (rename && !RenamePopover) loadRenamePopover().then((m) => (RenamePopover = m.default));
-    if (dialog && !Dialog) loadDialog().then((m) => (Dialog = m.default));
+    if (menu && !GtkMenu) loadGtkMenu().then((m) => (GtkMenu = m.default)).catch(() => (menu = null));
+    if (rename && !RenamePopover) loadRenamePopover().then((m) => (RenamePopover = m.default)).catch(() => (rename = null));
+    if (dialog && !Dialog) loadDialog().then((m) => (Dialog = m.default)).catch(() => (dialog = null));
   });
 
   function read(): Record<string, Cell> {

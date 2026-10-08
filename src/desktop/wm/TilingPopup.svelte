@@ -10,9 +10,10 @@
   import { tile, tiling, wm } from './wm.svelte';
   let layer: Layer | undefined;
 
-  const popup = tiling.popup!;
-  const rect = $derived(tileRect(wm.area, popup.tile));
-  const items = $derived(popupCandidates(wm, popup.tiledId).map((w) => ({ id: w.id, icon: appById(w.app).icon, label: w.title })));
+  // Follows tiling.popup, so tiling again while it is open updates the target.
+  const popup = $derived(tiling.popup);
+  const rect = $derived(popup ? tileRect(wm.area, popup.tile) : { x: 0, y: 0, w: 0, h: 0 });
+  const items = $derived(popup ? popupCandidates(wm, popup.tiledId).map((w) => ({ id: w.id, icon: appById(w.app).icon, label: w.title })) : []);
   let index = $state(0);
   let box = $state<HTMLElement>();
 
@@ -29,14 +30,16 @@
   });
 
   function pick(id: string) {
+    const where = popup?.tile;
     tiling.popup = null;
-    tile(id, popup.tile, { popup: false });
+    if (where) tile(id, where, { popup: false });
   }
 
   function onkey(e: KeyboardEvent) {
     if (!layer?.top() || session.state !== 'session') return;
     if (e.key === 'Escape') tiling.popup = null;
-    else if (e.key === 'ArrowRight' || e.key === 'Tab') index = step(index, items.length, 1);
+    else if (e.key === 'Tab') index = step(index, items.length, e.shiftKey ? -1 : 1);
+    else if (e.key === 'ArrowRight') index = step(index, items.length, 1);
     else if (e.key === 'ArrowLeft') index = step(index, items.length, -1);
     else if (e.key === 'Enter' && items[index]) pick(items[index].id);
     else return;

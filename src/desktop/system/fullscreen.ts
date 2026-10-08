@@ -30,3 +30,10 @@ export async function enterFullscreen(el: Element = document.documentElement): P
     return false;
   }
 }
+
+/** The full-screen session ends with the session: leave full screen and give the keys back to the browser. */
+export function leaveFullscreen(): void {
+  if (typeof document === 'undefined') return;
+  if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+  (navigator as Navigator & { keyboard?: { unlock?: () => void } }).keyboard?.unlock?.();
+}

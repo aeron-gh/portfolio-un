@@ -5,7 +5,7 @@ type Hooks = { ubuntu: { launch: (app: string) => Promise<string>; windows: () =
 
 async function session(page: Page, testApps = true) {
   await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto(`/desktop-next/${testApps ? '?test-apps' : ''}`);
+  await page.goto(`/desktop/${testApps ? '?test-apps' : ''}`);
   await page.locator('.gdm-user').click();
   await page.keyboard.press('Enter');
   await expect(page.locator('.session')).toBeVisible();
@@ -17,14 +17,14 @@ const focusedId = (page: Page) => page.evaluate(() => document.querySelector('.w
 
 /** The desktop inside an iframe, as on the homepage; `msgs` records what it tells the page. */
 async function embedded(page: Page, query = '') {
-  const HARNESS = `<!doctype html><meta charset="utf-8"><iframe id="d" src="/desktop-next/?embed=1${query}" style="width:1200px;height:760px;border:0"></iframe><script>window.msgs=[];addEventListener('message',(e)=>{if(e.origin===location.origin)msgs.push(e.data&&e.data.type)});</script>`;
+  const HARNESS = `<!doctype html><meta charset="utf-8"><iframe id="d" src="/desktop/?embed=1${query}" style="width:1200px;height:760px;border:0"></iframe><script>window.msgs=[];addEventListener('message',(e)=>{if(e.origin===location.origin)msgs.push(e.data&&e.data.type)});</script>`;
   await page.route('**/__harness', (r) => r.fulfill({ contentType: 'text/html', body: HARNESS }));
   await page.goto('/__harness');
   const d = page.frameLocator('#d');
   await d.locator('.gdm-user').click();
   await page.keyboard.press('Enter');
   await expect(d.locator('.session')).toBeVisible();
-  const frame = page.frame({ url: /\/desktop-next\// })!;
+  const frame = page.frame({ url: /\/desktop\// })!;
   const msgs = () => page.evaluate(() => (window as unknown as { msgs: string[] }).msgs);
   return { d, frame, msgs };
 }
@@ -178,7 +178,7 @@ test('Esc in a quick Alt+Tab cancels the switch and stays on the desktop', async
 });
 
 test('the login gear picks the full-screen session and remembers it', async ({ page }) => {
-  await page.goto('/desktop-next/');
+  await page.goto('/desktop/');
   await page.locator('.gdm-user').click();
   await page.getByRole('button', { name: 'Choose Session' }).click();
   const menu = page.getByRole('menu', { name: 'Choose Session' });

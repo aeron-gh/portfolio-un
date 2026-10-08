@@ -13,14 +13,14 @@ async function prepare(page: Page, style: 'light' | 'dark') {
 for (const style of ['light', 'dark'] as const) {
   test(`login screen (${style})`, async ({ page }) => {
     await prepare(page, style);
-    await page.goto('/desktop-next/');
+    await page.goto('/desktop/');
     await expect(page.locator('.gdm-user')).toBeVisible();
     await expect(page).toHaveScreenshot(`login-${style}.png`);
   });
 
   test(`session desktop (${style})`, async ({ page }) => {
     await prepare(page, style);
-    await page.goto('/desktop-next/');
+    await page.goto('/desktop/');
     await page.locator('.gdm-user').click();
     await page.keyboard.press('Enter');
     await expect(page.locator('.wall.real.show')).toBeVisible();
@@ -29,7 +29,7 @@ for (const style of ['light', 'dark'] as const) {
 
   test(`shell surfaces (${style})`, async ({ page }) => {
     await prepare(page, style);
-    await page.goto('/desktop-next/?test-apps');
+    await page.goto('/desktop/?test-apps');
     await page.locator('.gdm-user').click();
     await page.keyboard.press('Enter');
     await expect(page.locator('.wall.real.show')).toBeVisible();
@@ -62,7 +62,7 @@ for (const style of ['light', 'dark'] as const) {
 
   test(`lock screen (${style})`, async ({ page }) => {
     await prepare(page, style);
-    await page.goto('/desktop-next/');
+    await page.goto('/desktop/');
     await page.locator('.gdm-user').click();
     await page.keyboard.press('Enter');
     await expect(page.locator('.wall.real.show')).toBeVisible();

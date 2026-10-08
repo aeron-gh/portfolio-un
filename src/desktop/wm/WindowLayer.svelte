@@ -26,7 +26,7 @@
   });
   let TilingPopup = $state.raw<typeof TilingPopupView | null>(null);
   $effect(() => {
-    if (tiling.popup && !TilingPopup) loadTilingPopup().then((m) => (TilingPopup = m.default));
+    if (tiling.popup && !TilingPopup) loadTilingPopup().then((m) => (TilingPopup = m.default)).catch(() => (tiling.popup = null));
   });
 </script>
 

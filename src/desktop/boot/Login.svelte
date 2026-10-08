@@ -46,7 +46,7 @@
   }
   let PopupMenu = $state.raw<typeof PopupMenuView | null>(null);
   $effect(() => {
-    if (chooser && !PopupMenu) loadPopupMenu().then((m) => (PopupMenu = m.default));
+    if (chooser && !PopupMenu) loadPopupMenu().then((m) => (PopupMenu = m.default)).catch(() => (chooser = null));
   });
 </script>
 

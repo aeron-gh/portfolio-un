@@ -88,7 +88,7 @@
     switchWorkspace(wm, wm.workspace + (e.deltaY > 0 ? 1 : -1));
   }
   $effect(() => {
-    if (menu && !PopupMenu) loadPopupMenu().then((m) => (PopupMenu = m.default));
+    if (menu && !PopupMenu) loadPopupMenu().then((m) => (PopupMenu = m.default)).catch(() => (menu = null));
   });
 </script>
 

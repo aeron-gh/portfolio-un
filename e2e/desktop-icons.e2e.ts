@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 async function session(page: Page) {
-  await page.goto('/desktop-next/');
+  await page.goto('/desktop/');
   await page.locator('.gdm-user').click();
   await page.keyboard.press('Enter');
   await expect(page.locator('.session')).toBeVisible();
@@ -85,7 +85,7 @@ test('icons stay on screen in a 1024x640 window', async ({ page }) => {
 });
 
 test('embedded: Esc with the dialog open closes only the dialog', async ({ page }) => {
-  const HARNESS = `<!doctype html><meta charset="utf-8"><iframe id="d" src="/desktop-next/?embed=1" style="width:1200px;height:760px;border:0"></iframe><script>window.msgs=[];addEventListener('message',(e)=>{if(e.origin===location.origin)msgs.push(e.data&&e.data.type)});</script>`;
+  const HARNESS = `<!doctype html><meta charset="utf-8"><iframe id="d" src="/desktop/?embed=1" style="width:1200px;height:760px;border:0"></iframe><script>window.msgs=[];addEventListener('message',(e)=>{if(e.origin===location.origin)msgs.push(e.data&&e.data.type)});</script>`;
   await page.route('**/__harness', (r) => r.fulfill({ contentType: 'text/html', body: HARNESS }));
   await page.goto('/__harness');
   const d = page.frameLocator('#d');

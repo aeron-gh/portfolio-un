@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 async function session(page: Page) {
   await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto('/desktop-next/');
+  await page.goto('/desktop/');
   await page.locator('.gdm-user').click();
   await page.keyboard.press('Enter');
   await expect(page.locator('.session')).toBeVisible();

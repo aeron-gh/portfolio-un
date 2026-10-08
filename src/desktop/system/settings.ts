@@ -73,7 +73,7 @@ export function loadSettings(store: StoreLike | null): Settings {
   const bluetooth = typeof r.bluetooth === 'boolean' ? r.bluetooth : DEFAULTS.bluetooth;
   return {
     style: r.style === 'light' || r.style === 'dark' || r.style === 'system' ? r.style : DEFAULTS.style,
-    accent: typeof r.accent === 'string' && r.accent in ACCENTS ? (r.accent as Accent) : DEFAULTS.accent,
+    accent: typeof r.accent === 'string' && Object.hasOwn(ACCENTS, r.accent) ? (r.accent as Accent) : DEFAULTS.accent,
     nightLight: typeof r.nightLight === 'boolean' ? r.nightLight : DEFAULTS.nightLight,
     powerMode: r.powerMode === 'power-saver' || r.powerMode === 'performance' || r.powerMode === 'balanced' ? r.powerMode : DEFAULTS.powerMode,
     lastPowerMode: r.lastPowerMode === 'performance' ? 'performance' : 'power-saver',

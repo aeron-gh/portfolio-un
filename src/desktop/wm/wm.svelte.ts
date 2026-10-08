@@ -29,10 +29,20 @@ function after(ms: number, fn: () => void): void {
 }
 const find = (id: string) => wm.wins.find((w) => w.id === id);
 
+const starting = new Set<AppId>();
+
 export async function launch(app: AppId, args?: unknown): Promise<string | null> {
   const entry = appById(app);
   if (!isAvailable(entry) || !entry.load) return null;
-  views[app] ??= (await entry.load()).default;
+  if (!views[app]) {
+    if (starting.has(app)) return null; // a second click while the app's code downloads opens nothing more
+    starting.add(app);
+    try {
+      views[app] = (await entry.load()).default;
+    } finally {
+      starting.delete(app);
+    }
+  }
   const id = W.openWin(wm, app, entry.window, entry.name, args);
   phases[id] = 'opening';
   after(TIMES.open, () => {
@@ -107,7 +117,8 @@ export function showDesktop(): void {
 
 /** The session ended (log out, restart, power off): every app quits. */
 export function quitAll(): void {
-  Object.assign(wm, W.createWm(wm.area));
+  Object.assign(wm, W.createWm(wm.area), { seq: wm.seq }); // ids keep counting: a late timer never meets a new window
+  beforeDesktop = [];
   for (const id of Object.keys(phases)) delete phases[id];
   drag.id = null;
   drag.snap = null;

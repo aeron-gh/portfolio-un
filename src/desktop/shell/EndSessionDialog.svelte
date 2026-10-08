@@ -30,15 +30,18 @@
     };
   });
 
+  // On the window, so Esc works wherever focus went (a click on the dark background leaves it on the page).
   function onkeydown(e: KeyboardEvent) {
-    if (e.key !== 'Escape') return;
+    if (e.key !== 'Escape' || !layer?.top()) return;
     e.preventDefault();
     e.stopPropagation();
     cancelEndSession();
   }
 </script>
 
-<div class="lightbox" role="presentation" {onkeydown}>
+<svelte:window {onkeydown} />
+
+<div class="lightbox" role="presentation">
   <div class="modal-dialog" role="alertdialog" aria-modal="true" aria-labelledby="end-session-title" aria-describedby="end-session-text" use:trapFocus>
     <div class="content">
       <h2 id="end-session-title">{text.title}</h2>

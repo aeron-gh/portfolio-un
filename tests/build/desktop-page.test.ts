@@ -2,10 +2,10 @@ import { describe, expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { parseHTML } from 'linkedom';
 
-const html = readFileSync('dist/desktop-next/index.html', 'utf8');
+const html = readFileSync('dist/desktop/index.html', 'utf8');
 const { document } = parseHTML(html);
 
-describe('desktop-next page', () => {
+describe('desktop page', () => {
   test('is kept out of search results', () => {
     expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe('noindex');
   });

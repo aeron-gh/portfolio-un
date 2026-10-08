@@ -98,7 +98,7 @@ test('a hint says how to come back', async ({ page }) => {
 test('hovering the boot pill prefetches the desktop', async ({ page }) => {
   await page.goto('/');
   await page.locator('.boot-pill').hover();
-  await expect(page.locator('link[rel="prefetch"][href="/desktop-next/?embed=1"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="prefetch"][href="/desktop/?embed=1"]')).toHaveCount(1);
 });
 
 test.describe('with motion on', () => {

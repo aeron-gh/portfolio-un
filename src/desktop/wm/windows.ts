@@ -193,6 +193,11 @@ export function grabFromMaximized(wm: Wm, id: string, px: number): void {
 export function setArea(wm: Wm, area: Rect): void {
   wm.area = { ...area };
   for (const win of wm.wins) {
+    // The size a maximised or tiled window goes back to must fit the new screen as well.
+    if (win.restore) {
+      win.restore.w = Math.max(Math.min(win.restore.w, area.w), Math.min(win.minW, area.w));
+      win.restore.h = Math.max(Math.min(win.restore.h, area.h), Math.min(win.minH, area.h));
+    }
     if (win.state === 'maximized') win.rect = { ...area };
     else if (win.state !== 'normal') win.rect = tileRect(area, win.state.slice(6) as Tile);
     else {

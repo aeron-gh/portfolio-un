@@ -1,21 +1,21 @@
 import { expect, test, type Page } from '@playwright/test';
 
 async function loginToSession(page: Page) {
-  await page.goto('/desktop-next/');
+  await page.goto('/desktop/');
   await page.locator('.gdm-user').click();
   await page.keyboard.press('Enter');
   await expect(page.locator('.session')).toBeVisible();
 }
 
 test('boots through Plymouth to the login screen', async ({ page }) => {
-  await page.goto('/desktop-next/');
+  await page.goto('/desktop/');
   await expect(page.locator('.gdm')).toBeVisible();
   await expect(page.locator('#plymouth')).toHaveClass(/\bdone\b/);
   await expect(page.locator('.gdm-user')).toContainText('Abhishek Agarwal');
 });
 
 test('Enter, Enter logs in from the keyboard', async ({ page }) => {
-  await page.goto('/desktop-next/');
+  await page.goto('/desktop/');
   await expect(page.locator('.gdm-user')).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(page.locator('.gdm-prompt input')).toBeFocused();
@@ -25,7 +25,7 @@ test('Enter, Enter logs in from the keyboard', async ({ page }) => {
 });
 
 test('Esc in the password field goes back to the user list', async ({ page }) => {
-  await page.goto('/desktop-next/');
+  await page.goto('/desktop/');
   await page.locator('.gdm-user').click();
   await page.keyboard.press('Escape');
   await expect(page.locator('.gdm-user')).toBeVisible();
@@ -120,7 +120,7 @@ test('locks after 5 minutes without input', async ({ page }) => {
 
 test.describe('embedded in the homepage', () => {
   const HARNESS = `<!doctype html><meta charset="utf-8">
-<iframe id="d" src="/desktop-next/?embed=1" style="width:1200px;height:760px;border:0"></iframe>
+<iframe id="d" src="/desktop/?embed=1" style="width:1200px;height:760px;border:0"></iframe>
 <script>window.msgs=[];addEventListener('message',(e)=>{if(e.origin===location.origin)msgs.push(e.data&&e.data.type)});</script>`;
   const msgs = (page: Page) => page.evaluate(() => (window as unknown as { msgs: string[] }).msgs);
 

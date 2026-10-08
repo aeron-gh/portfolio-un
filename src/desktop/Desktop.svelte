@@ -91,7 +91,7 @@
   }
   let PowerOff = $state.raw<typeof PowerOffView | null>(null);
   $effect(() => {
-    if (session.state === 'off' && !EMBED && !PowerOff) loadPowerOff().then((m) => (PowerOff = m.default));
+    if (session.state === 'off' && !EMBED && !PowerOff) loadPowerOff().then((m) => (PowerOff = m.default)).catch(() => {});
   });
 </script>
 

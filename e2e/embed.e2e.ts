@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 // A same-origin page that embeds the desktop like the homepage does and records its messages.
 const HARNESS = `<!doctype html><meta charset="utf-8">
-<iframe id="d" src="/desktop-next/?embed=1" style="width:1200px;height:760px;border:0"></iframe>
+<iframe id="d" src="/desktop/?embed=1" style="width:1200px;height:760px;border:0"></iframe>
 <script>
   window.msgs = [];
   addEventListener('message', (e) => {

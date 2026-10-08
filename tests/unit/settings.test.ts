@@ -22,6 +22,11 @@ describe('settings', () => {
     expect(loadSettings(memory({ [SETTINGS_KEY]: '{oops' }))).toEqual(DEFAULTS);
   });
 
+  test('an accent name that only exists on every object is not an accent', () => {
+    expect(loadSettings(memory({ [SETTINGS_KEY]: JSON.stringify({ accent: 'constructor' }) })).accent).toBe('orange');
+    expect(loadSettings(memory({ [SETTINGS_KEY]: JSON.stringify({ accent: 'toString' }) })).accent).toBe('orange');
+  });
+
   test('unknown values are replaced, numbers are clamped', () => {
     const s = loadSettings(memory({ [SETTINGS_KEY]: JSON.stringify({ style: 'neon', accent: 'viridian', volume: 400, brightness: -5, clock24: 'yes' }) }));
     expect(s.style).toBe('system');

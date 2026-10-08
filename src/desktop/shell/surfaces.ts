@@ -14,19 +14,20 @@ export const loadTilingPopup = () => import('../wm/TilingPopup.svelte');
 export const loadPowerOff = () => import('../boot/PowerOff.svelte');
 
 export function prefetchSurfaces(): void {
+  // A failed prefetch stays quiet: the surface tries again when it is first used.
   const run = () => {
-    void loadOverview();
-    void loadQuickSettings();
-    void loadEndSession();
-    void loadDateMenu();
-    void loadBanner();
-    void loadPopupMenu();
-    void loadGtkMenu();
-    void loadRenamePopover();
-    void loadSwitcher();
-    void loadDialog();
-    void loadDesktopMenu();
-    void loadTilingPopup();
+    loadOverview().catch(() => {});
+    loadQuickSettings().catch(() => {});
+    loadEndSession().catch(() => {});
+    loadDateMenu().catch(() => {});
+    loadBanner().catch(() => {});
+    loadPopupMenu().catch(() => {});
+    loadGtkMenu().catch(() => {});
+    loadRenamePopover().catch(() => {});
+    loadSwitcher().catch(() => {});
+    loadDialog().catch(() => {});
+    loadDesktopMenu().catch(() => {});
+    loadTilingPopup().catch(() => {});
   };
   if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 3000 });
   else setTimeout(run, 1500);

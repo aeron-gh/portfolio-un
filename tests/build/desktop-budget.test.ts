@@ -3,7 +3,7 @@ import { readFileSync, statSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { parseHTML } from 'linkedom';
 
-const html = readFileSync('dist/desktop-next/index.html', 'utf8');
+const html = readFileSync('dist/desktop/index.html', 'utf8');
 const { document } = parseHTML(html);
 const gz = (s: string | Buffer) => gzipSync(s).length;
 const KB = 1024;
@@ -24,7 +24,7 @@ function staticGraph(entries: string[]): string[] {
   return [...seen];
 }
 
-describe('desktop-next budgets', () => {
+describe('desktop budgets', () => {
   test('shell JS is at most 45 KB gzipped', () => {
     const island = document.querySelector('astro-island')!;
     const entries = [island.getAttribute('component-url')!, island.getAttribute('renderer-url')!, ...[...document.querySelectorAll('script[src]')].map((s) => s.getAttribute('src')!)];

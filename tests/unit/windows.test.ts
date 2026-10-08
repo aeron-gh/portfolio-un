@@ -223,3 +223,15 @@ describe('dynamic workspaces', () => {
     expect(wm.workspace).toBe(0);
   });
 });
+
+describe('a smaller screen', () => {
+  test('also shrinks the size a maximised window restores to', () => {
+    const wm = fresh();
+    const a = openWin(wm, 'test-window', SIZE, 'A');
+    toggleMaximize(wm, a);
+    setArea(wm, { x: 66, y: 32, w: 500, h: 300 });
+    unmaximizeWin(wm, a);
+    expect(win(wm, a).rect.w).toBeLessThanOrEqual(500);
+    expect(win(wm, a).rect.h).toBeLessThanOrEqual(300);
+  });
+});

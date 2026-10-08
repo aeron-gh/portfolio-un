@@ -4,7 +4,7 @@ type Hooks = { ubuntu: { launch: (app: string) => Promise<string>; windows: () =
 
 async function session(page: Page, testApps = true) {
   await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto(`/desktop-next/${testApps ? '?test-apps' : ''}`);
+  await page.goto(`/desktop/${testApps ? '?test-apps' : ''}`);
   await page.locator('.gdm-user').click();
   await page.keyboard.press('Enter');
   await expect(page.locator('.session')).toBeVisible();

@@ -5,7 +5,7 @@ type Hooks = { ubuntu: { launch: (app: string) => Promise<string>; close: (id: s
 
 async function session(page: Page) {
   await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto('/desktop-next/?test-apps');
+  await page.goto('/desktop/?test-apps');
   await page.locator('.gdm-user').click();
   await page.keyboard.press('Enter');
   await expect(page.locator('.session')).toBeVisible();

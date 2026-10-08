@@ -13,8 +13,9 @@
   import { safeStorage } from '../system/settings';
   import { fsState } from '../fs/fs.svelte';
   import { closePanel, panel } from './panel.svelte';
+  import { leaveFullscreen } from '../system/fullscreen';
   import { endSwitch } from './switcher.svelte';
-  import { endSession } from '../system/end-session.svelte';
+  import { cancelEndSession, endSession } from '../system/end-session.svelte';
   import { quitAll, tiling } from '../wm/wm.svelte';
   import { currentStyle } from '../system/settings.svelte';
   import type { Env } from '../env';
@@ -36,12 +37,12 @@
   // The Overview loads on first use (and is prefetched when the browser is idle after login).
   let OverviewView = $state.raw<Component<{ env: Env }> | null>(null);
   $effect(() => {
-    if (overview.mode !== 'hidden' && !OverviewView) loadOverview().then((m) => (OverviewView = m.default));
+    if (overview.mode !== 'hidden' && !OverviewView) loadOverview().then((m) => (OverviewView = m.default)).catch(hideOverview);
   });
   // Quick Settings, the same way; locking the screen closes it, as GNOME closes every menu.
   let QuickSettingsView = $state.raw<Component | null>(null);
   $effect(() => {
-    if (panel.open === 'quick-settings' && !QuickSettingsView) loadQuickSettings().then((m) => (QuickSettingsView = m.default));
+    if (panel.open === 'quick-settings' && !QuickSettingsView) loadQuickSettings().then((m) => (QuickSettingsView = m.default)).catch(closePanel);
   });
   $effect(() => {
     if (!locked) return;
@@ -51,19 +52,19 @@
   });
   let EndSessionView = $state.raw<Component<{ realName: string }> | null>(null);
   $effect(() => {
-    if (endSession.kind && !EndSessionView) loadEndSession().then((m) => (EndSessionView = m.default));
+    if (endSession.kind && !EndSessionView) loadEndSession().then((m) => (EndSessionView = m.default)).catch(cancelEndSession);
   });
   let DateMenuView = $state.raw<Component | null>(null);
   $effect(() => {
-    if (panel.open === 'date-menu' && !DateMenuView) loadDateMenu().then((m) => (DateMenuView = m.default));
+    if (panel.open === 'date-menu' && !DateMenuView) loadDateMenu().then((m) => (DateMenuView = m.default)).catch(closePanel);
   });
   let BannerView = $state.raw<Component | null>(null);
   $effect(() => {
-    if (notifications.banner && !BannerView) loadBanner().then((m) => (BannerView = m.default));
+    if (notifications.banner && !BannerView) loadBanner().then((m) => (BannerView = m.default)).catch(resetNotifications);
   });
   let Switcher = $state.raw<typeof SwitcherView | null>(null);
   $effect(() => {
-    if (switcher.visible && !Switcher) loadSwitcher().then((m) => (Switcher = m.default));
+    if (switcher.visible && !Switcher) loadSwitcher().then((m) => (Switcher = m.default)).catch(endSwitch);
   });
   onMount(() => {
     prefetchSurfaces();
@@ -76,6 +77,7 @@
       closePanel();
       endSwitch();
       resetNotifications();
+      leaveFullscreen();
     };
   });
 </script>
