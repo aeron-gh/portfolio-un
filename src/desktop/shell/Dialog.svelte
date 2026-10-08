@@ -1,14 +1,20 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { layers } from '../system/layers.svelte';
+  import { openLayer, type Layer } from '../system/layers.svelte';
+  import { trapFocus } from './focus-trap';
+  let layer: Layer | undefined;
 
   let { title, body, buttons = ['OK'], onclose }: { title: string; body: string; buttons?: string[]; onclose: (choice: string | null) => void } = $props();
   let row = $state<HTMLDivElement>();
+  const before = document.activeElement as HTMLElement | null;
 
   onMount(() => {
-    layers.open++;
+    layer = openLayer();
     (row?.lastElementChild as HTMLButtonElement | null)?.focus(); // the default response
-    return () => layers.open--;
+    return () => {
+      layer?.close();
+      if (before?.isConnected) before.focus(); // back to what opened it
+    };
   });
 
   function onKey(e: KeyboardEvent) {
@@ -22,7 +28,7 @@
 <svelte:window onkeydown={onKey} />
 
 <div class="dialog-backdrop" role="presentation">
-  <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-body">
+  <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-body" use:trapFocus>
     <h2 id="dialog-title">{title}</h2>
     <p id="dialog-body">{body}</p>
     <div class="dialog-buttons" bind:this={row}>

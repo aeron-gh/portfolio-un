@@ -50,6 +50,28 @@ describe('real Ubuntu assets', () => {
     expect(missing).toEqual([]);
   });
 
+  test('every icon the interaction layer uses is present', () => {
+    const needed = [
+      'actions/view-app-grid-ubuntu-symbolic.svg', 'actions/edit-find-symbolic.svg', 'actions/edit-clear-symbolic.svg',
+      'actions/system-lock-screen-symbolic.svg', 'actions/system-shutdown-symbolic.svg',
+      'ui/window-minimize-symbolic.svg', 'ui/window-maximize-symbolic.svg', 'ui/window-restore-symbolic.svg', 'ui/window-close-symbolic.svg',
+      'ui/pan-start-symbolic.svg', 'ui/pan-end-symbolic.svg', 'ui/pan-down-symbolic.svg',
+      'status/network-wireless-disabled-symbolic.svg', 'status/network-wireless-no-route-symbolic.svg',
+      'status/bluetooth-active-symbolic.svg', 'status/bluetooth-disabled-symbolic.svg',
+      'status/power-profile-balanced-symbolic.svg', 'status/power-profile-power-saver-symbolic.svg', 'status/power-profile-performance-symbolic.svg',
+      'status/night-light-symbolic.svg', 'status/notifications-disabled-symbolic.svg', 'status/airplane-mode-symbolic.svg',
+      'status/audio-volume-muted-symbolic.svg', 'status/audio-volume-low-symbolic.svg', 'status/audio-volume-medium-symbolic.svg',
+      'status/display-brightness-symbolic.svg', 'status/user-trash-full.png', 'mimetypes/application-x-executable.png',
+      'actions/dark-mode-symbolic.svg', 'status/no-notifications-symbolic.svg', 'actions/ornament-check-symbolic.svg',
+      'actions/ornament-dot-checked-symbolic.svg', 'actions/ornament-dot-unchecked-symbolic.svg', 'actions/preview-close-symbolic.svg', 'status/message-indicator-symbolic.svg',
+      'actions/group-collapse-symbolic.svg', 'actions/notification-expand-symbolic.svg', 'actions/cog-wheel-symbolic.svg',
+      'org.gnome.Settings/org.gnome.Settings-accessibility-symbolic.svg',
+      'devices/network-wireless-symbolic.svg', 'status/network-wireless-encrypted-symbolic.svg', 'actions/object-select-symbolic.svg',
+    ];
+    const missing = needed.filter((p) => !existsSync(`${A}/icons/${p}`));
+    expect(missing).toEqual([]);
+  });
+
   test('every icon is a real image, not a git symlink saved as text', () => {
     const files = (readdirSync(`${A}/icons`, { recursive: true }) as string[]).filter((f) => /\.(svg|png)$/.test(f));
     expect(files.length).toBeGreaterThan(30);

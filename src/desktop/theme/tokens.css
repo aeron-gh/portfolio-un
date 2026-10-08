@@ -7,7 +7,7 @@
   --modal-radius: 16px;
   --ease: cubic-bezier(.25, .46, .45, .94);
   --dur: 250ms;
-  --accent: #E95420;
+  --accent: #cb4314;
 
   /* System surfaces: dark in every style (Yaru shell). */
   --panel-bg: #131313; /* $yaru_panel_bg_color */
@@ -16,16 +16,94 @@
   --sys-fg: #f2f2f2; /* $system_fg_color */
   --sys-border: rgb(242 242 242 / .1);
   --sys-hover: rgb(242 242 242 / .1);
+  --ease-expo: linear(0, 0.5, 0.75, 0.875, 0.9375, 0.9688, 0.9844, 0.9922, 0.9961, 0.998, 1); /* 1 - 2^(-10t) */
+  --panel-hover: rgb(242 242 242 / .17); /* #panel .panel-button:hover */
+  --dock-bg: #131313;
+  --dock-hover: rgb(238 238 238 / .2);
+  --tooltip-bg: rgb(0 0 0 / .9);
+  --tooltip-border: rgb(255 255 255 / .1);
+  --switcher-bg: #2f2f2f;
+  --overview-bg: #222222;
+  --search-bg: #3b3b3b;
 
   /* App surfaces (libadwaita dialogs): follow the style. */
   --bg: #fafafb;
-  --fg: #222226;
+  --fg: rgb(0 0 6 / .8); /* libadwaita window_fg_color */
   --card: #fff;
   --hover: rgb(34 34 38 / .08);
   --dim-fg: rgb(34 34 38 / .55);
   --border: rgb(34 34 38 / .15);
   --shadow: 0 2px 8px rgb(0 0 0 / .2), 0 0 0 1px rgb(0 0 0 / .05);
   color-scheme: light;
+  /* Shell popups: Quick Settings, date menu, dock menu (compiled Yaru shell CSS). */
+  --pop-bg: #fff;
+  --pop-fg: #222222;
+  --pop-border: #ededed;
+  --pop-shadow: 0 2px 4px 0 rgb(0 0 0 / .05);
+  --pop-radius: 16.8px;
+  --pop-button: #e4e4e4;
+  --pop-button-hover: #dadada;
+  --pop-button-active: #cdcdcd;
+  --pop-button-insensitive: #ececec;
+  --pop-dim: #6e6e6e;
+  --slider-track: rgb(34 34 34 / .1);
+  --slider-handle: #222222;
+  --slider-handle-hover: #343434;
+  --message-bg: #fff;
+  --message-border: rgb(0 0 0 / .09);
+  --message-shadow: 0 1px 2px 0 rgb(0 0 0 / .03);
+  --modal-bg: #fff;
+  /* Desktop right-click menus: GTK3 Yaru. */
+  --gtk-menu-bg: #fafafa;
+  --gtk-menu-fg: #3d3d3d;
+  --gtk-menu-hover: rgb(61 61 61 / .15);
+  --gtk-menu-disabled: #9c9c9c;
+  --gtk-menu-sep: #c7c7c7;
+  --gtk-menu-shadow: 0 1px 2px 1px rgb(0 0 0 / .3), 0 0 0 1px rgb(0 0 0 / .23);
+  /* App windows: libadwaita 1.9. */
+  --win-bg: #fafafb;
+  --win-fg: rgb(0 0 6 / .8);
+  --view-bg: #fff;
+  --hb-bg: #fff;
+  --hb-shade: rgb(0 0 6 / .12);
+  --win-radius: 15px;
+  --win-shadow: 0 0 14px 5px rgb(0 0 0 / .15), 0 0 5px 2px rgb(0 0 0 / .1), 0 0 0 1px rgb(0 0 0 / .05);
+  --win-shadow-backdrop: 0 0 14px 5px transparent, 0 0 10px 5px rgb(0 0 0 / .08), 0 0 0 1px rgb(0 0 0 / .05);
+  --win-outline: rgb(255 255 255 / .07);
+  /* Quick Settings tiles and tile menus (compiled Yaru shell CSS; st-darken = HSL lightness − 4). */
+  --accent-hover: hsl(from var(--accent) h s calc(l - 4));
+  --focus-ring: color-mix(in srgb, var(--accent) 80%, transparent);
+  --qs-arrow: #d9d9d9;
+  --qs-arrow-hover: #cfcfcf;
+  --qs-arrow-on: color-mix(in srgb, var(--accent) 92%, #222222);
+  --qs-arrow-on-hover: hsl(from var(--qs-arrow-on) h s calc(l - 4));
+  --qs-sep: rgb(34 34 34 / .25);
+  --qs-sep-on: color-mix(in srgb, var(--accent) 80%, #fff);
+  --qs-menu-bg: #fff;
+  --qs-menu-border: rgb(0 0 0 / .09);
+  --qs-menu-shadow: 0 1px 2px 0 rgb(0 0 0 / .03);
+  --qs-header-icon: rgb(34 34 34 / .2);
+  /* Date menu and notifications (compiled Yaru shell CSS). */
+  --message-hover: #f5f5f5;
+  --banner-shadow: 0 2px 4px 2px rgb(0 0 0 / .05);
+  --stack-2: #f5f5f5;
+  --stack-3: #ededed;
+  --cal-hover: #ededed;
+  --cal-selected: #e8e8e8;
+  --cal-weekend: #7b7b7b;
+  --menu-line: rgb(34 34 34 / .15);
+  /* Desktop icons (Desktop Icons NG: GTK3 .view colour) and the rename popover (Yaru GTK3). */
+  --icon-select: rgb(0 0 0 / .2);
+  --icon-hover: rgb(0 0 0 / .15);
+  --icon-ring: rgb(255 255 255 / .5);
+  --gtk-pop-border: rgb(0 0 0 / .23);
+  --gtk-border: #c7c7c7;
+  --gtk-entry-bg: #fff;
+  --gtk-entry-fg: #000;
+  --gtk-suggested: #11a428;
+  --gtk-suggested-border: #0c6d1a;
+  --gtk-disabled-bg: #fcfcfc;
+  --gtk-disabled-fg: #9c9c9c;
 }
 
 :root[data-style="dark"] {
@@ -36,5 +114,65 @@
   --dim-fg: rgb(255 255 255 / .55);
   --border: rgb(255 255 255 / .12);
   --shadow: 0 2px 8px rgb(0 0 0 / .45), 0 0 0 1px rgb(255 255 255 / .06);
+  --search-bg: #353535;
+  --pop-bg: #36363a;
+  --pop-fg: #fff;
+  --pop-border: #424247;
+  --pop-shadow: 0 2px 4px 0 rgb(0 0 0 / .2);
+  --pop-button: #48484c;
+  --pop-button-hover: #525256;
+  --pop-button-active: #5e5e64;
+  --pop-button-insensitive: #414144;
+  --pop-dim: #b2b2b4;
+  --slider-track: rgb(255 255 255 / .1);
+  --slider-handle: #e8e8e8;
+  --slider-handle-hover: #fff;
+  --message-bg: #54545a;
+  --message-border: transparent;
+  --message-shadow: none;
+  --modal-bg: #36363a;
+  --gtk-menu-bg: #1d1d1d;
+  --gtk-menu-fg: #f7f7f7;
+  --gtk-menu-hover: rgb(247 247 247 / .15);
+  --gtk-menu-disabled: #929292;
+  --gtk-menu-sep: #4b4b4b;
+  --gtk-menu-shadow: 0 1px 2px 1px rgb(0 0 0 / .4), 0 0 0 1px #4b4b4b;
+  --win-bg: #222226;
+  --win-fg: #fff;
+  --view-bg: #1d1d20;
+  --hb-bg: #2e2e32;
+  --hb-shade: rgb(0 0 6 / .36);
+  --accent-hover: hsl(from var(--accent) h s calc(l + 4));
+  /* Dark style lightens the accent for focus rings: st-mix(accent, white, 60%) at 80%. */
+  --focus-ring: color-mix(in srgb, color-mix(in srgb, var(--accent) 60%, #fff) 80%, transparent);
+  --qs-arrow: #5a5a5f;
+  --qs-arrow-hover: #646469;
+  --qs-arrow-on: color-mix(in srgb, var(--accent) 85%, #fff);
+  --qs-arrow-on-hover: hsl(from var(--qs-arrow-on) h s calc(l + 4));
+  --qs-sep: rgb(255 255 255 / .25);
+  --qs-sep-on: color-mix(in srgb, var(--accent) 70%, #fff);
+  --qs-menu-bg: #47474c;
+  --qs-menu-border: transparent;
+  --qs-menu-shadow: none;
+  --qs-header-icon: rgb(255 255 255 / .2);
+  --message-hover: #515157;
+  --banner-shadow: 0 2px 4px 2px rgb(0 0 0 / .2);
+  --stack-2: #45454a;
+  --stack-3: #3d3d42;
+  --cal-hover: #47474c;
+  --cal-selected: #4c4c52;
+  --cal-weekend: #9b9b9d;
+  --menu-line: rgb(255 255 255 / .1);
+  --icon-select: rgb(255 255 255 / .2);
+  --icon-hover: rgb(255 255 255 / .15);
+  --icon-ring: rgb(0 0 0 / .5);
+  --gtk-pop-border: #4b4b4b;
+  --gtk-border: #181818;
+  --gtk-entry-bg: #272727;
+  --gtk-entry-fg: #fff;
+  --gtk-suggested: #0d761d;
+  --gtk-suggested-border: #073f0f;
+  --gtk-disabled-bg: #2a2a2a;
+  --gtk-disabled-fg: #929292;
   color-scheme: dark;
 }

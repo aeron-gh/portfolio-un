@@ -23,17 +23,17 @@ describe('settings', () => {
   });
 
   test('unknown values are replaced, numbers are clamped', () => {
-    const s = loadSettings(memory({ [SETTINGS_KEY]: JSON.stringify({ style: 'neon', accent: 'pink', volume: 400, brightness: -5, clock24: 'yes' }) }));
+    const s = loadSettings(memory({ [SETTINGS_KEY]: JSON.stringify({ style: 'neon', accent: 'viridian', volume: 400, brightness: -5, clock24: 'yes' }) }));
     expect(s.style).toBe('system');
     expect(s.accent).toBe('orange');
     expect(s.volume).toBe(100);
-    expect(s.brightness).toBe(10);
+    expect(s.brightness).toBe(0);
     expect(s.clock24).toBeNull();
   });
 
   test('saved settings round-trip', () => {
     const m = memory();
-    const s = { ...DEFAULTS, style: 'dark' as const, accent: 'viridian' as const, clock24: true };
+    const s = { ...DEFAULTS, style: 'dark' as const, accent: 'teal' as const, clock24: true, wifi: false, muted: true, lastPowerMode: 'performance' as const };
     expect(saveSettings(m, s)).toBe(true);
     expect(loadSettings(m)).toEqual(s);
   });
@@ -43,10 +43,20 @@ describe('settings', () => {
     expect(saveSettings(broken, DEFAULTS)).toBe(false);
   });
 
-  test('the ten Ubuntu accents with their Yaru colours', () => {
-    expect(Object.keys(ACCENTS)).toEqual(['orange', 'bark', 'sage', 'olive', 'viridian', 'prussiangreen', 'blue', 'purple', 'magenta', 'red']);
-    expect(ACCENTS.orange).toBe('#E95420');
-    expect(ACCENTS.red).toBe('#DA3450');
+  test('the 26.04 accents: GNOME names, Yaru shell colours for light and dark', () => {
+    expect(Object.keys(ACCENTS)).toEqual(['blue', 'teal', 'green', 'yellow', 'orange', 'red', 'pink', 'purple', 'slate', 'brown']);
+    expect(ACCENTS.orange).toEqual({ light: '#cb4314', dark: '#d34615' });
+    expect(ACCENTS.teal.dark).toBe('#308280');
+  });
+
+  test('radios: on by default; a damaged airplane flag with a radio on is dropped', () => {
+    expect([DEFAULTS.wifi, DEFAULTS.bluetooth, DEFAULTS.airplane, DEFAULTS.muted]).toEqual([true, true, false, false]);
+    const s = loadSettings(memory({ [SETTINGS_KEY]: JSON.stringify({ airplane: true, wifi: true, bluetooth: false, muted: 'no', lastPowerMode: 'balanced' }) }));
+    expect(s.airplane).toBe(false);
+    expect(s.wifi).toBe(true);
+    expect(s.muted).toBe(false);
+    expect(s.lastPowerMode).toBe('power-saver');
+    expect(loadSettings(memory({ [SETTINGS_KEY]: JSON.stringify({ airplane: true, wifi: false, bluetooth: false }) })).airplane).toBe(true);
   });
 
   test('system style follows the visitor', () => {

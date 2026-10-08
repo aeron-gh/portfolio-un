@@ -3,18 +3,19 @@
 export type Style = 'system' | 'light' | 'dark';
 export type PowerMode = 'balanced' | 'power-saver' | 'performance';
 
-/** Ubuntu's ten accent colours (Yaru common/accent-colors.scss.in). */
+/** Ubuntu 26.04 accents: GNOME's accent names, with the Yaru colours Ubuntu's GNOME Shell uses for them (`light` with
+ *  the default colour scheme, `dark` with prefer-dark). */
 export const ACCENTS = {
-  orange: '#E95420',
-  bark: '#787859',
-  sage: '#657B69',
-  olive: '#4B8501',
-  viridian: '#03875B',
-  prussiangreen: '#308280',
-  blue: '#0073E5',
-  purple: '#7764D8',
-  magenta: '#B34CB3',
-  red: '#DA3450',
+  blue: { light: '#0070de', dark: '#0073e5' },
+  teal: { light: '#2e7e7c', dark: '#308280' },
+  green: { light: '#488001', dark: '#4b8501' },
+  yellow: { light: '#9a6800', dark: '#9f6c00' },
+  orange: { light: '#cb4314', dark: '#d34615' },
+  red: { light: '#d82b48', dark: '#da3450' },
+  pink: { light: '#ae4aae', dark: '#b34cb3' },
+  purple: { light: '#7360d7', dark: '#7764d8' },
+  slate: { light: '#627766', dark: '#657b69' },
+  brown: { light: '#8c6c47', dark: '#92714a' },
 } as const;
 export type Accent = keyof typeof ACCENTS;
 
@@ -23,11 +24,17 @@ export type Settings = {
   accent: Accent;
   nightLight: boolean;
   powerMode: PowerMode;
+  /** The Power Mode tile switches between Balanced and the last other profile. */
+  lastPowerMode: Exclude<PowerMode, 'balanced'>;
   dnd: boolean;
   /** null = follow the visitor's locale */
   clock24: boolean | null;
   volume: number;
+  muted: boolean;
   brightness: number;
+  wifi: boolean;
+  bluetooth: boolean;
+  airplane: boolean;
 };
 
 export const DEFAULTS: Settings = {
@@ -35,10 +42,15 @@ export const DEFAULTS: Settings = {
   accent: 'orange',
   nightLight: false,
   powerMode: 'balanced',
+  lastPowerMode: 'power-saver',
   dnd: false,
   clock24: null,
   volume: 70,
+  muted: false,
   brightness: 100,
+  wifi: true,
+  bluetooth: true,
+  airplane: false,
 };
 
 export const SETTINGS_KEY = 'ubuntu.settings.v1';
@@ -57,15 +69,23 @@ export function loadSettings(store: StoreLike | null): Settings {
   }
   if (!raw || typeof raw !== 'object') return { ...DEFAULTS };
   const r = raw as Record<string, unknown>;
+  const wifi = typeof r.wifi === 'boolean' ? r.wifi : DEFAULTS.wifi;
+  const bluetooth = typeof r.bluetooth === 'boolean' ? r.bluetooth : DEFAULTS.bluetooth;
   return {
     style: r.style === 'light' || r.style === 'dark' || r.style === 'system' ? r.style : DEFAULTS.style,
     accent: typeof r.accent === 'string' && r.accent in ACCENTS ? (r.accent as Accent) : DEFAULTS.accent,
     nightLight: typeof r.nightLight === 'boolean' ? r.nightLight : DEFAULTS.nightLight,
     powerMode: r.powerMode === 'power-saver' || r.powerMode === 'performance' || r.powerMode === 'balanced' ? r.powerMode : DEFAULTS.powerMode,
+    lastPowerMode: r.lastPowerMode === 'performance' ? 'performance' : 'power-saver',
     dnd: typeof r.dnd === 'boolean' ? r.dnd : DEFAULTS.dnd,
     clock24: typeof r.clock24 === 'boolean' ? r.clock24 : null,
     volume: clamp(r.volume, 0, 100, DEFAULTS.volume),
-    brightness: clamp(r.brightness, 10, 100, DEFAULTS.brightness),
+    muted: r.muted === true,
+    brightness: clamp(r.brightness, 0, 100, DEFAULTS.brightness),
+    wifi,
+    bluetooth,
+    // Airplane mode means every radio is off; anything else is a damaged save.
+    airplane: r.airplane === true && !wifi && !bluetooth,
   };
 }
 

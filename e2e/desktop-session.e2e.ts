@@ -93,11 +93,11 @@ test('Tab cannot reach the desktop behind the lock screen', async ({ page }) => 
 });
 
 test('saved dark style and accent are applied', async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('ubuntu.settings.v1', JSON.stringify({ style: 'dark', accent: 'viridian' })));
+  await page.addInitScript(() => localStorage.setItem('ubuntu.settings.v1', JSON.stringify({ style: 'dark', accent: 'teal' })));
   await loginToSession(page);
   await expect(page.locator('html')).toHaveAttribute('data-style', 'dark');
   await expect(page.locator('.wall.real')).toHaveAttribute('style', /ubuntu-dark/);
-  expect(await page.evaluate(() => document.documentElement.style.getPropertyValue('--accent'))).toBe('#03875B');
+  expect(await page.evaluate(() => document.documentElement.style.getPropertyValue('--accent'))).toBe('#308280');
 });
 
 test('the top bar uses the Yaru colours', async ({ page }) => {

@@ -195,6 +195,25 @@ export class Vfs {
     this.recordTree(dst, moved);
   }
 
+  /** Copy a file or a whole folder; the copy is the visitor's own (never read-only), with the original's times. */
+  copy(from: string, to: string): void {
+    const src = resolvePath(from);
+    let dst = resolvePath(to);
+    const node = this.walk(src);
+    if (!node) throw new FsError('ENOENT', src);
+    if (node.denied) throw new FsError('EACCES', src);
+    const target = this.walk(dst);
+    if (target?.kind === 'dir') dst = join(dst, node.name);
+    if (dst === src || dst.startsWith(`${src}/`)) throw new FsError('EINVAL', dst);
+    if (this.walk(dst)) throw new FsError('EEXIST', dst);
+    this.writableDir(dirname(dst));
+    const own = (n: FsNode): FsNode => {
+      const { readonly: _r, origin: _o, children, ...rest } = n;
+      return children ? { ...rest, children: Object.fromEntries(Object.entries(children).map(([k, c]) => [k, own(c)])) } : rest;
+    };
+    this.recordTree(dst, { ...own(structuredClone(node)), name: basename(dst) });
+  }
+
   trash(path: string): string {
     const p = resolvePath(path);
     if (!p.startsWith(`${HOME}/`) || p.startsWith(`${TRASH}/`)) throw new FsError('EACCES', p);

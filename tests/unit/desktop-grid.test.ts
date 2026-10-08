@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { CELL, MARGIN, cellAt, cellToXY, gridSize, layout, nearestFree } from '../../src/desktop/shell/desktop-grid';
+import { CELL, MARGIN, cellAt, cellToXY, gridSize, layout, nearestFree, neighbor } from '../../src/desktop/shell/desktop-grid';
 import { iconFor, noAppDialog, typeLabel } from '../../src/desktop/shell/file-icons';
 
 describe('desktop icon grid', () => {
@@ -55,5 +55,14 @@ describe('file icons', () => {
       body: 'There is no app installed for “Markdown document” files',
     });
     expect(noAppDialog('blob', { name: 'blob', kind: 'file', mime: 'application/octet-stream', size: 0, mtime: T }).body).toBe('The file is of an unknown type');
+  });
+  test('arrow keys move to the next icon in that direction', () => {
+    // col 0 is the rightmost column, row 0 the bottom row
+    const cells = { home: { col: 0, row: 0 }, readme: { col: 0, row: 1 }, notes: { col: 1, row: 1 } };
+    expect(neighbor(cells, 'readme', 'ArrowDown')).toBe('home');
+    expect(neighbor(cells, 'home', 'ArrowUp')).toBe('readme');
+    expect(neighbor(cells, 'readme', 'ArrowLeft')).toBe('notes');
+    expect(neighbor(cells, 'notes', 'ArrowRight')).toBe('readme');
+    expect(neighbor(cells, 'home', 'ArrowRight')).toBeNull();
   });
 });

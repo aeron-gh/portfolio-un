@@ -13,6 +13,8 @@ const DEBS = {
   bash: `${ARCHIVE}/b/bash/bash_5.3-2ubuntu1_amd64.deb`,
 };
 const YARU = 'https://raw.githubusercontent.com/ubuntu/yaru/7f18973e05607c609c4b972f0dd9bff36fa2a13e/icons/Yaru';
+// GNOME Shell's own icons (dark mode, menu ornaments, …), as Yaru ships them.
+const YARU_SHELL = 'https://raw.githubusercontent.com/ubuntu/yaru/7f18973e05607c609c4b972f0dd9bff36fa2a13e/gnome-shell/src/data/icons';
 const BATTERY = Array.from({ length: 11 }, (_, i) => i * 10).flatMap((n) => [
   `scalable/status/battery-level-${n}-symbolic.svg`,
   n === 100 ? 'scalable/status/battery-level-100-charged-symbolic.svg' : `scalable/status/battery-level-${n}-charging-symbolic.svg`,
@@ -33,7 +35,51 @@ const ICONS = [
   'scalable/status/network-wireless-offline-symbolic.svg',
   'scalable/status/audio-volume-high-symbolic.svg',
   'scalable/status/battery-missing-symbolic.svg',
+  'scalable/actions/view-app-grid-ubuntu-symbolic.svg',
+  'scalable/actions/edit-find-symbolic.svg',
+  'scalable/actions/edit-clear-symbolic.svg',
+  'scalable/actions/system-lock-screen-symbolic.svg',
+  'scalable/actions/system-shutdown-symbolic.svg',
+  'scalable/ui/window-minimize-symbolic.svg',
+  'scalable/ui/window-maximize-symbolic.svg',
+  'scalable/ui/window-restore-symbolic.svg',
+  'scalable/ui/window-close-symbolic.svg',
+  'scalable/ui/pan-start-symbolic.svg',
+  'scalable/ui/pan-end-symbolic.svg',
+  'scalable/ui/pan-down-symbolic.svg',
+  'scalable/status/network-wireless-disabled-symbolic.svg',
+  'scalable/status/network-wireless-no-route-symbolic.svg',
+  'scalable/status/bluetooth-active-symbolic.svg',
+  'scalable/status/bluetooth-disabled-symbolic.svg',
+  'scalable/status/power-profile-balanced-symbolic.svg',
+  'scalable/status/power-profile-power-saver-symbolic.svg',
+  'scalable/status/power-profile-performance-symbolic.svg',
+  'scalable/status/night-light-symbolic.svg',
+  'scalable/status/notifications-disabled-symbolic.svg',
+  'scalable/status/airplane-mode-symbolic.svg',
+  'scalable/status/audio-volume-muted-symbolic.svg',
+  'scalable/status/audio-volume-low-symbolic.svg',
+  'scalable/status/audio-volume-medium-symbolic.svg',
+  'scalable/status/display-brightness-symbolic.svg',
+  'scalable/org.gnome.Settings/org.gnome.Settings-accessibility-symbolic.svg',
+  'scalable/devices/network-wireless-symbolic.svg',
+  'scalable/status/network-wireless-encrypted-symbolic.svg',
+  'scalable/actions/object-select-symbolic.svg',
+  '48x48@2x/status/user-trash-full.png',
+  '48x48@2x/mimetypes/application-x-executable.png',
   ...BATTERY,
+];
+const SHELL_ICONS = [
+  'scalable/actions/dark-mode-symbolic.svg',
+  'scalable/status/no-notifications-symbolic.svg',
+  'scalable/actions/ornament-check-symbolic.svg',
+  'scalable/actions/ornament-dot-checked-symbolic.svg',
+  'scalable/actions/ornament-dot-unchecked-symbolic.svg',
+  'scalable/actions/preview-close-symbolic.svg',
+  'scalable/status/message-indicator-symbolic.svg',
+  'scalable/actions/group-collapse-symbolic.svg',
+  'scalable/actions/notification-expand-symbolic.svg',
+  'scalable/actions/cog-wheel-symbolic.svg',
 ];
 
 const OUT = 'src/desktop/assets';
@@ -99,14 +145,14 @@ await unpack(DEBS.bash, bash, ['./etc/skel/.bashrc', './etc/skel/.profile', './e
 for (const f of ['bashrc', 'profile', 'bash_logout']) copyFileSync(join(bash, 'etc/skel', `.${f}`), `${SYS}/skel/${f}`);
 
 /** Raw GitHub serves a git symlink as a short text file holding the target path: follow it to the real icon. */
-async function downloadIcon(rel: string, to: string, hops = 3): Promise<void> {
-  const res = await fetch(`${YARU}/${rel}`);
+async function downloadIcon(rel: string, to: string, hops = 3, base = YARU): Promise<void> {
+  const res = await fetch(`${base}/${rel}`);
   if (!res.ok) throw new Error(`${res.status} ${rel}`);
   const bytes = new Uint8Array(await res.arrayBuffer());
   const target = new TextDecoder().decode(bytes.subarray(0, 200)).trim();
   if (bytes.length < 200 && /^[\w./-]+\.(svg|png)$/.test(target)) {
     if (hops === 0) throw new Error(`too many symlinks: ${rel}`);
-    return downloadIcon(join(dirname(rel), target), to, hops - 1);
+    return downloadIcon(join(dirname(rel), target), to, hops - 1, base);
   }
   mkdirSync(dirname(to), { recursive: true });
   await Bun.write(to, bytes);
@@ -116,11 +162,14 @@ async function downloadIcon(rel: string, to: string, hops = 3): Promise<void> {
 for (const rel of ICONS) {
   await downloadIcon(rel, `${OUT}/icons/${rel.replace(/^(48x48@2x|scalable)\//, '')}`);
 }
+for (const rel of SHELL_ICONS) {
+  await downloadIcon(rel, `${OUT}/icons/${rel.replace(/^scalable\//, '')}`, 3, YARU_SHELL);
+}
 
 // 4. Owner avatar: 256 px head-and-shoulders square from the old site's 1600x900 photo
 //    (a centre crop leaves the face too small for the 48 px login circle).
 const avatarPng = join(tmp, 'avatar.png');
-await $`magick desktop/assets/photos/abhishek.jpeg -crop 520x520+589+50 +repage -resize 256x256 ${avatarPng}`;
+await $`magick scripts/sources/abhishek.jpeg -crop 520x520+589+50 +repage -resize 256x256 ${avatarPng}`;
 await $`avifenc --speed 6 -q 60 ${avatarPng} ${OUT}/avatar.avif`.quiet();
 
 console.log('ubuntu assets: done');

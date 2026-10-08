@@ -60,3 +60,25 @@ export function nearestFree(target: Cell, used: Set<string>, cols: number, rows:
   }
   return target;
 }
+
+const STEP = { ArrowLeft: [1, 0], ArrowRight: [-1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] } as const;
+
+/** Desktop Icons NG arrow keys: the nearest icon in that direction, preferring the same row or column. */
+export function neighbor(cells: Record<string, Cell>, from: string, key: keyof typeof STEP): string | null {
+  const start = cells[from];
+  if (!start) return null;
+  const [dc, dr] = STEP[key];
+  let best: string | null = null;
+  let bestScore = Number.POSITIVE_INFINITY;
+  for (const [path, c] of Object.entries(cells)) {
+    const ahead = (c.col - start.col) * dc + (c.row - start.row) * dr;
+    if (ahead <= 0) continue;
+    const aside = Math.abs(dc ? c.row - start.row : c.col - start.col);
+    const score = ahead * 10 + aside;
+    if (score < bestScore) {
+      bestScore = score;
+      best = path;
+    }
+  }
+  return best;
+}

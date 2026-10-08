@@ -9,6 +9,7 @@
   let step = $state<'curtain' | 'prompt'>('curtain');
   let now = $state(new Date());
   let entry = $state<HTMLInputElement>();
+  let pending = '';
   const time = $derived(formatClock(now, settings.clock24).time);
   const date = $derived(now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' }));
   const wallpaper = $derived(currentStyle() === 'dark' ? env.wallpaperDark : env.wallpaperLight);
@@ -18,11 +19,21 @@
     return () => clearInterval(t);
   });
   $effect(() => {
-    if (step === 'prompt') entry?.focus();
+    if (step !== 'prompt' || !entry) return;
+    entry.focus();
+    if (pending) {
+      entry.value = pending; // GNOME passes the key that lifted the curtain on to the password field
+      pending = '';
+    }
   });
 
   function onKey(e: KeyboardEvent) {
     if (step === 'curtain') {
+      if (e.key === 'Shift' || e.key === 'CapsLock') return; // unlockDialog.js: these leave the curtain down
+      if (e.key.length === 1 && e.key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault(); // typed below; otherwise the browser types it too, into the field it now finds focused
+        pending = e.key;
+      }
       step = 'prompt';
       return;
     }
@@ -68,7 +79,8 @@
   .lock-prompt img { border-radius: 50%; object-fit: cover; }
   .lock-name { font-size: 1.4em; font-weight: bold; }
   .lock-prompt form { display: flex; gap: 8px; width: 100%; }
-  .lock-prompt input { flex: 1; height: 2.75em; padding: 0 12px; border: 0; border-radius: var(--radius); background: rgb(255 255 255 / .15); color: #fff; outline: 2px solid transparent; }
-  .lock-prompt input:focus { outline-color: var(--accent); }
+  .lock-prompt input { flex: 1; height: 2.75em; padding: 9px; border: 0; border-radius: 8px; background: #3b3b3b; color: rgb(242 242 242 / .7); outline: none; }
+  .lock-prompt input:hover { background: #454545; color: #f2f2f2; }
+  .lock-prompt input:focus { color: #f2f2f2; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent) 80%, transparent); }
   .lock-prompt button { display: grid; place-items: center; width: 2.75em; height: 2.75em; border-radius: 50%; background: rgb(255 255 255 / .15); }
 </style>

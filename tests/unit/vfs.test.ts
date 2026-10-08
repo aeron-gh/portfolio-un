@@ -104,6 +104,20 @@ describe('writing', () => {
     expect(() => fs.move('~/Desktop/README.md', '~/Desktop/me.md')).toThrow('EEXIST');
   });
 
+  test('copy duplicates files and whole folders, as the visitor\'s own', () => {
+    const fs = new Vfs(seed(), {}, now);
+    fs.copy('~/Desktop/README.md', '~/Desktop/README (Copy).md');
+    expect(fs.read('~/Desktop/README (Copy).md')).toBe('# Hi');
+    expect(fs.read('~/Desktop/README.md')).toBe('# Hi');
+    fs.copy('~/Projects', '~/Desktop');
+    expect(fs.read('~/Desktop/Projects/partlore/README.md')).toBe('pins');
+    fs.copy('/etc/hostname', '~/Desktop');
+    expect(fs.stat('~/Desktop/hostname')?.readonly).toBeUndefined();
+    expect(() => fs.copy('~/Projects', '~/Projects/partlore')).toThrow('EINVAL');
+    expect(() => fs.copy('~/Desktop/README.md', '~/Desktop/README (Copy).md')).toThrow('EEXIST');
+    expect(() => fs.copy('/root', '~/Desktop')).toThrow('EACCES');
+  });
+
   test('trash and restore remember where things came from', () => {
     const fs = new Vfs(seed(), {}, now);
     const t1 = fs.trash('~/Desktop/README.md');

@@ -3,10 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "GITHUB_DATA=snapshot bun scripts/build-desktop.ts && astro dev",
-    "build": "bun scripts/build-desktop.ts && astro build",
+    "dev": "GITHUB_DATA=snapshot astro dev",
+    "build": "astro build",
     "preview": "astro preview --port 4321",
-    "desktop": "bun scripts/build-desktop.ts",
     "test": "bun test tests/unit",
     "test:build": "GITHUB_DATA=snapshot bun run build && bun test tests/build",
     "test:e2e": "GITHUB_DATA=snapshot bun run build && playwright test",

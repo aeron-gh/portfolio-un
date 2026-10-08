@@ -11,6 +11,9 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     // Most tests run with reduced motion so animations finish instantly.
     reducedMotion: 'reduce',
+    // Every test starts as a returning visitor, so the first-login welcome banner does not cover what tests click;
+    // the welcome test starts with empty storage.
+    storageState: { cookies: [], origins: [{ origin: `http://localhost:${PORT}`, localStorage: [{ name: 'ubuntu.welcome.v1', value: '1' }] }] },
     launchOptions: { executablePath: process.env.PW_BUNDLED ? undefined : '/usr/bin/chromium' },
   },
   webServer: {

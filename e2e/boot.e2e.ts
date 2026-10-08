@@ -8,9 +8,18 @@ async function bootAndWait(page: Page) {
   await expect(desk(page)).toHaveClass(/\bready\b/);
 }
 
+/** Log in on the embedded desktop's login screen, as a visitor would. */
+async function logIn(page: Page) {
+  const frame = page.frameLocator('.desk-frame');
+  await frame.locator('.gdm-user').click();
+  await page.keyboard.press('Enter');
+  await expect(frame.locator('.session')).toBeVisible();
+  return frame;
+}
+
 test('U boots the desktop and gives it focus', async ({ page }) => {
   await bootAndWait(page);
-  await expect(page.frameLocator('.desk-frame').locator('#desktop')).toBeVisible();
+  await expect(page.frameLocator('.desk-frame').locator('.gdm-user')).toBeVisible();
   expect(await page.evaluate(() => document.activeElement?.classList.contains('desk-frame'))).toBe(true);
 });
 
@@ -22,7 +31,8 @@ test('the page behind is locked while the desktop is open', async ({ page }) => 
 
 test('Esc inside the desktop shuts it down and gives the page back', async ({ page }) => {
   await bootAndWait(page);
-  await page.frameLocator('.desk-frame').locator('#desktop-area').click({ position: { x: 600, y: 300 } });
+  const frame = await logIn(page);
+  await frame.locator('.session').click({ position: { x: 600, y: 300 } });
   await page.keyboard.press('Escape');
   await expect(desk(page)).toBeHidden();
   await expect(page.locator('.desk-frame')).toHaveCount(0);
@@ -43,10 +53,11 @@ test('focus returns to the miniature after shutdown', async ({ page }) => {
 
 test('the power button inside the desktop also returns to the page', async ({ page }) => {
   await bootAndWait(page);
-  const frame = page.frameLocator('.desk-frame');
-  await frame.locator('#system-tray').click();
-  await frame.locator('#power-btn').click();
-  await frame.locator('.power-btn-option[data-action="shutdown"]').click();
+  const frame = await logIn(page);
+  await frame.locator('.panel .status').click();
+  await frame.getByRole('button', { name: 'Power Off Menu' }).click();
+  await frame.getByRole('menuitem', { name: 'Power Off…' }).click();
+  await frame.getByRole('alertdialog').getByRole('button', { name: 'Power Off' }).click();
   await expect(desk(page)).toBeHidden();
 });
 
@@ -87,7 +98,7 @@ test('a hint says how to come back', async ({ page }) => {
 test('hovering the boot pill prefetches the desktop', async ({ page }) => {
   await page.goto('/');
   await page.locator('.boot-pill').hover();
-  await expect(page.locator('link[rel="prefetch"][href="/desktop/app.js"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="prefetch"][href="/desktop-next/?embed=1"]')).toHaveCount(1);
 });
 
 test.describe('with motion on', () => {
@@ -95,7 +106,8 @@ test.describe('with motion on', () => {
 
   test('the grow and shrink animations still finish', async ({ page }) => {
     await bootAndWait(page);
-    await page.frameLocator('.desk-frame').locator('#desktop-area').click({ position: { x: 600, y: 300 } });
+    const frame = await logIn(page);
+    await frame.locator('.session').click({ position: { x: 600, y: 300 } });
     await page.keyboard.press('Escape');
     await expect(desk(page)).toBeHidden();
   });

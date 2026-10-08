@@ -34,8 +34,6 @@ npm-debug.log*
 # Astro
 .astro/
 
-# Built copy of the Ubuntu desktop (Plan 2)
-public/desktop/
 
 # Playwright
 test-results/

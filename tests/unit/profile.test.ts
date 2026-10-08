@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { profile } from '../../src/content/profile';
 import { formatRich } from '../../src/lib/rich';
-import { spotifyEmbedUrl } from '../../src/lib/desktop-build';
+import { spotifyEmbedUrl } from '../../src/lib/spotify';
 
 const vars = { since: 'June', total: '70+' };
 const copy = [
