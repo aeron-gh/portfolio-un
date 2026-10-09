@@ -1,8 +1,9 @@
 name: CI
 
+# Every pull request is checked before it can be merged; master is checked again after each merge.
 on:
   push:
-    branches: [master, rebuild]
+    branches: [master]
   pull_request:
 
 # A newer push to the same branch cancels the run that is still going.
