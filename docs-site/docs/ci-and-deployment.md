@@ -64,7 +64,6 @@ program that runs in Cloudflare's data centres around the world. Here it only se
 | Build command | `bun run build` | `bun run build` |
 | Deploy command | `npx wrangler deploy --assets=./dist --name=portfolio-un --compatibility-date=2026-10-01` | `npx wrangler deploy --assets=./build --name=portfolio-un-docs --compatibility-date=2026-10-01` |
 | Build variable | `BUN_VERSION=1.4.0` | `BUN_VERSION=1.4.0` |
-| Preview deploy command | `npx wrangler preview` | `npx wrangler preview` |
 | Domain | `mraeron.tech`, `www.mraeron.tech` | `docs.mraeron.tech` |
 
 Cloudflare's **Workers Builds** watches the repository. **Every change to `master` (each merged pull request) builds
@@ -73,18 +72,21 @@ and deploys.**
 Each Worker also has a config file: `wrangler.jsonc` at the root for the site, and `docs-site/wrangler.jsonc` for the
 docs. It holds the Worker's name and the folder to serve.
 
-### Preview builds
+### Preview builds are off
 
-For every pull request, Cloudflare also builds the branch and uploads it as a **preview**, with `npx wrangler
-preview`. That command has no `--assets` flag, and it takes the Worker's name from the config file, so preview builds
-need `wrangler.jsonc`.
+Cloudflare can also build every pull request as a **preview** (Worker Previews, an open beta since September 2026).
+It is **turned off** for both Workers ("Builds for Preview branches", under **Settings → Build → Previews Base**).
 
-Preview builds have **their own settings** in the dashboard, separate from production. They need the same
-`BUN_VERSION=1.4.0` variable (and, for the docs Worker, the `docs-site` root directory). Without it, Cloudflare uses
-its default Bun, which can't read our `bun.lock` ("Unknown lockfile version"), and the install fails.
+Why: preview builds don't use the production settings, and there is no documented place to give them build
+variables. So they run with Cloudflare's default Bun (1.2.15), which can't read our `bun.lock` ("Unknown lockfile
+version"). Every preview build failed, and every pull request showed a red Cloudflare check. Production builds are not
+affected: they have their own `BUN_VERSION=1.4.0`.
 
-A preview check doesn't block a merge (only the two CI jobs do), but a red check on every pull request hides real
-failures, so keep them green.
+Nothing is lost on safety: CI builds the site and runs every test on each pull request. Only the preview link is
+missing.
+
+To turn previews back on, Cloudflare first has to offer a way to set `BUN_VERSION` for preview builds. The preview
+command (`npx wrangler preview`) takes the Worker's name and folder from `wrangler.jsonc`, which is already in place.
 
 `--assets=./dist` means "serve this folder". There is no Worker script of our own. The `compatibility-date` pins how
 Cloudflare's runtime behaves, so a later Cloudflare change can't alter the site by surprise.
