@@ -1,7 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "desktop", "node_modules"],
+  "exclude": ["dist", "node_modules", "docs-site"],
   "compilerOptions": {
     "types": ["bun"]
   }

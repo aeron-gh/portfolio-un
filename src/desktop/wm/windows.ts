@@ -103,7 +103,8 @@ export function tileRect(area: Rect, tile: Tile): Rect {
   const th = Math.floor(area.h / 2);
   const cols = { L: { x: area.x, w: lw }, R: { x: area.x + lw, w: area.w - lw }, F: { x: area.x, w: area.w } };
   const rows = { T: { y: area.y, h: th }, B: { y: area.y + th, h: area.h - th }, F: { y: area.y, h: area.h } };
-  const [c, r] = ({ left: 'LF', right: 'RF', top: 'FT', bottom: 'FB', tl: 'LT', tr: 'RT', bl: 'LB', br: 'RB' } as const)[tile];
+  const parts = { left: ['L', 'F'], right: ['R', 'F'], top: ['F', 'T'], bottom: ['F', 'B'], tl: ['L', 'T'], tr: ['R', 'T'], bl: ['L', 'B'], br: ['R', 'B'] } as const;
+  const [c, r] = parts[tile];
   return { ...cols[c], ...rows[r] };
 }
 

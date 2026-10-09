@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [master, rebuild]
+  pull_request:
+
+# A newer push to the same branch cancels the run that is still going.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  site:
+    name: Type check, tests and budgets
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Use the saved GitHub data so builds never depend on the GitHub API.
+      GITHUB_DATA: snapshot
+      # Playwright's own Chromium instead of the system one the local config points at.
+      PW_BUNDLED: '1'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.0
+      - name: Install
+        run: bun install --frozen-lockfile
+      - name: Type check
+        run: bun run check
+      - name: Unit tests
+        run: bun test tests/unit
+      - name: Build
+        run: bun run build
+      - name: Build checks and size budgets
+        run: bun test tests/build
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Browser tests
+        run: bunx playwright test --reporter=list,html
+      - name: Upload the test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+
+  docs:
+    name: Docs site
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: docs-site
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.0
+      - name: Install
+        run: bun install --frozen-lockfile
+      - name: Build (fails on broken links)
+        run: bun run build

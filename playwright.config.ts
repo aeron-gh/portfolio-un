@@ -6,6 +6,9 @@ const PORT = 4399;
 export default defineConfig({
   testDir: 'e2e',
   testMatch: '**/*.e2e.ts',
+  // Screenshot baselines are made on the owner's machine; other machines render fonts a few pixels differently,
+  // so CI runs every other test and the screenshots stay a local check.
+  testIgnore: process.env.CI ? ['**/desktop-visual.e2e.ts'] : [],
   fullyParallel: true,
   use: {
     baseURL: `http://localhost:${PORT}`,
