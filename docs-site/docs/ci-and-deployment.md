@@ -64,18 +64,27 @@ program that runs in Cloudflare's data centres around the world. Here it only se
 | Build command | `bun run build` | `bun run build` |
 | Deploy command | `npx wrangler deploy --assets=./dist --name=portfolio-un --compatibility-date=2026-10-01` | `npx wrangler deploy --assets=./build --name=portfolio-un-docs --compatibility-date=2026-10-01` |
 | Build variable | `BUN_VERSION=1.4.0` | `BUN_VERSION=1.4.0` |
+| Preview deploy command | `npx wrangler preview` | `npx wrangler preview` |
 | Domain | `mraeron.tech`, `www.mraeron.tech` | `docs.mraeron.tech` |
 
 Cloudflare's **Workers Builds** watches the repository. **Every change to `master` (each merged pull request) builds
 and deploys.**
 
 Each Worker also has a config file: `wrangler.jsonc` at the root for the site, and `docs-site/wrangler.jsonc` for the
-docs. It holds the Worker's name and the folder to serve. The deploy commands above pass the same values as flags, but
-**preview builds** need the file: for every pull request, Cloudflare builds the branch and uploads it as a preview
-version with plain `npx wrangler versions upload`, which has no flags. Without the file, that command fails with
-"Missing entry-point to Worker script or to assets directory", and the pull request shows a red Cloudflare check.
-Preview builds don't block a merge (only the two CI jobs do), but a red check on every pull request hides real
-failures.
+docs. It holds the Worker's name and the folder to serve.
+
+### Preview builds
+
+For every pull request, Cloudflare also builds the branch and uploads it as a **preview**, with `npx wrangler
+preview`. That command has no `--assets` flag, and it takes the Worker's name from the config file, so preview builds
+need `wrangler.jsonc`.
+
+Preview builds have **their own settings** in the dashboard, separate from production. They need the same
+`BUN_VERSION=1.4.0` variable (and, for the docs Worker, the `docs-site` root directory). Without it, Cloudflare uses
+its default Bun, which can't read our `bun.lock` ("Unknown lockfile version"), and the install fails.
+
+A preview check doesn't block a merge (only the two CI jobs do), but a red check on every pull request hides real
+failures, so keep them green.
 
 `--assets=./dist` means "serve this folder". There is no Worker script of our own. The `compatibility-date` pins how
 Cloudflare's runtime behaves, so a later Cloudflare change can't alter the site by surprise.
