@@ -29,7 +29,7 @@ the Yaru theme, the Ubuntu Dock, Desktop Icons NG), never guessed. See [Matching
 | Language | TypeScript (strict) | Every module is type-checked with `astro check`. |
 | Runtime and tests | [Bun](https://bun.sh) | Installs, scripts and fast unit tests. |
 | Browser tests | [Playwright](https://playwright.dev) | Real Chromium: clicks, keys, screenshots, timing with a fake clock. |
-| Hosting | Cloudflare Workers (static assets) | Free, global, deploys on every push to `master`. |
+| Hosting | Cloudflare Workers (static assets) | Free, global, deploys every merge to `master`. |
 | CI | GitHub Actions | Type check, unit tests, build budgets, browser tests, docs build. |
 | These docs | [Docusaurus](https://docusaurus.io) 3 | Lives in `docs-site/` next to the code it describes. |
 

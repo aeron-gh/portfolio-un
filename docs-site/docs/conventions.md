@@ -66,9 +66,12 @@ See [Settings and saved data](./desktop/settings-and-storage.md).
 ## Git
 
 - **One short line** per commit message. If it doesn't fit on one line, the commit is too big: split it.
-- Work happens on `rebuild`. CI must be green before `master` moves.
-- `master` only moves by fast-forward (`git merge --ff-only rebuild`). Every push to `master` deploys.
-- Before pushing, squash the work into one commit with a clear one-line message.
+- Every change goes through a pull request from a short-lived branch. `master` can't be pushed to directly.
+- A pull request is merged only when CI is green. GitHub blocks the merge until then.
+- Pull requests are squash-merged, so each one becomes one commit on `master`. Its title is the commit message: keep
+  it to one short line. Every merge to `master` deploys.
+
+See [CI and deployment](./ci-and-deployment.md#how-a-change-reaches-the-site).
 
 ## TypeScript
 

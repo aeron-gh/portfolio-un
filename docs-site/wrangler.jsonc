@@ -1,0 +1,7 @@
+// The Cloudflare Worker for docs.mraeron.tech. It only serves the built docs in build/; there is no Worker script.
+// Production (master) and preview (pull request) builds both read this file.
+{
+  "name": "portfolio-un-docs",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./build" }
+}

@@ -10,7 +10,7 @@ site on the internet. Here, GitHub Actions does CI, and Cloudflare does deployme
 
 ## CI: `.github/workflows/ci.yml`
 
-It runs on every push to `master` or `rebuild`, and on every pull request. If you push again to the same branch
+It runs on every pull request, and again on `master` after each merge. If you push again to the same branch
 while a run is still going, the old run is cancelled. Only the newest code matters.
 
 There are two jobs, and they run side by side.
@@ -57,16 +57,36 @@ program that runs in Cloudflare's data centres around the world. Here it only se
 
 | Setting | Main site | Docs site |
 | --- | --- | --- |
-| Worker name | `portfolio-un` | your choice, e.g. `portfolio-docs` |
+| Worker name | `portfolio-un` | `portfolio-un-docs` |
 | Git repository | `aeron-gh/portfolio-un` | `aeron-gh/portfolio-un` |
 | Production branch | `master` | `master` |
 | Root directory | `/` | `docs-site` |
 | Build command | `bun run build` | `bun run build` |
-| Deploy command | `npx wrangler deploy --assets=./dist --name=portfolio-un --compatibility-date=2026-10-01` | `npx wrangler deploy --assets=./build --name=portfolio-docs --compatibility-date=2026-10-01` |
+| Deploy command | `npx wrangler deploy --assets=./dist --name=portfolio-un --compatibility-date=2026-10-01` | `npx wrangler deploy --assets=./build --name=portfolio-un-docs --compatibility-date=2026-10-01` |
 | Build variable | `BUN_VERSION=1.4.0` | `BUN_VERSION=1.4.0` |
 | Domain | `mraeron.tech`, `www.mraeron.tech` | `docs.mraeron.tech` |
 
-Cloudflare's **Workers Builds** watches the repository. **Every push to `master` builds and deploys.**
+Cloudflare's **Workers Builds** watches the repository. **Every change to `master` (each merged pull request) builds
+and deploys.**
+
+Each Worker also has a config file: `wrangler.jsonc` at the root for the site, and `docs-site/wrangler.jsonc` for the
+docs. It holds the Worker's name and the folder to serve.
+
+### Preview builds are off
+
+Cloudflare can also build every pull request as a **preview** (Worker Previews, an open beta since September 2026).
+It is **turned off** for both Workers ("Builds for Preview branches", under **Settings → Build → Previews Base**).
+
+Why: preview builds don't use the production settings, and there is no documented place to give them build
+variables. So they run with Cloudflare's default Bun (1.2.15), which can't read our `bun.lock` ("Unknown lockfile
+version"). Every preview build failed, and every pull request showed a red Cloudflare check. Production builds are not
+affected: they have their own `BUN_VERSION=1.4.0`.
+
+Nothing is lost on safety: CI builds the site and runs every test on each pull request. Only the preview link is
+missing.
+
+To turn previews back on, Cloudflare first has to offer a way to set `BUN_VERSION` for preview builds. The preview
+command (`npx wrangler preview`) takes the Worker's name and folder from `wrangler.jsonc`, which is already in place.
 
 `--assets=./dist` means "serve this folder". There is no Worker script of our own. The `compatibility-date` pins how
 Cloudflare's runtime behaves, so a later Cloudflare change can't alter the site by surprise.
@@ -74,19 +94,29 @@ Cloudflare's runtime behaves, so a later Cloudflare change can't alter the site 
 The production build has no `GITHUB_DATA`, so it fetches **live** GitHub data. If GitHub fails, it falls back to the
 snapshot. See [GitHub data](./homepage/github-data.md).
 
-### CI does not block a deploy
+### How a change reaches the site
 
-Cloudflare builds `master` on its own. It does not wait for GitHub Actions. So the safe order is:
+Cloudflare deploys `master` without waiting for GitHub Actions. So the gate is on `master` itself: a GitHub
+**ruleset** named "Protect master" means nothing reaches `master` without passing CI first.
+
+| Rule | Effect |
+| --- | --- |
+| Pull request required | Nobody can push to `master` directly, not even the owner |
+| Required checks | A pull request can't be merged until both CI jobs are green |
+| No force-push, no deletion | `master`'s history can't be rewritten or lost |
+
+The repository also allows **squash merging only**, with the pull request's title as the whole commit message. Each
+pull request becomes exactly one one-line commit on `master`. The branch is deleted after the merge.
 
 ```bash
-git push origin rebuild         # 1. push the work branch; CI runs
-gh run watch                    # 2. wait for green
-git checkout master && git merge --ff-only rebuild
-git push origin master          # 3. now it deploys
+git switch -c fix-dock-menu        # 1. a short-lived branch for one change
+# … edit, test, commit …
+git push -u origin fix-dock-menu   # 2. push it
+gh pr create --fill                # 3. open a pull request; CI runs on it
+gh pr checks --watch               # 4. wait for green
+gh pr merge --squash               # 5. merge: master changes, and Cloudflare deploys
+git switch master && git pull      # 6. back to an up-to-date master
 ```
-
-`--ff-only` (fast-forward only) moves `master` to exactly the tested commit, or refuses. Nothing new is mixed in on
-the way.
 
 ### DNS
 
