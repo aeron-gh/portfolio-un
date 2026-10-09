@@ -29,7 +29,8 @@ portfolio-un/
 ├── tests/
 │   ├── unit/                  Pure logic tests (Bun)
 │   └── build/                 Tests that read the built dist/ (HTML, budgets)
-└── tsconfig.json              Strict TypeScript, Bun types
+├── tsconfig.json              Strict TypeScript, Bun types
+└── wrangler.jsonc             The Cloudflare Worker: its name and the folder it serves (dist/)
 ```
 
 ## How the code is organised

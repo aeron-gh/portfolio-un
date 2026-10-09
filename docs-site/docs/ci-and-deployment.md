@@ -57,17 +57,25 @@ program that runs in Cloudflare's data centres around the world. Here it only se
 
 | Setting | Main site | Docs site |
 | --- | --- | --- |
-| Worker name | `portfolio-un` | your choice, e.g. `portfolio-docs` |
+| Worker name | `portfolio-un` | `portfolio-un-docs` |
 | Git repository | `aeron-gh/portfolio-un` | `aeron-gh/portfolio-un` |
 | Production branch | `master` | `master` |
 | Root directory | `/` | `docs-site` |
 | Build command | `bun run build` | `bun run build` |
-| Deploy command | `npx wrangler deploy --assets=./dist --name=portfolio-un --compatibility-date=2026-10-01` | `npx wrangler deploy --assets=./build --name=portfolio-docs --compatibility-date=2026-10-01` |
+| Deploy command | `npx wrangler deploy --assets=./dist --name=portfolio-un --compatibility-date=2026-10-01` | `npx wrangler deploy --assets=./build --name=portfolio-un-docs --compatibility-date=2026-10-01` |
 | Build variable | `BUN_VERSION=1.4.0` | `BUN_VERSION=1.4.0` |
 | Domain | `mraeron.tech`, `www.mraeron.tech` | `docs.mraeron.tech` |
 
 Cloudflare's **Workers Builds** watches the repository. **Every change to `master` (each merged pull request) builds
 and deploys.**
+
+Each Worker also has a config file: `wrangler.jsonc` at the root for the site, and `docs-site/wrangler.jsonc` for the
+docs. It holds the Worker's name and the folder to serve. The deploy commands above pass the same values as flags, but
+**preview builds** need the file: for every pull request, Cloudflare builds the branch and uploads it as a preview
+version with plain `npx wrangler versions upload`, which has no flags. Without the file, that command fails with
+"Missing entry-point to Worker script or to assets directory", and the pull request shows a red Cloudflare check.
+Preview builds don't block a merge (only the two CI jobs do), but a red check on every pull request hides real
+failures.
 
 `--assets=./dist` means "serve this folder". There is no Worker script of our own. The `compatibility-date` pins how
 Cloudflare's runtime behaves, so a later Cloudflare change can't alter the site by surprise.

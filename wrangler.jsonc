@@ -1,0 +1,7 @@
+// The Cloudflare Worker for mraeron.tech. It only serves the built site in dist/; there is no Worker script.
+// Production (master) and preview (pull request) builds both read this file.
+{
+  "name": "portfolio-un",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./dist" }
+}
