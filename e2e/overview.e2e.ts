@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 type W = { id: string; app: string; workspace: number };
-type Hooks = { ubuntu: { launch: (app: string) => Promise<string>; windows: () => W[] } };
+type Hooks = { ubuntu: { launch: (app: string) => Promise<string>; windows: () => W[]; overview: () => { mode: string; query: string } } };
 
 async function session(page: Page, testApps = true) {
   await page.setViewportSize({ width: 1280, height: 800 });
@@ -12,7 +12,19 @@ async function session(page: Page, testApps = true) {
 }
 const launch = (page: Page, app = 'test-window') => page.evaluate((a) => (window as unknown as Hooks).ubuntu.launch(a), app);
 const wins = (page: Page) => page.evaluate(() => (window as unknown as Hooks).ubuntu.windows());
+const state = (page: Page) => page.evaluate(() => (window as unknown as Hooks).ubuntu.overview());
 const activities = (page: Page) => page.getByRole('button', { name: 'Activities' });
+
+/** Holds the Overview's code at the network until release(), as on a slow connection. */
+async function holdOverview(page: Page): Promise<() => void> {
+  let release!: () => void;
+  const gate = new Promise<void>((r) => (release = r));
+  await page.route(/\/_astro\/Overview\.[\w-]+\.js$/, async (route) => {
+    await gate;
+    await route.continue();
+  });
+  return release;
+}
 
 test('the workspace pill opens the overview with the mouse', async ({ page }) => {
   await session(page, false);
@@ -86,6 +98,32 @@ test('with the providers on, files and settings answer', async ({ page }) => {
   await expect(page.locator('.search-section-content[aria-label="Settings"]')).toContainText('Appearance');
 });
 
+test('keys typed while the Overview is still loading go into the search', async ({ page }) => {
+  const release = await holdOverview(page);
+  await session(page);
+  await activities(page).click();
+  await page.keyboard.type('test w');
+  await expect.poll(() => state(page)).toMatchObject({ mode: 'windows', query: 'test w' });
+  release();
+  await expect(page.locator('input.search-entry')).toHaveValue('test w');
+  await page.keyboard.type('i'); // the caret is at the end, as if the visitor had typed into the entry all along
+  await expect(page.locator('input.search-entry')).toHaveValue('test wi');
+  await expect(page.locator('.grid-results .overview-tile')).toHaveCount(1);
+});
+
+test('Esc while the Overview is still loading clears the search, then closes the Overview', async ({ page }) => {
+  const release = await holdOverview(page);
+  await session(page, false);
+  await activities(page).click();
+  await page.keyboard.type('ab');
+  await page.keyboard.press('Escape');
+  await expect.poll(() => state(page)).toMatchObject({ mode: 'windows', query: '' });
+  await page.keyboard.press('Escape');
+  await expect.poll(() => state(page)).toMatchObject({ mode: 'hidden' });
+  release();
+  await expect(page.locator('.ov-back')).toHaveCount(0);
+});
+
 test('dropping a window on the next workspace moves it; thumbnails show with three workspaces', async ({ page }) => {
   await session(page);
   const a = await launch(page);
@@ -116,14 +154,14 @@ test('dragging a tile reorders the grid and the order is kept', async ({ page })
   await session(page);
   await page.getByRole('button', { name: 'Show Apps' }).click();
   const ids = () => page.locator('.app-grid .overview-tile').evaluateAll((els) => els.map((e) => e.getAttribute('data-tile')));
-  expect(await ids()).toEqual(['test-window', 'Utilities']);
+  await expect.poll(ids).toEqual(['test-window', 'Utilities']);
   await page.locator('[data-tile="Utilities"]').dragTo(page.locator('[data-tile="test-window"]'));
-  expect(await ids()).toEqual(['Utilities', 'test-window']);
+  await expect.poll(ids).toEqual(['Utilities', 'test-window']);
   await page.reload();
   await page.locator('.gdm-user').click();
   await page.keyboard.press('Enter');
   await page.getByRole('button', { name: 'Show Apps' }).click();
-  expect(await ids()).toEqual(['Utilities', 'test-window']);
+  await expect.poll(ids).toEqual(['Utilities', 'test-window']);
 });
 
 test('a visitor\'s app grid shows the workspace and no apps yet', async ({ page }) => {

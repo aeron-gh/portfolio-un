@@ -34,7 +34,7 @@ The desktop is one Svelte app, mounted by `src/pages/desktop/index.astro`. Folde
 | `ScreenFilters.svelte` | Night Light (warm overlay) and brightness (dimming overlay). |
 | `DateMenu.svelte`, `Calendar.svelte` | The date menu: notifications on the left; Today, calendar and events on the right. |
 | `Banner.svelte`, `MessageCard.svelte` | Notification banners and the notification card used everywhere. |
-| `Dock.svelte`, `dock.ts` | The Ubuntu Dock: pinned and running apps, running dots, tooltips, menus, Show Apps. |
+| `Dock.svelte`, `dock.ts`, `dock-menu.ts` | The Ubuntu Dock: pinned and running apps, running dots, tooltips, menus, Show Apps. The menu builder (`dock-menu.ts`) loads on first right-click. |
 | `Overview.svelte`, `overview.ts`, `overview.svelte.ts` | Activities Overview: window picker, workspaces, search, app grid. |
 | `AppGrid.svelte`, `app-grid.ts` | The app grid: pages, folders, drag to reorder. |
 | `SearchResults.svelte`, `search.ts` | Overview search results and ranking. |

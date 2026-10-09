@@ -1,6 +1,6 @@
-// The Ubuntu Dock's rules (ubuntu-dock 26.04 defaults): which items show, what a click does, pins, the menu.
+// The Ubuntu Dock's rules (ubuntu-dock 26.04 defaults): which items show, what a click does, pins.
+// The app menu is in dock-menu.ts, loaded on first right-click.
 import { APPS, PINNED_DEFAULT, type AppId } from '../apps/registry';
-import { tidySeparators, type MenuItem } from './menu';
 
 export type DockItem =
   | { kind: 'app'; app: AppId; pinned: boolean; windows: number; focused: boolean }
@@ -65,19 +65,4 @@ export const unpinApp = (pins: AppId[], app: AppId): AppId[] => pins.filter((a) 
 export function hotkeyApp(items: DockItem[], n: number): AppId | null {
   const apps = items.filter((i): i is Extract<DockItem, { kind: 'app' }> => i.kind === 'app');
   return apps[n - 1]?.app ?? null;
-}
-
-/** ubuntu-dock's app menu: name, open windows, New Window, Pin to Dock / Unpin, Quit. */
-export function dockMenu(name: string, pinned: boolean, windows: { id: string; title: string }[]): MenuItem[] {
-  const items: MenuItem[] = [{ kind: 'separator', label: name }];
-  if (windows.length) {
-    items.push({ kind: 'separator', label: 'Open Windows' });
-    for (const w of windows) items.push({ kind: 'item', id: `win:${w.id}`, label: w.title });
-  }
-  items.push({ kind: 'separator' }, { kind: 'item', id: 'new-window', label: 'New Window' }, { kind: 'separator' });
-  items.push({ kind: 'separator' }, pinned ? { kind: 'item', id: 'unpin', label: 'Unpin' } : { kind: 'item', id: 'pin', label: 'Pin to Dock' });
-  if (windows.length) {
-    items.push({ kind: 'separator' }, { kind: 'item', id: 'quit', label: windows.length === 1 ? 'Quit' : `Quit ${windows.length} Windows` });
-  }
-  return tidySeparators(items);
 }

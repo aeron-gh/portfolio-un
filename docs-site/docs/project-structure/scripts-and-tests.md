@@ -40,7 +40,7 @@ bun run test:build
 | File | Tests | Covers |
 | --- | ---: | --- |
 | `top.e2e.ts`, `building.e2e.ts`, `oss.e2e.ts`, `contact.e2e.ts`, `preview.e2e.ts`, `guards.e2e.ts` | 21 | Homepage sections, previews, guards against broken states |
-| `menu.e2e.ts` | 11 | The command menu |
+| `menu.e2e.ts` | 12 | The command menu |
 | `boot.e2e.ts` | 13 | Booting the desktop from the homepage and coming back |
 | `embed.e2e.ts` | 5 | The iframe protocol (ready, Esc to exit, Power Off) |
 | `desktop-page.e2e.ts` | 1 | The desktop page loads with no script errors |
@@ -49,8 +49,8 @@ bun run test:build
 | `desktop-menus.e2e.ts` | 5 | Right-click menus, rename, copy/paste, trash, arrange |
 | `windows.e2e.ts` | 11 | Open, move, resize, snap, maximise, minimise, close |
 | `dock.e2e.ts` | 9 | Dock clicks, menus, pins, running dots |
-| `overview.e2e.ts` | 12 | Window picker, workspaces, search, app grid |
-| `keyboard.e2e.ts` | 14 | Shortcuts, Alt+Tab, the full-screen session |
+| `overview.e2e.ts` | 14 | Window picker, workspaces, search, app grid |
+| `keyboard.e2e.ts` | 15 | Shortcuts, Alt+Tab, the full-screen session |
 | `quick-settings.e2e.ts` | 10 | Tiles, sliders, menus, power menu |
 | `end-session.e2e.ts` | 8 | Log Out / Restart / Power Off dialogs, countdown, Suspend |
 | `notifications.e2e.ts` | 6 | Banners, the date menu, grouping, Do Not Disturb |

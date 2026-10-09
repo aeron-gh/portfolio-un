@@ -150,6 +150,24 @@ test('Super+1 focuses the first dock app; Super+Shift+PageDown takes the window 
   await expect.poll(() => focusedId(page)).not.toBe(a);
 });
 
+test('embedded: Esc while the Overview is still loading closes the Overview, not the desktop', async ({ page }) => {
+  let release!: () => void;
+  const gate = new Promise<void>((r) => (release = r));
+  await page.route(/\/_astro\/Overview\.[\w-]+\.js$/, async (route) => {
+    await gate;
+    await route.continue();
+  });
+  const { d, frame, msgs } = await embedded(page);
+  await d.getByRole('button', { name: 'Activities' }).click();
+  await page.keyboard.press('Escape');
+  await expect.poll(() => frame.evaluate(() => (window as unknown as Hooks).ubuntu.overview().mode)).toBe('hidden');
+  release();
+  // A second Esc on the quiet desktop hands control back; only that one may say so.
+  await page.keyboard.press('Escape');
+  await expect.poll(msgs).toContain('desktop:exit');
+  expect((await msgs()).filter((m) => m === 'desktop:exit')).toHaveLength(1);
+});
+
 test('Esc closes the topmost layer first', async ({ page }) => {
   const { d, msgs } = await embedded(page);
   await d.getByRole('button', { name: 'Activities' }).click();

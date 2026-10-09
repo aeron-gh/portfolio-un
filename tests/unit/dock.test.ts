@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { PINNED_DEFAULT, type AppId } from '../../src/desktop/apps/registry';
-import { PINS_KEY, clickAction, dockItems, dockMenu, hotkeyApp, loadPins, pinApp, savePins, unpinApp } from '../../src/desktop/shell/dock';
+import { PINS_KEY, clickAction, dockItems, hotkeyApp, loadPins, pinApp, savePins, unpinApp } from '../../src/desktop/shell/dock';
+import { dockMenu } from '../../src/desktop/shell/dock-menu';
 
 const memory = (initial: Record<string, string> = {}) => {
   const data = { ...initial };

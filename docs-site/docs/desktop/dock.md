@@ -5,7 +5,8 @@ title: The dock
 
 # The Ubuntu Dock
 
-Rules in `shell/dock.ts`, drawing in `shell/Dock.svelte`. Values come from the ubuntu-dock extension's 26.04 defaults.
+Rules in `shell/dock.ts`, the right-click menu in `shell/dock-menu.ts` (loaded on first use), drawing in
+`shell/Dock.svelte`. Values come from the ubuntu-dock extension's 26.04 defaults.
 
 ## Layout
 

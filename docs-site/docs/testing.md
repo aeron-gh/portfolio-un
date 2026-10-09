@@ -11,7 +11,7 @@ There are three kinds of tests. Each one catches a different kind of mistake.
 | --- | --- | --- | ---: | --- |
 | **Unit** | `tests/unit/` | Bun, no browser, under 1 s | 222 | Wrong rules: window maths, sort orders, saved-data checks |
 | **Build** | `tests/build/` | Bun, reading `dist/` | 40 | Broken HTML, missing tags, files that grew too big |
-| **Browser** | `e2e/` | Playwright with real Chromium | 169 | Wrong behaviour: clicks, keys, focus, timing, looks |
+| **Browser** | `e2e/` | Playwright with real Chromium | 173 | Wrong behaviour: clicks, keys, focus, timing, looks |
 
 ```bash
 bun run test        # unit
@@ -74,6 +74,26 @@ A test that passes and fails at random usually means the code has a real timing 
 example: Alt+Tab sometimes picked the wrong window when the machine was busy. The cause was that the switcher appeared
 under the resting pointer and took hover as a choice. GNOME ignores the pointer for 500 ms after the switcher appears.
 Copying that rule fixed the real bug and the flaky test together.
+
+### Testing a slow connection
+
+Parts that load on demand (the Overview, menus, the homepage's command menu) arrive a moment after they are asked
+for. On a fast machine that moment is too short to notice, so a bug in it never shows. To test it, a test can **hold
+the file at the network** until it says so:
+
+```ts
+let release!: () => void;
+const gate = new Promise<void>((r) => (release = r));
+await page.route(/\/_astro\/Overview\.[\w-]+\.js$/, async (route) => {
+  await gate;            // the file waits here…
+  await route.continue();
+});
+// … click Activities, type, press Esc: all while the Overview's code is still on its way …
+release();               // … and arrives only now
+```
+
+This is not a fixed wait, so the test is not slow and not flaky. The "slow" moment lasts exactly as long as the test
+needs.
 
 ## Size budgets
 

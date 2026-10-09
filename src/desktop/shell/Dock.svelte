@@ -1,15 +1,17 @@
 <script lang="ts">
   import type PopupMenuView from './PopupMenu.svelte';
-  import { loadPopupMenu } from './surfaces';
+  import type { dockMenu as DockMenu } from './dock-menu';
+  import { loadDockMenu, loadPopupMenu } from './surfaces';
   import { appById, isAvailable, type AppId } from '../apps/registry';
   import { icon } from '../icons';
   import { safeStorage } from '../system/settings';
   import { appWindows, runningApps, switchWorkspace } from '../wm/windows';
   import { close, dockIcons, focus, launch, wm } from '../wm/wm.svelte';
-  import { clickAction, dockItems, dockMenu, loadPins, pinApp, savePins, unpinApp } from './dock';
+  import { clickAction, dockItems, loadPins, pinApp, savePins, unpinApp } from './dock';
   import { hideOverview, overview, showAppsClicked, spread } from './overview.svelte';
-  // The menu loads on first use (prefetched when the browser is idle after login).
+  // The menu and its items load on first use (prefetched when the browser is idle after login).
   let PopupMenu = $state.raw<typeof PopupMenuView | null>(null);
+  let dockMenu = $state.raw<typeof DockMenu | null>(null);
 
   const store = safeStorage();
   let pins = $state(loadPins(store));
@@ -88,7 +90,14 @@
     switchWorkspace(wm, wm.workspace + (e.deltaY > 0 ? 1 : -1));
   }
   $effect(() => {
-    if (menu && !PopupMenu) loadPopupMenu().then((m) => (PopupMenu = m.default)).catch(() => (menu = null));
+    if (menu && !PopupMenu) {
+      Promise.all([loadPopupMenu(), loadDockMenu()])
+        .then(([m, d]) => {
+          dockMenu = d.dockMenu;
+          PopupMenu = m.default;
+        })
+        .catch(() => (menu = null));
+    }
   });
 </script>
 
@@ -133,7 +142,7 @@
 </nav>
 
 {#if tip}<div class="dash-label" style:top="{tip.y}px">{tip.text}</div>{/if}
-{#if menu && PopupMenu}
+{#if menu && PopupMenu && dockMenu}
   {@const m = menu}
   <PopupMenu
     items={dockMenu(appById(m.app).name, pins.includes(m.app), appWindows(wm, m.app).map((w) => ({ id: w.id, title: w.title })))}

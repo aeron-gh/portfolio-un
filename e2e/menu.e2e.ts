@@ -45,6 +45,28 @@ test('Escape closes the menu and gives focus back', async ({ page }) => {
   await expect(trigger).toBeFocused();
 });
 
+test('Escape while the menu code is still loading closes it, and it stays closed', async ({ page }) => {
+  let release!: () => void;
+  const gate = new Promise<void>((r) => (release = r));
+  await page.route(/\/_astro\/command-menu\.[\w-]+\.js$/, async (route) => {
+    await gate;
+    await route.continue();
+  });
+  await page.goto('/');
+  const trigger = page.locator('[data-cmdk]');
+  const dialog = page.getByRole('dialog', { name: 'Command menu' });
+  await trigger.click();
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+  const loaded = page.waitForResponse(/command-menu\./);
+  release();
+  await loaded;
+  await page.waitForTimeout(300); // time for the arrived code to run; the menu must not open by itself
+  await expect(dialog).toBeHidden();
+});
+
 test('closing a keyboard-opened menu does not leave focus in its hidden input', async ({ page }) => {
   await page.goto('/');
   await page.keyboard.press('Control+k');

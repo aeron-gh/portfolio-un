@@ -18,6 +18,8 @@
   import { cancelEndSession, endSession } from '../system/end-session.svelte';
   import { quitAll, tiling } from '../wm/wm.svelte';
   import { currentStyle } from '../system/settings.svelte';
+  import { openLayer } from '../system/layers.svelte';
+  import { session } from '../system/session.svelte';
   import type { Env } from '../env';
 
   // locked: the lock screen covers the session, so nothing in it may take focus or be read out.
@@ -38,6 +40,27 @@
   let OverviewView = $state.raw<Component<{ env: Env }> | null>(null);
   $effect(() => {
     if (overview.mode !== 'hidden' && !OverviewView) loadOverview().then((m) => (OverviewView = m.default)).catch(hideOverview);
+  });
+  // Until its code arrives, the keys still belong to the Overview: typing goes into the search, and Esc clears it,
+  // then closes the Overview. Without this layer the keys are lost, and an embedded desktop takes Esc as "leave".
+  $effect(() => {
+    if (overview.mode === 'hidden' || OverviewView) return;
+    const layer = openLayer();
+    const onkey = (e: KeyboardEvent) => {
+      if (!layer.top() || session.state !== 'session') return;
+      if (e.key === 'Escape') {
+        if (overview.query) overview.query = '';
+        else hideOverview();
+      } else if (e.key === 'Backspace') overview.query = overview.query.slice(0, -1);
+      else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) overview.query += e.key;
+      else return;
+      e.preventDefault();
+    };
+    addEventListener('keydown', onkey);
+    return () => {
+      removeEventListener('keydown', onkey);
+      layer.close();
+    };
   });
   // Quick Settings, the same way; locking the screen closes it, as GNOME closes every menu.
   let QuickSettingsView = $state.raw<Component | null>(null);

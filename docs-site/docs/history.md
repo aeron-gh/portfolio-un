@@ -72,4 +72,6 @@ Each of these was a real bug. Each one now has a test.
 | Quick Settings tiles had the wrong padding | A rule written only for left-to-right text (`:ltr`) was missed in the theme CSS | Check direction-specific rules too |
 | The accent colour was a little off | The Ubuntu brand orange (`#E95420`) was used | Ubuntu's GNOME Shell uses its own accent colours: copied from there |
 | The start-up JavaScript went over budget | Menus, dialogs and the switcher were loaded at start | Load them when first needed. See [Testing](./testing.md#size-budgets) |
+| On a slow connection, keys pressed right after opening the Overview were lost, and in the embedded desktop Esc left the whole desktop | The Overview's code loads on demand. Until it arrived, nothing was listening for its keys | Until it arrives, a placeholder layer keeps the typing for the search and handles Esc. Found by CI, whose machines are slower |
+| On a slow connection, Esc right after opening the homepage menu was ignored | The box shows at once, but its key handling came with the code | Esc before the code arrives closes the box and cancels the opening |
 | Esc closed two things at once | Every open menu listened to the same key | A [layer stack](./desktop/architecture.md#overlays-and-the-keyboard): only the top layer acts |

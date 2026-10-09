@@ -10,6 +10,7 @@ export const loadRenamePopover = () => import('./RenamePopover.svelte');
 export const loadSwitcher = () => import('./Switcher.svelte');
 export const loadDialog = () => import('./Dialog.svelte');
 export const loadDesktopMenu = () => import('./desktop-menu');
+export const loadDockMenu = () => import('./dock-menu');
 export const loadTilingPopup = () => import('../wm/TilingPopup.svelte');
 export const loadPowerOff = () => import('../boot/PowerOff.svelte');
 
@@ -27,6 +28,7 @@ export function prefetchSurfaces(): void {
     loadSwitcher().catch(() => {});
     loadDialog().catch(() => {});
     loadDesktopMenu().catch(() => {});
+    loadDockMenu().catch(() => {});
     loadTilingPopup().catch(() => {});
   };
   if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 3000 });

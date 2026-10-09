@@ -12,12 +12,19 @@ if (/Mac|iPhone|iPad/.test(navigator.platform)) {
 const palRoot = document.querySelector<HTMLElement>('[data-pal]');
 const palInput = palRoot?.querySelector<HTMLInputElement>('[data-pal-input]');
 
+let ready = false; // the menu code has arrived and handles its own keys
+let opener: Element | null = null;
+// Escape before the code arrives bumps this, which cancels every opening asked for until then.
+let cancels = 0;
+
 async function toggleMenu(trigger: Element | null) {
-  if (!menu && palRoot && palInput) {
+  if (!ready && palRoot && palInput) {
     // First use: show the box and take focus now, so keys typed while the code downloads land in it.
+    opener = trigger;
     palRoot.hidden = false;
     palInput.focus();
   }
+  const asked = cancels;
   let m: Menu;
   try {
     m = await loadMenu();
@@ -27,9 +34,22 @@ async function toggleMenu(trigger: Element | null) {
     toast('Menu failed to load. Try again.');
     return;
   }
+  ready = true;
+  if (asked !== cancels) return;
   if (m.isOpen()) m.close();
   else m.open(trigger as HTMLElement | null);
 }
+
+palRoot?.addEventListener('keydown', (e) => {
+  if (ready || e.key !== 'Escape' || !palInput) return;
+  e.preventDefault();
+  cancels++;
+  palRoot.hidden = true;
+  palInput.value = '';
+  // Focus goes back to what opened it; <body> (Ctrl K from nothing focused) cannot take focus, so just leave the input.
+  if (opener instanceof HTMLElement && opener !== document.body) opener.focus();
+  else palInput.blur();
+});
 
 function requestBoot() {
   window.dispatchEvent(new CustomEvent('machine:boot'));
