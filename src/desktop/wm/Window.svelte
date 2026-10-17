@@ -1,10 +1,12 @@
 <script lang="ts">
   import { layers } from '../system/layers.svelte';
-  import { icon } from '../icons';
   import { snapFor, TOP_HOLD_MS } from './tiling';
   import { grabFromMaximized, moveWin, resizeRect, setRect, type Edge, type Win } from './windows';
-  import { close, dockIcons, drag, focus, minimize, phases, tile, toggleMaximize, views, wm } from './wm.svelte';
+  import { dockIcons, drag, focus, phases, tile, toggleMaximize, views, wm } from './wm.svelte';
+  import { provideWindow } from './window-context';
   import { motion, overview, slots } from '../shell/overview.svelte';
+  import { ACCENTS } from '../system/settings';
+  import { settings } from '../system/settings.svelte';
 
   let { win, hidden = false }: { win: Win; hidden?: boolean } = $props();
 
@@ -97,6 +99,14 @@
     handle.addEventListener('pointercancel', up);
   }
 
+  // The app draws its own header bar (GTK's client-side decorations); it gets the window and the drag handler here.
+  provideWindow({
+    get win() {
+      return win;
+    },
+    startMove,
+  });
+
   function startResize(e: PointerEvent, edge: Edge) {
     if (e.button !== 0 || win.state !== 'normal') return;
     e.stopPropagation();
@@ -150,30 +160,14 @@
   inert={hidden || inOverview}
   data-win={win.id}
   data-app={win.app}
+  data-style={win.style}
   tabindex="-1"
   onfocusin={(e) => (lastFocus = e.target as HTMLElement)}
-  style="translate: {slot ? slot.x : win.rect.x}px {slot ? slot.y : win.rect.y}px; scale: {slot ? slot.scale : 1}; width: {win.rect.w}px; height: {win.rect.h}px; z-index: {win.z}; {target}"
+  style="translate: {slot ? slot.x : win.rect.x}px {slot ? slot.y : win.rect.y}px; scale: {slot ? slot.scale : 1}; width: {win.rect.w}px; height: {win.rect.h}px; z-index: {win.z}; {target}{win.style ? `--accent: ${ACCENTS[settings.accent][win.style]};` : ''}"
   onpointerdowncapture={() => focus(win.id)}
 >
   <div class="frame">
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <header class="headerbar" onpointerdown={startMove} ondblclick={(e) => !(e.target as Element).closest('button') && toggleMaximize(win.id)}>
-      <span class="title">{win.title}</span>
-      <div class="controls">
-        <button aria-label="Minimize" onclick={() => minimize(win.id)}>
-          <span class="ctl"><span class="sym" style:--icon={`url(${icon('window-minimize-symbolic')})`}></span></span>
-        </button>
-        <button aria-label={maximized ? 'Restore' : 'Maximize'} onclick={() => toggleMaximize(win.id)}>
-          <span class="ctl"><span class="sym" style:--icon={`url(${icon(maximized ? 'window-restore-symbolic' : 'window-maximize-symbolic')})`}></span></span>
-        </button>
-        <button aria-label="Close" onclick={() => close(win.id)}>
-          <span class="ctl"><span class="sym" style:--icon={`url(${icon('window-close-symbolic')})`}></span></span>
-        </button>
-      </div>
-    </header>
-    <div class="content">
-      {#if View}<View winId={win.id} args={win.args} />{/if}
-    </div>
+    {#if View}<View winId={win.id} args={win.args} />{/if}
   </div>
   {#if win.state === 'normal'}
     {#each EDGES as edge (edge)}
@@ -189,9 +183,9 @@
   .window.hidden { visibility: hidden; pointer-events: none; }
   .overviewing { transition: translate var(--dur) var(--ease), scale var(--dur) var(--ease), opacity var(--dur) var(--ease); }
   .ov-hidden { opacity: 0; }
-  /* libadwaita 1.9: window.csd, headerbar, windowcontrols. */
+  /* libadwaita 1.9: window.csd. The header bar and the content are the app's (apps/adw/HeaderBar.svelte). */
   .frame {
-    width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;
+    position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;
     border-radius: var(--win-radius); background: var(--win-bg); color: var(--win-fg);
     box-shadow: var(--win-shadow); outline: 1px solid var(--win-outline); outline-offset: -1px;
     transition: box-shadow 200ms ease-out;
@@ -199,25 +193,6 @@
   .backdrop .frame { box-shadow: var(--win-shadow-backdrop); }
   .maximized .frame { border-radius: 0; box-shadow: none; outline: none; }
   .tiled .frame { border-radius: 0; outline: none; box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 15%, transparent); }
-  .headerbar {
-    flex: none; min-height: 47px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 6px;
-    background: var(--hb-bg); box-shadow: inset 0 -1px var(--hb-shade); transition: background-color 200ms ease-out;
-  }
-  .backdrop .headerbar { background: var(--win-bg); }
-  .headerbar > * { transition: opacity 200ms ease-out; }
-  .backdrop .headerbar > * { opacity: .5; }
-  .title { grid-column: 2; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .controls { grid-column: 3; justify-self: end; display: flex; gap: 3px; }
-  .controls button { min-width: 24px; padding: 5px; display: grid; place-items: center; }
-  .ctl {
-    display: grid; place-items: center; width: 24px; height: 24px; border-radius: 100%;
-    background: color-mix(in srgb, currentColor 10%, transparent);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 15%, transparent);
-    transition: background 200ms var(--ease), box-shadow 200ms var(--ease);
-  }
-  .controls button:hover .ctl { background: color-mix(in srgb, currentColor 15%, transparent); }
-  .controls button:active .ctl { background: color-mix(in srgb, currentColor 30%, transparent); }
-  .content { flex: 1; min-height: 0; overflow: hidden; background: var(--view-bg); }
   .edge { position: absolute; }
   .n { top: -6px; left: 10px; right: 10px; height: 10px; cursor: n-resize; }
   .s { bottom: -6px; left: 10px; right: 10px; height: 10px; cursor: s-resize; }

@@ -63,7 +63,7 @@ The desktop is one Svelte app, mounted by `src/pages/desktop/index.astro`. Folde
 | `wm.svelte.ts` | The live window manager: the shared state, animation phases, launch, close, minimise, quit all. |
 | `tiling.ts` | Edge snapping rules (Tiling Assistant) and the tiling popup's candidates. |
 | `switcher.ts` | Switcher order: most recently used first. |
-| `Window.svelte` | One window: libadwaita-style frame, header bar buttons, drag, resize, animations, keyboard focus. |
+| `Window.svelte` | One window: libadwaita-style frame, drag, resize, animations, keyboard focus. The app draws its own header bar. |
 | `WindowLayer.svelte` | All windows, the snap preview, workspace slides, the tiling popup. |
 | `TilingPopup.svelte` | "Pick the window for the other half" after tiling. |
 
@@ -94,7 +94,10 @@ The desktop is one Svelte app, mounted by `src/pages/desktop/index.astro`. Folde
 
 | Path | Contents |
 | --- | --- |
-| `apps/registry.ts` | Every app the desktop knows. Real apps are marked as not built yet; the two test apps load only with `?test-apps`. |
+| `apps/registry.ts` | Every app the desktop knows: built apps load on demand; the others are marked as not built yet; the two test apps load only with `?test-apps`. |
+| `apps/open.ts`, `apps/opener.ts` | Which app opens a file type, and what a double-click does. |
+| `apps/adw/` | The libadwaita kit every app uses: header bar, popovers and menus, dialogs, tab bar, status page, colours and buttons. See [Apps](../desktop/apps.md). |
+| `apps/text-editor/` | [Text Editor](../desktop/text-editor.md). |
 | `apps/test-window/` | *Test Window* and *Test Utility*, used by the browser tests. |
 | `theme/tokens.css` | Every colour and size, light and dark, from Yaru and GNOME Shell. |
 | `theme/base.css` | Reset, fonts, symbolic icons (`.sym`), reduced motion. |

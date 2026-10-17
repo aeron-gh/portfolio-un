@@ -23,7 +23,8 @@ test('each code-split surface is its own file, at most 25 KB gzipped', async () 
   const dir = 'dist/_astro';
   const files = readdirSync(dir);
   // Each of these loads only when first used; if one became part of the first download, its file would be missing.
-  const surfaces = ['Overview', 'QuickSettings', 'DateMenu', 'Banner', 'EndSessionDialog', 'PopupMenu', 'GtkMenu', 'RenamePopover', 'Switcher', 'TilingPopup', 'Dialog', 'PowerOff', 'desktop-menu'];
+  // Apps too: each app is its own file, and the shared header bar loads with the first app, not at start.
+  const surfaces = ['Overview', 'QuickSettings', 'DateMenu', 'Banner', 'EndSessionDialog', 'PopupMenu', 'GtkMenu', 'RenamePopover', 'Switcher', 'TilingPopup', 'Dialog', 'PowerOff', 'desktop-menu', 'TextEditor', 'HeaderBar'];
   for (const name of surfaces) {
     const file = files.find((f) => f.startsWith(`${name}.`) && f.endsWith('.js'));
     expect(file, name).toBeDefined();

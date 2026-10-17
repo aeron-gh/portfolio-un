@@ -94,6 +94,10 @@ help:
    Other browsers get full screen only. Holding Esc for 2 seconds leaves full screen. That is a browser rule, not ours
    to change. The choice is saved in `ubuntu.session.v1`.
 
+## In apps
+
+Apps have their own shortcuts, for example [Text Editor's](./text-editor.md#shortcuts).
+
 ## Embedded on the homepage
 
 When the desktop runs inside the homepage (`?embed=1`), **Esc** on a quiet session hands control back to the homepage.

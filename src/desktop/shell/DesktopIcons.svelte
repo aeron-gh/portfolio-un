@@ -6,6 +6,7 @@
   import { CELL, cellAt, cellToXY, gridSize, layout, nearestFree, neighbor, type Cell } from './desktop-grid';
   import { arrangeOrder, loadArrange, saveArrange, type Arrange, type SortOrder } from './desktop-arrange';
   import type { GtkItem } from './desktop-menu';
+  import { openPath } from '../apps/opener';
   import { iconFor, noAppDialog } from './file-icons';
   import { clipboard } from './clipboard.svelte';
   import { fs, fsState } from '../fs/fs.svelte';
@@ -88,8 +89,8 @@
   const elementFor = (p: string) => document.querySelector<HTMLElement>(`.desktop-icon[data-path="${CSS.escape(p)}"]`);
 
   // No apps can open files yet, so every file gets Nautilus's "no app" dialog.
-  function open(item: Item) {
-    dialog = noAppDialog(item.label, item.node);
+  async function open(item: Item) {
+    if (!(await openPath(item.path))) dialog = noAppDialog(item.label, item.node);
   }
 
   function setArrange(next: Partial<Arrange>, rearrange: boolean) {

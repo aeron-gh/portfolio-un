@@ -18,7 +18,8 @@ title: Scripts and tests
 One file per module, testing the pure rules: window maths (`windows`, `tiling`, `switcher`), shell rules (`dock`,
 `app-grid`, `overview`, `search`, `menu`, `quick-settings`, `desktop-grid`, `desktop-menu`), system rules (`session`,
 `settings`, `shortcuts`, `fullscreen`, `calendar`, `notifications`, `end-session`), the file system (`vfs`, `seed`),
-assets (`ubuntu-assets`: every icon the desktop uses exists and is a real image), and the homepage helpers (`github`,
+assets (`ubuntu-assets`: every icon the desktop uses exists, is a real image, and every SVG has the SVG namespace), the
+apps (`open`, `registry`, and Text Editor's `text-editor-document`, `-markdown`, `-find`, `-recents`), and the homepage helpers (`github`,
 `github-fetch`, `rich`, `fuzzy`, `split`, `profile`, `featured`, `theme`, `spotify`).
 
 ```bash
@@ -56,8 +57,9 @@ bun run test:build
 | `notifications.e2e.ts` | 6 | Banners, the date menu, grouping, Do Not Disturb |
 | `layers.e2e.ts` | 4 | Keys and focus with several layers open |
 | `review-fixes.e2e.ts` | 6 | Edge cases: slow downloads, full screen, id reuse, failures |
-| `desktop-budget.e2e.ts` | 2 | Icon download budget; each on-demand surface is its own small file |
-| `desktop-visual.e2e.ts` | 8 | Screenshot baselines for 11 surfaces in light and dark (local only) |
+| `text-editor.e2e.ts` | 24 | Text Editor: open, save, Save Changes?, tabs, menus, theme, zoom, recents, Markdown colours, Find/Replace |
+| `desktop-budget.e2e.ts` | 2 | Icon download budget; each on-demand surface and app is its own small file |
+| `desktop-visual.e2e.ts` | 10 | Screenshot baselines for 14 surfaces in light and dark (local only) |
 
 ```bash
 bun run test:e2e

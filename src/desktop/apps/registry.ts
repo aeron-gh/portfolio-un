@@ -19,6 +19,8 @@ export type AppEntry = {
   folder?: 'Utilities';
   window: { w: number; h: number; minW: number; minH: number };
   load?: () => Promise<{ default: Component<AppProps> }>;
+  /** Opens a file in this app when a new window is not always the answer (a tab in the window already open). */
+  open?: (path: string) => Promise<void>;
 };
 
 const WIDE = { w: 1100, h: 720, minW: 450, minH: 300 };
@@ -28,7 +30,11 @@ export const APPS: AppEntry[] = [
   { id: 'firefox', name: 'Firefox', icon: 'firefox', keywords: ['web', 'browser', 'internet'], built: false, window: WIDE },
   { id: 'files', name: 'Files', icon: 'org.gnome.Nautilus', keywords: ['folder', 'manager', 'explore'], built: false, window: NORMAL },
   { id: 'terminal', name: 'Terminal', icon: 'org.gnome.Ptyxis', keywords: ['shell', 'prompt', 'command'], built: false, window: NORMAL },
-  { id: 'text-editor', name: 'Text Editor', icon: 'org.gnome.TextEditor', keywords: ['text', 'edit', 'notes'], built: false, window: NORMAL },
+  {
+    id: 'text-editor', name: 'Text Editor', icon: 'org.gnome.TextEditor', keywords: ['text', 'edit', 'notes'], built: true, window: NORMAL,
+    load: () => import('./text-editor/TextEditor.svelte'),
+    open: (path) => import('./text-editor/session.svelte').then((m) => m.openDocument(path)),
+  },
   { id: 'music', name: 'Music', icon: 'spotify-client', keywords: ['songs', 'playlist', 'spotify'], built: false, window: NORMAL },
   { id: 'app-center', name: 'App Center', icon: 'snap-store', keywords: ['software', 'install', 'store'], built: false, window: WIDE },
   { id: 'help', name: 'Help', icon: 'org.gnome.Yelp', keywords: ['documentation', 'manual'], built: false, window: NORMAL },

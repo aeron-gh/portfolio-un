@@ -137,11 +137,11 @@ test('Super+D shows the desktop and brings the windows back', async ({ page }) =
   expect((await wins(page)).every((w) => !w.minimized)).toBe(true);
 });
 
-test('Super+1 focuses the first dock app; Super+Shift+PageDown takes the window to the next workspace', async ({ page }) => {
+test('Super+number focuses that dock app; Super+Shift+PageDown takes the window to the next workspace', async ({ page }) => {
   await session(page);
   const a = await launch(page);
   await launch(page, 'test-utility');
-  await page.keyboard.press('Meta+Digit1');
+  await page.keyboard.press('Meta+Digit2'); // the dock: Text Editor (pinned), then the two running test apps
   await expect.poll(() => focusedId(page)).toBe(a);
   await page.keyboard.press('Meta+Shift+PageDown');
   const w = (await wins(page)).find((x) => x.id === a)!;

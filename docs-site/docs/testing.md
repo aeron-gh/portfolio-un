@@ -9,9 +9,9 @@ There are three kinds of tests. Each one catches a different kind of mistake.
 
 | Kind | Folder | Runs in | Count | Catches |
 | --- | --- | --- | ---: | --- |
-| **Unit** | `tests/unit/` | Bun, no browser, under 1 s | 222 | Wrong rules: window maths, sort orders, saved-data checks |
+| **Unit** | `tests/unit/` | Bun, no browser, about 1 s | 253 | Wrong rules: window maths, sort orders, saved-data checks |
 | **Build** | `tests/build/` | Bun, reading `dist/` | 40 | Broken HTML, missing tags, files that grew too big |
-| **Browser** | `e2e/` | Playwright with real Chromium | 173 | Wrong behaviour: clicks, keys, focus, timing, looks |
+| **Browser** | `e2e/` | Playwright with real Chromium | 199 | Wrong behaviour: clicks, keys, focus, timing, looks |
 
 ```bash
 bun run test        # unit
@@ -105,7 +105,7 @@ Speed is a feature. So the sizes that matter have hard limits, and a test fails 
 | Desktop page CSS (gzip) | **20 KB** | `tests/build/desktop-budget.test.ts` |
 | Preloaded Ubuntu Sans font files | **60 KB** | `tests/build/desktop-budget.test.ts` |
 | The file system seed written into the page (gzip) | **15 KB** | `tests/build/desktop-budget.test.ts` |
-| Each surface loaded on demand (gzip) | **25 KB**, and in its own file | `e2e/desktop-budget.e2e.ts` |
+| Each surface and app loaded on demand (gzip) | **25 KB**, and in its own file | `e2e/desktop-budget.e2e.ts` |
 | Icons downloaded during boot, login and the first session | **40 KB** | `e2e/desktop-budget.e2e.ts` |
 | Homepage fonts preloaded | at most **2** files | `tests/build/shell.test.ts` |
 
@@ -125,3 +125,9 @@ export const loadQuickSettings = () => import('./QuickSettings.svelte');
 A dynamic `import()` tells the bundler to put that component in its own file. The browser downloads it only when the
 function is called. Moving the desktop's menus, popovers, switcher and dialogs behind `import()` brought the start-up
 JavaScript from about 47.5 KB back under 45 KB.
+
+Then look at **how** the start-up code is split. Left alone, the bundler cut it into 19 small files, because some of
+the same modules are shared with code loaded later. Small files compress worse, and each one is a request. A
+`codeSplitting` group in `astro.config.mjs` puts every module the desktop loads at start (Rolldown's built-in
+`$initial` tag) into one file. Code loaded on demand is not touched. That took the start-up JavaScript from
+46.7 KB to 42.5 KB, in 3 files.

@@ -72,6 +72,15 @@ describe('real Ubuntu assets', () => {
     expect(missing).toEqual([]);
   });
 
+  test('every SVG declares the SVG namespace, or a browser cannot draw it', () => {
+    // GTK's loader accepts an SVG without it (libadwaita's adw-external-link.svg); a browser shows nothing.
+    const svgs = (readdirSync('src/desktop', { recursive: true }) as string[]).filter((f) => f.endsWith('.svg'));
+    expect(svgs.length).toBeGreaterThan(80);
+    for (const f of svgs) {
+      expect(readFileSync(`src/desktop/${f}`, 'utf8'), f).toMatch(/xmlns=["']http:\/\/www\.w3\.org\/2000\/svg["']/);
+    }
+  });
+
   test('every icon is a real image, not a git symlink saved as text', () => {
     const files = (readdirSync(`${A}/icons`, { recursive: true }) as string[]).filter((f) => /\.(svg|png)$/.test(f));
     expect(files.length).toBeGreaterThan(30);

@@ -2,13 +2,13 @@ import { describe, expect, test } from 'bun:test';
 import { APPS, PINNED_DEFAULT, appById, availableApps, isAvailable, testModeFrom } from '../../src/desktop/apps/registry';
 
 describe('app registry', () => {
-  test('no real app is built yet, so none is available', () => {
-    expect(availableApps(false)).toEqual([]);
-    expect(APPS.filter((a) => !a.testOnly).every((a) => !a.built)).toBe(true);
+  test('a visitor gets the apps that are built, and only those', () => {
+    expect(availableApps(false).map((a) => a.id)).toEqual(['text-editor']);
+    expect(APPS.filter((a) => a.built && !a.testOnly).every((a) => a.load)).toBe(true);
   });
 
   test('the two test apps exist only in test mode', () => {
-    expect(availableApps(true).map((a) => a.id)).toEqual(['test-window', 'test-utility']);
+    expect(availableApps(true).map((a) => a.id)).toEqual(['text-editor', 'test-window', 'test-utility']);
     expect(isAvailable(appById('test-window'), false)).toBe(false);
     expect(appById('test-utility').folder).toBe('Utilities');
   });

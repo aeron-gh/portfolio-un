@@ -5,7 +5,18 @@ import svelte from '@astrojs/svelte';
 export default defineConfig({
   integrations: [svelte()],
   // Icons must stay separate files: inlining dozens of them as base64 would blow the JS budget.
-  vite: { build: { assetsInlineLimit: 0 } },
+  vite: {
+    build: {
+      assetsInlineLimit: 0,
+      rolldownOptions: {
+        output: {
+          // Everything the desktop needs at start goes in one file. Left alone, the bundler cuts it into a dozen
+          // small files, which compress worse and each cost a request. Code loaded on demand is not touched.
+          codeSplitting: { groups: [{ name: 'desktop', tags: ['$initial'], test: /[\\/]src[\\/]desktop[\\/]/ }] },
+        },
+      },
+    },
+  },
   site: 'https://mraeron.tech',
   // Astro 7 defaults to 'jsx' whitespace rules, which can eat spaces between
   // inline elements. `true` collapses whitespace but keeps single spaces.
@@ -38,6 +49,17 @@ export default defineConfig({
       styles: ['normal'],
       subsets: ['latin'],
       fallbacks: ['sans-serif'],
+    },
+    {
+      // Ubuntu's monospace font (ubuntu-settings: "Ubuntu Sans Mono 11"). Not preloaded: it downloads when an app uses it.
+      provider: fontProviders.fontsource(),
+      name: 'Ubuntu Sans Mono',
+      cssVariable: '--font-ubuntu-mono',
+      // Bold and italic for highlighted text (headings, emphasis): same advance width, so the caret stays in line.
+      weights: [400, 700],
+      styles: ['normal', 'italic'],
+      subsets: ['latin'],
+      fallbacks: ['monospace'],
     },
   ],
 });

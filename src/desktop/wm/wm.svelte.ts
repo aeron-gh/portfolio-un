@@ -63,8 +63,18 @@ export function focus(id: string): void {
   });
 }
 
-export function close(id: string): void {
+/** Apps with unsaved work ask first (GtkWindow::close-request): the check returns false and the app asks itself. */
+const closeChecks = new Map<string, () => boolean>();
+
+export function guardClose(id: string, check: () => boolean): () => void {
+  closeChecks.set(id, check);
+  return () => closeChecks.delete(id);
+}
+
+/** `force`: the app has already asked. (Leaving the session skips the checks too: `quitAll` drops every window.) */
+export function close(id: string, force = false): void {
   if (!find(id) || phases[id] === 'closing') return;
+  if (!force && closeChecks.get(id)?.() === false) return;
   phases[id] = 'closing';
   after(TIMES.close, () => {
     W.closeWin(wm, id);
