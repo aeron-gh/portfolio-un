@@ -67,6 +67,19 @@ const ICONS = [
   'scalable/actions/object-select-symbolic.svg',
   '48x48@2x/status/user-trash-full.png',
   '48x48@2x/mimetypes/application-x-executable.png',
+  // Text Editor
+  '48x48@2x/apps/org.gnome.TextEditor.png',
+  'scalable/actions/open-menu-symbolic.svg',
+  'scalable/ui/tab-new-symbolic.svg',
+  'scalable/status/info-outline-symbolic.svg',
+  'scalable/actions/document-open-symbolic.svg',
+  'scalable/actions/document-open-recent-symbolic.svg',
+  'scalable/actions/go-up-symbolic.svg',
+  'scalable/actions/go-down-symbolic.svg',
+  'scalable/actions/edit-find-replace-symbolic.svg',
+  'scalable/emblems/emblem-system-symbolic.svg',
+  'scalable/actions/zoom-in-symbolic.svg',
+  'scalable/actions/zoom-out-symbolic.svg',
   ...BATTERY,
 ];
 const SHELL_ICONS = [
@@ -165,6 +178,24 @@ for (const rel of ICONS) {
 for (const rel of SHELL_ICONS) {
   await downloadIcon(rel, `${OUT}/icons/${rel.replace(/^scalable\//, '')}`, 3, YARU_SHELL);
 }
+
+// 3b. Icons an app ships itself or uses only inside its window, saved next to that app (loaded with it, not at start).
+const TEXT_EDITOR = 'https://gitlab.gnome.org/GNOME/gnome-text-editor/-/raw/50.1';
+const LIBADWAITA = 'https://gitlab.gnome.org/GNOME/libadwaita/-/raw/1.9.2';
+for (const [url, to] of [
+  [`${TEXT_EDITOR}/data/icons/hicolor/scalable/actions/document-modified-symbolic.svg`, 'src/desktop/apps/text-editor/icons/document-modified-symbolic.svg'],
+  [`${YARU}/scalable/apps/org.gnome.TextEditor-symbolic.svg`, 'src/desktop/apps/text-editor/icons/org.gnome.TextEditor-symbolic.svg'],
+  [`${LIBADWAITA}/src/stylesheet/assets/check-symbolic.svg`, 'src/desktop/apps/adw/assets/check-symbolic.svg'],
+  [`${LIBADWAITA}/src/icons/adw-external-link.svg`, 'src/desktop/apps/adw/assets/adw-external-link-symbolic.svg'],
+  [`${YARU}/scalable/actions/go-previous-symbolic.svg`, 'src/desktop/apps/adw/assets/go-previous-symbolic.svg'],
+  [`${YARU}/256x256/apps/org.gnome.TextEditor.png`, 'src/desktop/apps/text-editor/icons/org.gnome.TextEditor.png'],
+]) {
+  await download(url, to);
+}
+// GTK 4.22's own symbolic format ("grappa") leaves out the SVG namespace and paints with a GTK-only reference;
+// browsers need both fixed. The drawing is unchanged.
+const ext = 'src/desktop/apps/adw/assets/adw-external-link-symbolic.svg';
+writeFileSync(ext, readFileSync(ext, 'utf8').replace('<svg xmlns:cc=', '<svg xmlns="http://www.w3.org/2000/svg" xmlns:cc=').replace('stroke="url(&quot;#gpa:foreground&quot;) rgb(0,0,0)"', 'stroke="#000"'));
 
 // 4. Owner avatar: 256 px head-and-shoulders square from the old site's 1600x900 photo
 //    (a centre crop leaves the face too small for the 48 px login circle).

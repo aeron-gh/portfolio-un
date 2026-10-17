@@ -123,8 +123,8 @@ test('embedded: Esc cancels the dialog and stays on the desktop', async ({ page 
 
 test('the "no app" dialog keeps focus inside and gives it back to the icon', async ({ page }) => {
   await session(page);
-  const readme = page.locator('.desktop-icon[data-path="/home/ubuntu/Desktop/README.md"]');
-  await readme.focus();
+  const home = page.locator('.desktop-icon[data-path="/home/ubuntu"]'); // a folder: Files is not built yet
+  await home.focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('alertdialog')).toBeVisible();
   for (let i = 0; i < 3; i++) {
@@ -133,5 +133,5 @@ test('the "no app" dialog keeps focus inside and gives it back to the icon', asy
   }
   await page.keyboard.press('Escape');
   await expect(page.getByRole('alertdialog')).toHaveCount(0);
-  await expect(readme).toBeFocused();
+  await expect(home).toBeFocused();
 });

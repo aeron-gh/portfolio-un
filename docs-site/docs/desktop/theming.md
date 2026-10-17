@@ -99,6 +99,17 @@ generic icon instead of a hole. A unit test (`ubuntu-assets`) checks that every 
 build time from Fontsource and serves it from the site itself. No request goes to a font CDN. The homepage uses
 Geist and Geist Mono the same way.
 
+**Ubuntu Sans Mono 11** is Ubuntu's monospace font (`ubuntu-settings` sets `monospace-font-name`). Apps like Text
+Editor use it, in regular, bold and italic. It is not preloaded: the browser downloads it the first time it draws text
+in it.
+
+## An app's own style
+
+An app can pick light or dark for its own windows, as Text Editor's theme picker does. The window then carries
+`data-style="light"` or `"dark"`, and `tokens.css` applies to `.window[data-style=…]` as well as to the page. The
+accent shade follows too. The rest of the desktop keeps its style. App colours from libadwaita (dialogs, popovers,
+cards) are in `apps/adw/adw.css`, which loads with the first app.
+
 ## Wallpapers
 
 `ubuntu-light.avif` and `ubuntu-dark.avif` come from the real `ubuntu-wallpapers` 26.04 package, converted to AVIF

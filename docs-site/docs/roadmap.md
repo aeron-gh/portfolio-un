@@ -6,17 +6,18 @@ title: Roadmap
 # Roadmap
 
 The shell is done: boot, login, lock, top bar, Quick Settings, dock, windows, Overview, search, notifications,
-desktop icons. The next work is the **apps** that open inside it.
+desktop icons. **[Text Editor](./desktop/text-editor.md)** is the first app, on the shared
+[libadwaita kit](./desktop/apps.md). The next work is the other apps.
 
 ## Next: the apps
 
-Every app is already listed in `src/desktop/apps/registry.ts` with `built: false`. That flag keeps an app out of the
+Every app not built yet is listed in `src/desktop/apps/registry.ts` with `built: false`. That flag keeps an app out of the
 dock, the app grid and search until it works. So the dock order is already right, and once an app works, showing it
 is a small change in one file.
 
 | Phase | Apps | Notes |
 | --- | --- | --- |
-| 1 | **Files**, **Text Editor**, **Image Viewer**, **Document Viewer** | All four work on the [file system](./desktop/file-system.md), which is ready. Files also gets a "Reset" menu item that puts the files back to the seed |
+| 1 | **Text Editor** (done), **Files**, **Image Viewer**, **Document Viewer** | All four work on the [file system](./desktop/file-system.md). Files also gets a "Reset" menu item that puts the files back to the seed, and brings the file chooser that turns on Text Editor's Save As… |
 | 2 | **Terminal** | Looks like Ptyxis, the terminal Ubuntu 26.04 ships, and runs `bash`-like commands on the same file system |
 | 3 | **Firefox** | A browser window that looks like Firefox |
 | 4 | **Settings**, **Music**, **Help**, **App Center**, **About**, and the screenshot tool | Settings is a window over the settings store that already exists. It adds Privacy → "Reset this computer". App Center lists the projects as apps to install. Music plays the Spotify playlist |
@@ -26,11 +27,7 @@ Change Background…) turn on too.
 
 ### Adding an app
 
-1. Make a folder `src/desktop/apps/<app>/` with a Svelte component that takes `AppProps` (`winId`, and optional
-   `args`).
-2. In `registry.ts`, set `built: true` and add `load: () => import('./<app>/<App>.svelte')`. The dynamic import keeps
-   the app out of the start-up JavaScript (see [Size budgets](./testing.md#size-budgets)).
-3. Write the app's rules in plain `.ts` files with unit tests, then browser tests for what a visitor does.
+See [Apps and the libadwaita kit](./desktop/apps.md#adding-an-app).
 
 ## Smaller items
 
@@ -38,6 +35,9 @@ Change Background…) turn on too.
 | --- | --- | --- |
 | Tile preview and workspace dot animation | Animate `width` | Should animate `transform`, which the browser can do without re-laying-out the page |
 | Super+1 … 9 | Reads the dock pins from saved data | Should read the dock's live copy, so a change made a moment ago is always seen |
+| Text Editor: other languages | Only Markdown is coloured | GtkSourceView also colours shell scripts (`.bashrc`), `.desktop` files and more |
+| Text Editor: drafts after logout | Lost | Text Editor restores the last session, unsaved drafts included |
+| Text Editor: undo after switching tabs | Gone: the browser keeps one undo list for the whole page, so each tab's text box starts a fresh one | Each tab keeps its own undo history |
 | Desktop icons: rubber-band selection | Not built | Drag on empty desktop to draw a box and select the icons inside |
 | Desktop icons: Keep Stacked by type | Greyed out | Groups files of one type into a stack |
 | Drag and drop between the desktop and windows | Not built | Needs Files first |

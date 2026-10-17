@@ -14,14 +14,15 @@ const wins = (page: Page) => page.evaluate(() => (window as unknown as Hooks).ub
 const ov = (page: Page) => page.evaluate(() => (window as unknown as Hooks).ubuntu.overview());
 const tile = (page: Page, app = 'test-window') => page.locator(`.dock .tile[data-app="${app}"]`);
 
-test('a visitor sees the dock with only Show Apps while no app is built', async ({ page }) => {
+test('a visitor sees the dock with the built apps and Show Apps', async ({ page }) => {
   await session(page, false);
   const dock = page.locator('nav.dock');
   await expect(dock).toBeVisible();
   const box = (await dock.boundingBox())!;
   expect(box.width).toBe(66);
   expect(box.y).toBe(32);
-  await expect(dock.locator('.tile')).toHaveCount(1);
+  await expect(dock.locator('.tile')).toHaveCount(2);
+  await expect(tile(page, 'text-editor')).toBeVisible();
   await expect(dock.getByRole('button', { name: 'Show Apps' })).toBeVisible();
 });
 

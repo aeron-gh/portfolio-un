@@ -21,6 +21,8 @@ export type Win = {
   workspace: number;
   /** Stacking order; the highest is in front and was used most recently. */
   z: number;
+  /** An app's own light or dark style (Text Editor's theme picker); unset follows the desktop. */
+  style?: 'light' | 'dark';
   minW: number;
   minH: number;
   args?: unknown;

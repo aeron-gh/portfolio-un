@@ -16,7 +16,7 @@ Desktop.svelte                 picks the screen for the session state
 ├── shell/Session.svelte       the logged-in session
 │   ├── TopBar                 clock, status icons, workspace dots
 │   ├── DesktopIcons           ~/Desktop on the wallpaper
-│   ├── wm/WindowLayer         every window
+│   ├── wm/WindowLayer         every window (the frame; the app inside draws its own header bar)
 │   ├── Dock                   the Ubuntu Dock
 │   ├── Keyboard               every shortcut
 │   └── on demand: Overview, Quick Settings, date menu, banners,
@@ -55,6 +55,8 @@ first paint loads the first time it is used, and is prefetched when the browser 
 Overview, Quick Settings, the date menu, banners, end-session dialogs, menus, the rename popover, the switcher, the
 tiling popup, the "no app" dialog, the power-off screen. This logic is in `shell/surfaces.ts`. If one of these fails
 to download (for example, offline right after a deploy), the surface backs out cleanly instead of getting stuck.
+Apps load the same way, from the registry. The code the desktop needs at start is grouped into one file (see
+[size budgets](../testing.md#when-a-budget-fails)).
 
 ## Motion
 

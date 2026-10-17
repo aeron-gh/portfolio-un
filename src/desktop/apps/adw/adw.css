@@ -1,0 +1,77 @@
+/* libadwaita 1.9 named colours (src/stylesheet/_colors.scss), for app windows. Loaded with the first app, not at
+   start. --win-bg, --win-fg and --view-bg (window_bg, window_fg, view_bg) are in theme/tokens.css already. */
+:root, .window[data-style="light"] {
+  --adw-dialog-bg: #fafafb;
+  --adw-dialog-fg: rgb(0 0 6 / 80%);
+  --adw-card-bg: #fff;
+  --adw-card-fg: rgb(0 0 6 / 80%);
+  --adw-card-shade: rgb(0 0 6 / 7%);
+  --adw-popover-bg: #fff;
+  --adw-popover-fg: rgb(0 0 6 / 80%);
+  --adw-popover-shade: rgb(0 0 6 / 7%);
+  --adw-shade: rgb(0 0 6 / 7%);
+  --adw-destructive-bg: #e01b24; /* @red_3 */
+  --adw-destructive: oklab(from #e01b24 min(l, 0.5) a b);
+  --adw-accent: oklab(from var(--accent) min(l, 0.5) a b);
+}
+:root[data-style="dark"], .window[data-style="dark"] {
+  --adw-dialog-bg: #36363a;
+  --adw-dialog-fg: #fff;
+  --adw-card-bg: rgb(255 255 255 / 8%);
+  --adw-card-fg: #fff;
+  --adw-card-shade: rgb(0 0 6 / 36%);
+  --adw-popover-bg: #36363a;
+  --adw-popover-fg: #fff;
+  --adw-popover-shade: rgb(0 0 6 / 25%);
+  --adw-shade: rgb(0 0 6 / 25%);
+  --adw-destructive-bg: #c01c28; /* @red_4 */
+  --adw-destructive: oklab(from #c01c28 max(l, 0.85) a b);
+  --adw-accent: oklab(from var(--accent) max(l, 0.85) a b);
+}
+
+/* button, button.flat, button.image-button (libadwaita 1.9). GTK's min sizes are for the content, inside the padding:
+   24px + 2 × 5px = 34px high. The hover border is a high-contrast rule only. */
+.adw-button {
+  display: inline-grid; grid-auto-flow: column; place-items: center; gap: 6px; min-height: 34px; min-width: 36px; padding: 5px 10px;
+  border-radius: 9px; font-weight: bold; background: color-mix(in srgb, currentColor 10%, transparent);
+  outline: 0 solid transparent; outline-offset: 4px;
+  transition: background 200ms var(--ease), outline-color 200ms var(--ease), outline-width 200ms var(--ease), outline-offset 200ms var(--ease);
+}
+.adw-button:hover { background: color-mix(in srgb, currentColor 15%, transparent); }
+.adw-button:active { background: color-mix(in srgb, currentColor 30%, transparent); }
+.adw-button.flat { background: transparent; }
+.adw-button.flat:hover { background: color-mix(in srgb, currentColor 7%, transparent); }
+.adw-button.flat:active { background: color-mix(in srgb, currentColor 16%, transparent); }
+.adw-button.flat[aria-pressed="true"], .adw-button.flat[aria-expanded="true"] { background: color-mix(in srgb, currentColor 10%, transparent); }
+.adw-button.flat[aria-pressed="true"]:hover, .adw-button.flat[aria-expanded="true"]:hover { background: color-mix(in srgb, currentColor 13%, transparent); }
+.adw-button.image { min-width: 34px; padding: 5px; }
+.adw-button.pill { padding: 10px 32px; border-radius: 9999px; }
+.adw-button.circular { min-width: 34px; min-height: 34px; padding: 0; border-radius: 9999px; }
+.adw-button.suggested { color: #fff; background-color: var(--accent); }
+.adw-button.suggested:hover { background-image: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 10%)); }
+.adw-button.suggested:active { background-image: linear-gradient(rgb(0 0 6 / 20%), rgb(0 0 6 / 20%)); }
+.adw-button:disabled { filter: opacity(50%); }
+.adw-button:focus-visible { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
+.adw-button.suggested:focus-visible { outline-offset: 1px; }
+
+/* list.boxed-list and its rows (AdwActionRow, AdwLinkRow), preferencesgroup (libadwaita 1.9). */
+.adw-group { display: flex; flex-direction: column; gap: 6px; }
+.adw-group > .heading { margin-bottom: 6px; font-weight: bold; }
+.adw-boxed-list {
+  border-radius: 12px; background: var(--adw-card-bg); color: var(--adw-card-fg);
+  box-shadow: 0 0 0 1px rgb(0 0 6 / 3%), 0 1px 3px 1px rgb(0 0 6 / 7%), 0 2px 6px 2px rgb(0 0 6 / 3%);
+}
+.adw-row {
+  display: flex; align-items: center; gap: 6px; width: 100%; min-height: 50px; padding: 0 12px; text-align: left;
+  border-bottom: 1px solid var(--adw-card-shade); transition: background-color 200ms var(--ease); color: inherit; text-decoration: none;
+}
+.adw-row:first-child { border-radius: 12px 12px 0 0; }
+.adw-row:last-child { border-radius: 0 0 12px 12px; border-bottom: 0; }
+.adw-row:only-child { border-radius: 12px; }
+.adw-row.activatable:hover { background-color: color-mix(in srgb, currentColor 4%, transparent); }
+.adw-row.activatable:active { background-color: color-mix(in srgb, currentColor 8%, transparent); }
+.adw-row:disabled, .adw-row[aria-disabled="true"] { opacity: .5; }
+.adw-row:focus-visible { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
+.adw-row > .titles { flex: 1; display: flex; flex-direction: column; gap: 3px; margin: 6px 0; min-width: 0; }
+.adw-row .subtitle { font-size: .8333em; }
+.adw-row .sym { flex: none; }

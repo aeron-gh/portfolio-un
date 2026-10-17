@@ -18,15 +18,16 @@ test('Home and the README are on the desktop, Home bottom-right', async ({ page 
   expect(box.y + box.height).toBeGreaterThan(vp.height - 130);
 });
 
-test('click selects; double-click shows the Nautilus no-app dialog', async ({ page }) => {
+// Files is not built yet, so a folder is still something no installed app opens.
+test('click selects; double-click on something no app opens shows the Nautilus no-app dialog', async ({ page }) => {
   await session(page);
-  const readme = page.locator('.desktop-icon[data-path="/home/ubuntu/Desktop/README.md"]');
-  await readme.click();
-  await expect(readme).toHaveAttribute('aria-selected', 'true');
-  await readme.dblclick();
+  const home = page.locator('.desktop-icon[data-path="/home/ubuntu"]');
+  await home.click();
+  await expect(home).toHaveAttribute('aria-selected', 'true');
+  await home.dblclick();
   const dialog = page.getByRole('alertdialog');
-  await expect(dialog).toContainText('Could Not Display “README.md”');
-  await expect(dialog).toContainText('There is no app installed for “Markdown document” files');
+  await expect(dialog).toContainText('Could Not Display “Home”');
+  await expect(dialog).toContainText('There is no app installed for “Folder” files');
   await expect(dialog.getByRole('button', { name: 'Select App' })).toBeVisible();
   await expect(dialog.getByRole('button', { name: 'OK' })).toBeFocused();
   await page.keyboard.press('Escape');
@@ -35,7 +36,7 @@ test('click selects; double-click shows the Nautilus no-app dialog', async ({ pa
 
 test('Enter on a focused icon opens the no-app dialog and it stays open', async ({ page }) => {
   await session(page);
-  await page.locator('.desktop-icon[data-path="/home/ubuntu/Desktop/README.md"]').focus();
+  await page.locator('.desktop-icon[data-path="/home/ubuntu"]').focus();
   await page.keyboard.press('Enter');
   const dialog = page.getByRole('alertdialog');
   await expect(dialog).toBeVisible();
@@ -91,7 +92,7 @@ test('embedded: Esc with the dialog open closes only the dialog', async ({ page 
   const d = page.frameLocator('#d');
   await d.locator('.gdm-user').click();
   await page.keyboard.press('Enter');
-  await d.locator('.desktop-icon[data-path="/home/ubuntu/Desktop/README.md"]').dblclick();
+  await d.locator('.desktop-icon[data-path="/home/ubuntu"]').dblclick();
   await expect(d.getByRole('alertdialog')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(d.getByRole('alertdialog')).toHaveCount(0);

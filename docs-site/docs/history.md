@@ -14,7 +14,8 @@ title: How it was built
 | **7 Oct 2026** | Started the new **Svelte 5** desktop at `/desktop-next/`, next to the old one: boot screen, login, lock, power off, top bar, desktop icons, the settings store, the file system and the real Ubuntu assets. |
 | **8 Oct 2026** | The interactive desktop: windows (move, resize, snap, tile), the dock, the Overview with search and the app grid, Alt+Tab, Quick Settings, keyboard shortcuts, end-session dialogs, notifications and the date menu, desktop right-click menus. The old desktop was deleted. |
 | **8 Oct 2026** | Moved hosting from GitHub Pages to Cloudflare Workers. Moved the desktop to `/desktop/`. Fixed layering, focus and loading edge cases. |
-| **9 Oct 2026** | Added CI (GitHub Actions) and these docs. |
+| **9 Oct 2026** | Added CI (GitHub Actions) and these docs. Changes now reach `master` only through pull requests. |
+| **12–17 Oct 2026** | The first app, **Text Editor**, and the shared libadwaita kit for the apps that follow. |
 
 ## Why rebuild?
 
@@ -74,4 +75,8 @@ Each of these was a real bug. Each one now has a test.
 | The start-up JavaScript went over budget | Menus, dialogs and the switcher were loaded at start | Load them when first needed. See [Testing](./testing.md#size-budgets) |
 | On a slow connection, keys pressed right after opening the Overview were lost, and in the embedded desktop Esc left the whole desktop | The Overview's code loads on demand. Until it arrived, nothing was listening for its keys | Until it arrives, a placeholder layer keeps the typing for the search and handles Esc. Found by CI, whose machines are slower |
 | On a slow connection, Esc right after opening the homepage menu was ignored | The box shows at once, but its key handling came with the code | Esc before the code arrives closes the box and cancels the opening |
+| A dialog came out 26 px too narrow | GTK's `min-width` sizes the content, inside the padding; here it includes the padding | Add the padding. See [GTK sizes](./desktop/apps.md#gtk-sizes-are-content-sizes) |
+| An icon from libadwaita was invisible | GTK's newer SVG format leaves out the SVG namespace; a browser then draws nothing | Fix the file when fetching it, and a unit test for every SVG |
+| A menu opened off the bottom of the window | The popover always opened below its button | Open above when there is no room below, as GTK does |
+| Text typed right after opening a file was lost in tests | The keys came before the editor had focus | Real GNOME behaves the same; the tests wait for focus first |
 | Esc closed two things at once | Every open menu listened to the same key | A [layer stack](./desktop/architecture.md#overlays-and-the-keyboard): only the top layer acts |

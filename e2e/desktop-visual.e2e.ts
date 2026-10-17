@@ -28,6 +28,7 @@ for (const style of ['light', 'dark'] as const) {
   });
 
   test(`shell surfaces (${style})`, async ({ page }) => {
+    test.setTimeout(60_000); // nine screenshots: on a busy machine this passes 30s
     await prepare(page, style);
     await page.goto('/desktop/?test-apps');
     await page.locator('.gdm-user').click();
@@ -58,6 +59,30 @@ for (const style of ['light', 'dark'] as const) {
     await page.getByRole('dialog', { name: 'System' }).getByRole('button', { name: 'Power Off Menu' }).click();
     await page.getByRole('menuitem', { name: 'Power Off…' }).click();
     await shot('power-off');
+  });
+
+  test(`text editor (${style})`, async ({ page }) => {
+    await prepare(page, style);
+    await page.goto('/desktop/');
+    await page.locator('.gdm-user').click();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.wall.real.show')).toBeVisible();
+    await page.locator('.desktop-icon[data-path="/home/ubuntu/Desktop/README.md"]').dblclick();
+    const win = page.locator('.window[data-app="text-editor"]');
+    await expect(win.getByRole('textbox')).toBeFocused();
+    await page.mouse.move(1270, 790);
+    await expect(page).toHaveScreenshot(`text-editor-${style}.png`);
+    await win.getByRole('button', { name: 'Main Menu' }).click();
+    await page.mouse.move(1270, 790);
+    await expect(page).toHaveScreenshot(`text-editor-menu-${style}.png`);
+    await page.keyboard.press('Escape'); // focus goes back to the menu button, as in GTK
+    await win.getByRole('textbox').focus();
+    await page.keyboard.press('Control+End');
+    await page.keyboard.type('x');
+    await win.getByRole('button', { name: 'Close' }).click();
+    await expect(page.getByRole('alertdialog')).toBeVisible();
+    await page.mouse.move(1270, 790);
+    await expect(page).toHaveScreenshot(`text-editor-save-${style}.png`);
   });
 
   test(`lock screen (${style})`, async ({ page }) => {

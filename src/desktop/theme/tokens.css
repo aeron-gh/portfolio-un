@@ -1,5 +1,5 @@
-/* GNOME Shell 50 and Yaru (Ubuntu 26.04) values. */
-:root {
+/* GNOME Shell 50 and Yaru (Ubuntu 26.04) values. An app window can pick its own style (Text Editor's theme picker). */
+:root, .window[data-style="light"] {
   --font: var(--font-ubuntu), 'Ubuntu Sans', sans-serif;
   --pad: 6px;
   --margin: 4px;
@@ -106,7 +106,7 @@
   --gtk-disabled-fg: #9c9c9c;
 }
 
-:root[data-style="dark"] {
+:root[data-style="dark"], .window[data-style="dark"] {
   --bg: #36363a;
   --fg: #fff;
   --card: #49494e;
