@@ -123,6 +123,17 @@ test('New Tab adds a draft and the tab bar appears; the tabs switch documents', 
   await expect(win).toHaveAttribute('aria-label', 'README.md (~/Desktop) - Text Editor');
 });
 
+test('clicking the header leaves the keyboard in the text', async ({ page }) => {
+  await session(page);
+  await openReadme(page);
+  const win = editor(page);
+  await page.keyboard.type('x');
+  await win.locator('.headerbar .title').click();
+  await expect(win.getByRole('textbox', { name: 'README.md' })).toBeFocused();
+  await page.keyboard.press('Control+s');
+  await expect(win.locator('.headerbar .modified')).toHaveText('');
+});
+
 test('each tab keeps its caret and scroll position', async ({ page }) => {
   await session(page);
   await openReadme(page);

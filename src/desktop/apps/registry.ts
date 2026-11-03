@@ -28,7 +28,12 @@ const NORMAL = { w: 900, h: 640, minW: 360, minH: 240 };
 
 export const APPS: AppEntry[] = [
   { id: 'firefox', name: 'Firefox', icon: 'firefox', keywords: ['web', 'browser', 'internet'], built: false, window: WIDE },
-  { id: 'files', name: 'Files', icon: 'org.gnome.Nautilus', keywords: ['folder', 'manager', 'explore'], built: false, window: NORMAL },
+  {
+    id: 'files', name: 'Files', icon: 'org.gnome.Nautilus', keywords: ['folder', 'manager', 'explore'], built: true,
+    window: { w: 890, h: 550, minW: 360, minH: 380 },
+    load: () => import('./files/Files.svelte'),
+    open: (path) => import('./files/session.svelte').then((m) => m.openLocation(path)),
+  },
   { id: 'terminal', name: 'Terminal', icon: 'org.gnome.Ptyxis', keywords: ['shell', 'prompt', 'command'], built: false, window: NORMAL },
   {
     id: 'text-editor', name: 'Text Editor', icon: 'org.gnome.TextEditor', keywords: ['text', 'edit', 'notes'], built: true, window: NORMAL,

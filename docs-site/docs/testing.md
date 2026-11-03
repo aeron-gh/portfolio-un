@@ -9,9 +9,9 @@ There are three kinds of tests. Each one catches a different kind of mistake.
 
 | Kind | Folder | Runs in | Count | Catches |
 | --- | --- | --- | ---: | --- |
-| **Unit** | `tests/unit/` | Bun, no browser, about 1 s | 253 | Wrong rules: window maths, sort orders, saved-data checks |
+| **Unit** | `tests/unit/` | Bun, no browser, about 1 s | 388 | Wrong rules: window maths, sort orders, saved-data checks |
 | **Build** | `tests/build/` | Bun, reading `dist/` | 40 | Broken HTML, missing tags, files that grew too big |
-| **Browser** | `e2e/` | Playwright with real Chromium | 199 | Wrong behaviour: clicks, keys, focus, timing, looks |
+| **Browser** | `e2e/` | Playwright with real Chromium | 266 | Wrong behaviour: clicks, keys, focus, timing, looks |
 
 ```bash
 bun run test        # unit

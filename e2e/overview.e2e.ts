@@ -82,11 +82,31 @@ test('typing finds an app and Enter launches it', async ({ page }) => {
   await expect(page.locator('.ov-back')).toHaveCount(0);
 });
 
-test('a visitor\'s search has no file or settings results until those apps exist', async ({ page }) => {
+test('a visitor\'s search has no settings results until Settings exists', async ({ page }) => {
+  await session(page, false);
+  await activities(page).click();
+  await page.keyboard.type('appearance');
+  await expect(page.locator('.search-statustext')).toHaveText('No results');
+});
+
+test('Files answers a search, under its own icon; a result opens with its default app', async ({ page }) => {
   await session(page, false);
   await activities(page).click();
   await page.keyboard.type('readme');
-  await expect(page.locator('.search-statustext')).toHaveText('No results');
+  const section = page.locator('.search-section-content[aria-label="Files"]');
+  await expect(section).toContainText('README.md');
+  await expect(section.locator('.provider img')).toHaveAttribute('src', /org\.gnome\.Nautilus/);
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('dialog', { name: 'README.md (~/Desktop) - Text Editor' })).toBeVisible();
+  await expect(page.locator('input.search-entry')).toHaveCount(0);
+});
+
+test('clicking a folder in the results opens it in Files', async ({ page }) => {
+  await session(page, false);
+  await activities(page).click();
+  await page.keyboard.type('Wallpapers');
+  await page.locator('.search-section-content[aria-label="Files"]').getByRole('button', { name: /Wallpapers/ }).click();
+  await expect(page.getByRole('dialog', { name: 'Wallpapers' })).toBeVisible();
 });
 
 test('with the providers on, files and settings answer', async ({ page }) => {
@@ -138,7 +158,7 @@ test('dropping a window on the next workspace moves it; thumbnails show with thr
 test('the app grid shows apps and folders; a folder opens and Esc closes it first', async ({ page }) => {
   await session(page);
   await page.getByRole('button', { name: 'Show Apps' }).click();
-  await expect(page.locator('.app-grid .overview-tile')).toHaveCount(3);
+  await expect(page.locator('.app-grid .overview-tile')).toHaveCount(4);
   await page.locator('.overview-tile[data-tile="Utilities"]').click();
   const folder = page.getByRole('dialog', { name: 'Utilities' });
   await expect(folder).toBeVisible();
@@ -154,21 +174,22 @@ test('dragging a tile reorders the grid and the order is kept', async ({ page })
   await session(page);
   await page.getByRole('button', { name: 'Show Apps' }).click();
   const ids = () => page.locator('.app-grid .overview-tile').evaluateAll((els) => els.map((e) => e.getAttribute('data-tile')));
-  await expect.poll(ids).toEqual(['test-window', 'text-editor', 'Utilities']); // by name, as GNOME's grid starts
-  await page.locator('[data-tile="Utilities"]').dragTo(page.locator('[data-tile="test-window"]'));
-  await expect.poll(ids).toEqual(['Utilities', 'test-window', 'text-editor']);
+  await expect.poll(ids).toEqual(['files', 'test-window', 'text-editor', 'Utilities']); // by name, as GNOME's grid starts
+  await page.locator('[data-tile="Utilities"]').dragTo(page.locator('[data-tile="files"]'));
+  await expect.poll(ids).toEqual(['Utilities', 'files', 'test-window', 'text-editor']);
   await page.reload();
   await page.locator('.gdm-user').click();
   await page.keyboard.press('Enter');
   await page.getByRole('button', { name: 'Show Apps' }).click();
-  await expect.poll(ids).toEqual(['Utilities', 'test-window', 'text-editor']);
+  await expect.poll(ids).toEqual(['Utilities', 'files', 'test-window', 'text-editor']);
 });
 
 test('a visitor\'s app grid shows the workspace and the built apps', async ({ page }) => {
   await session(page, false);
   await page.getByRole('button', { name: 'Show Apps' }).click();
   await expect(page.locator('.app-grid .ws-preview')).toHaveCount(1);
-  await expect(page.locator('.app-grid .overview-tile')).toHaveCount(1);
+  await expect(page.locator('.app-grid .overview-tile')).toHaveCount(2);
+  await expect(page.locator('.app-grid .overview-tile[data-tile="files"]')).toContainText('Files');
   await expect(page.locator('.app-grid .overview-tile[data-tile="text-editor"]')).toContainText('Text Editor');
 });
 

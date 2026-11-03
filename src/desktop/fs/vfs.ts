@@ -18,8 +18,9 @@ export type FsNode = {
   readonly?: boolean;
   /** Listing or reading gives "Permission denied". */
   denied?: boolean;
-  /** For items in the Trash: the path they came from. */
+  /** For items in the Trash: the path they came from, and when they went. */
   origin?: string;
+  trashed?: string;
   children?: Record<string, FsNode>;
 };
 
@@ -208,7 +209,7 @@ export class Vfs {
     if (this.walk(dst)) throw new FsError('EEXIST', dst);
     this.writableDir(dirname(dst));
     const own = (n: FsNode): FsNode => {
-      const { readonly: _r, origin: _o, children, ...rest } = n;
+      const { readonly: _r, origin: _o, trashed: _t, children, ...rest } = n;
       return children ? { ...rest, children: Object.fromEntries(Object.entries(children).map(([k, c]) => [k, own(c)])) } : rest;
     };
     this.recordTree(dst, { ...own(structuredClone(node)), name: basename(dst) });
@@ -227,18 +228,19 @@ export class Vfs {
     const dst = join(TRASH, name);
     this.move(p, dst);
     const trashed = this.walk(dst)!;
-    this.record(dst, { ...trashed, origin: p, children: trashed.children });
+    this.record(dst, { ...trashed, origin: p, trashed: this.now(), children: trashed.children });
     return dst;
   }
 
-  restore(trashPath: string): string {
+  /** Back to where it came from, or to `to` when that place is taken. */
+  restore(trashPath: string, to?: string): string {
     const p = resolvePath(trashPath);
     const node = this.walk(p);
     if (!node?.origin) throw new FsError('EINVAL', p);
-    const origin = node.origin;
+    const origin = to ?? node.origin;
     this.move(p, origin);
     const restored = this.walk(origin)!;
-    const { origin: _gone, ...clean } = restored;
+    const { origin: _gone, trashed: _when, ...clean } = restored;
     this.record(origin, clean);
     return origin;
   }

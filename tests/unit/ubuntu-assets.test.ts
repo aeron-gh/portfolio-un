@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { APPS } from '../../src/desktop/apps/registry';
 
 const A = 'src/desktop/assets';
 const S = 'src/desktop/fs/system';
@@ -34,6 +35,15 @@ describe('real Ubuntu assets', () => {
 
   test('the avatar is small', () => {
     expect(statSync(`${A}/avatar.avif`).size).toBeLessThanOrEqual(20 * 1024);
+  });
+
+  test('every app a visitor can open has its own icon, as a real image', () => {
+    const PNG = [0x89, 0x50, 0x4e, 0x47];
+    for (const app of APPS.filter((a) => a.built && !a.testOnly)) {
+      // Yaru stores some icons as symlinks: fetched raw, the "icon" would be a line of text.
+      const bytes = readFileSync(`${A}/icons/apps/${app.icon}.png`);
+      expect([...bytes.subarray(0, 4)], app.icon).toEqual(PNG);
+    }
   });
 
   test('every icon the shell uses is present', () => {

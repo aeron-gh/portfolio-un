@@ -141,7 +141,7 @@ test('Super+number focuses that dock app; Super+Shift+PageDown takes the window 
   await session(page);
   const a = await launch(page);
   await launch(page, 'test-utility');
-  await page.keyboard.press('Meta+Digit2'); // the dock: Text Editor (pinned), then the two running test apps
+  await page.keyboard.press('Meta+Digit3'); // the dock: Files and Text Editor (pinned), then the two running test apps
   await expect.poll(() => focusedId(page)).toBe(a);
   await page.keyboard.press('Meta+Shift+PageDown');
   const w = (await wins(page)).find((x) => x.id === a)!;

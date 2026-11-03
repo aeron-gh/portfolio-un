@@ -19,7 +19,9 @@ One file per module, testing the pure rules: window maths (`windows`, `tiling`, 
 `app-grid`, `overview`, `search`, `menu`, `quick-settings`, `desktop-grid`, `desktop-menu`), system rules (`session`,
 `settings`, `shortcuts`, `fullscreen`, `calendar`, `notifications`, `end-session`), the file system (`vfs`, `seed`),
 assets (`ubuntu-assets`: every icon the desktop uses exists, is a real image, and every SVG has the SVG namespace), the
-apps (`open`, `registry`, and Text Editor's `text-editor-document`, `-markdown`, `-find`, `-recents`), and the homepage helpers (`github`,
+apps (`open`, `registry`, `adw-scrollbar`, Text Editor's `text-editor-document`, `-markdown`, `-find`, `-recents`, and
+Files' `files-sort`, `-format`, `-selection`, `-history`, `-places`, `-menus`, `-names`, `-operations`, `-status`,
+`-icons`, `-prefs`, `-ellipsize`), and the homepage helpers (`github`,
 `github-fetch`, `rich`, `fuzzy`, `split`, `profile`, `featured`, `theme`, `spotify`).
 
 ```bash
@@ -57,9 +59,10 @@ bun run test:build
 | `notifications.e2e.ts` | 6 | Banners, the date menu, grouping, Do Not Disturb |
 | `layers.e2e.ts` | 4 | Keys and focus with several layers open |
 | `review-fixes.e2e.ts` | 6 | Edge cases: slow downloads, full screen, id reuse, failures |
-| `text-editor.e2e.ts` | 24 | Text Editor: open, save, Save Changes?, tabs, menus, theme, zoom, recents, Markdown colours, Find/Replace |
+| `files.e2e.ts` | 62 | Files: browsing, views, sorting, selecting, menus, naming, copy and paste, the Trash, Undo, the narrow layout, scrollbars |
+| `text-editor.e2e.ts` | 25 | Text Editor: open, save, Save Changes?, tabs, menus, theme, zoom, recents, Markdown colours, Find/Replace |
 | `desktop-budget.e2e.ts` | 2 | Icon download budget; each on-demand surface and app is its own small file |
-| `desktop-visual.e2e.ts` | 10 | Screenshot baselines for 14 surfaces in light and dark (local only) |
+| `desktop-visual.e2e.ts` | 12 | Screenshot baselines for 19 surfaces in light and dark (local only) |
 
 ```bash
 bun run test:e2e

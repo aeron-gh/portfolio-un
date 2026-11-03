@@ -98,6 +98,7 @@ The desktop is one Svelte app, mounted by `src/pages/desktop/index.astro`. Folde
 | `apps/open.ts`, `apps/opener.ts` | Which app opens a file type, and what a double-click does. |
 | `apps/adw/` | The libadwaita kit every app uses: header bar, popovers and menus, dialogs, tab bar, status page, colours and buttons. See [Apps](../desktop/apps.md). |
 | `apps/text-editor/` | [Text Editor](../desktop/text-editor.md). |
+| `apps/files/` | [Files](../desktop/files.md). |
 | `apps/test-window/` | *Test Window* and *Test Utility*, used by the browser tests. |
 | `theme/tokens.css` | Every colour and size, light and dark, from Yaru and GNOME Shell. |
 | `theme/base.css` | Reset, fonts, symbolic icons (`.sym`), reduced motion. |

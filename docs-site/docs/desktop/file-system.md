@@ -5,8 +5,8 @@ title: File system
 
 # The file system
 
-The desktop has one file tree. The desktop icons and search use it now. Files, Terminal and Text Editor will use the
-same tree when they are built.
+The desktop has one file tree. The desktop icons, search, Text Editor and Files use it. Terminal will use the same
+tree when it is built.
 
 | File | Job |
 | --- | --- |
@@ -69,7 +69,7 @@ Each file or folder is an `FsNode`:
 | `size`, `mtime`, `mime` | Shown by Files and used for sorting |
 | `readonly` | Nothing can be created, changed or removed here |
 | `denied` | Listing or reading gives "Permission denied" |
-| `origin` | For items in the Trash: where they came from |
+| `origin`, `trashed` | For items in the Trash: where they came from, and when they went |
 
 ## Rules
 

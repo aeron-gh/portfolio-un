@@ -3,6 +3,7 @@
   import { icon as themed } from '../../icons';
   import { trapFocus } from '../../shell/focus-trap';
   import { openLayer } from '../../system/layers.svelte';
+  import Toast from './Toast.svelte';
   import external from './assets/adw-external-link-symbolic.svg?url';
   import back from './assets/go-previous-symbolic.svg?url';
   import './adw.css';
@@ -37,14 +38,11 @@
     };
   });
 
-  // The version button copies it, with AdwToast's "Copied to clipboard" for 5 seconds (adw-toast.c default timeout).
-  let toast = $state(false);
-  let toastTimer: ReturnType<typeof setTimeout> | undefined;
+  // The version button copies it, with AdwToast's "Copied to clipboard". Copying again restarts the toast.
+  let toast = $state(0);
   function copyVersion() {
     navigator.clipboard?.writeText(version).catch(() => {});
-    toast = true;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => (toast = false), 5000);
+    toast++;
   }
 
   function go(to: typeof page) {
@@ -112,10 +110,7 @@
       {/if}
     </div>
     {#if toast}
-      <div class="toast" role="status">
-        <span>Copied to clipboard</span>
-        <button class="adw-button flat circular" aria-label="Dismiss" title="Dismiss" onclick={() => (toast = false)}><span class="sym" style:--icon={`url(${themed('window-close-symbolic')})`}></span></button>
-      </div>
+      {#key toast}<Toast title="Copied to clipboard" ondismiss={() => (toast = 0)} />{/key}
     {/if}
   </div>
 </div>
@@ -150,11 +145,4 @@
   .heading { margin: 0; font-size: 1em; }
   .body { line-height: 1.4; }
   .body a { color: var(--adw-accent); }
-  /* toast (libadwaita 1.9): a dark pill 24px above the bottom, its title then a flat circular Dismiss button. */
-  .toast {
-    position: absolute; left: 50%; bottom: 24px; translate: -50% 0; display: flex; align-items: center; gap: 6px;
-    padding: 6px 6px 6px 12px; border-radius: 150px; background: #505053; color: #fff; white-space: nowrap;
-    box-shadow: 0 1px 3px 1px rgb(0 0 6 / 7%), 0 2px 6px 2px rgb(0 0 6 / 3%);
-  }
-  .toast > span { margin: 0 6px; }
 </style>

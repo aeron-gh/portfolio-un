@@ -59,7 +59,7 @@
   .tab:active { background: color-mix(in srgb, currentColor 16%, transparent); }
   .tab.selected { background: color-mix(in srgb, currentColor 10%, transparent); }
   .tab.selected:hover { background: color-mix(in srgb, currentColor 13%, transparent); }
-  .tab:focus-visible { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
+  :global(:root[data-focus-ring]) .tab:focus { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
   /* The separator in the 5px gap before each tab: gone beside the selected or hovered one. */
   .tab + .tab::before {
     content: ''; position: absolute; left: -3px; top: 9px; bottom: 9px; width: 1px;
@@ -73,7 +73,7 @@
     grid-column: 2; grid-row: 1; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 99px;
     opacity: 0; transition: opacity 150ms ease-in-out, background 200ms var(--ease);
   }
-  .tab:hover .close, .tab.selected .close, .close:focus-visible { opacity: 1; }
+  .tab:hover .close, .tab.selected .close, :global(:root[data-focus-ring]) .close:focus { opacity: 1; }
   .close:hover { background: color-mix(in srgb, currentColor 7%, transparent); }
   .close:active { background: color-mix(in srgb, currentColor 16%, transparent); }
 </style>

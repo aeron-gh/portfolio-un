@@ -13,6 +13,12 @@
   --adw-destructive-bg: #e01b24; /* @red_3 */
   --adw-destructive: oklab(from #e01b24 min(l, 0.5) a b);
   --adw-accent: oklab(from var(--accent) min(l, 0.5) a b);
+  --adw-warning: oklab(from #e5a50a min(l, 0.5) a b); /* @yellow_5 */
+  --adw-scrollbar-outline: #fff;
+  --adw-sidebar-bg: #ebebed;
+  --adw-sidebar-fg: rgb(0 0 6 / 80%);
+  --adw-sidebar-backdrop: #f2f2f4;
+  --adw-sidebar-border: rgb(0 0 6 / 7%);
 }
 :root[data-style="dark"], .window[data-style="dark"] {
   --adw-dialog-bg: #36363a;
@@ -27,7 +33,16 @@
   --adw-destructive-bg: #c01c28; /* @red_4 */
   --adw-destructive: oklab(from #c01c28 max(l, 0.85) a b);
   --adw-accent: oklab(from var(--accent) max(l, 0.85) a b);
+  --adw-warning: oklab(from #cd9309 max(l, 0.85) a b);
+  --adw-scrollbar-outline: rgb(0 0 12 / 95%);
+  --adw-sidebar-bg: #2e2e32;
+  --adw-sidebar-fg: #fff;
+  --adw-sidebar-backdrop: #28282c;
+  --adw-sidebar-border: rgb(0 0 6 / 36%);
 }
+
+/* libadwaita's text selection in an entry, not the browser's blue. */
+.window input::selection, .popover input::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); }
 
 /* button, button.flat, button.image-button (libadwaita 1.9). GTK's min sizes are for the content, inside the padding:
    24px + 2 × 5px = 34px high. The hover border is a high-contrast rule only. */
@@ -51,8 +66,8 @@
 .adw-button.suggested:hover { background-image: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 10%)); }
 .adw-button.suggested:active { background-image: linear-gradient(rgb(0 0 6 / 20%), rgb(0 0 6 / 20%)); }
 .adw-button:disabled { filter: opacity(50%); }
-.adw-button:focus-visible { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
-.adw-button.suggested:focus-visible { outline-offset: 1px; }
+:root[data-focus-ring] .adw-button:focus { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
+:root[data-focus-ring] .adw-button.suggested:focus { outline-offset: 1px; }
 
 /* list.boxed-list and its rows (AdwActionRow, AdwLinkRow), preferencesgroup (libadwaita 1.9). */
 .adw-group { display: flex; flex-direction: column; gap: 6px; }
@@ -71,7 +86,7 @@
 .adw-row.activatable:hover { background-color: color-mix(in srgb, currentColor 4%, transparent); }
 .adw-row.activatable:active { background-color: color-mix(in srgb, currentColor 8%, transparent); }
 .adw-row:disabled, .adw-row[aria-disabled="true"] { opacity: .5; }
-.adw-row:focus-visible { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
+:root[data-focus-ring] .adw-row:focus { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
 .adw-row > .titles { flex: 1; display: flex; flex-direction: column; gap: 3px; margin: 6px 0; min-width: 0; }
 .adw-row .subtitle { font-size: .8333em; }
 .adw-row .sym { flex: none; }

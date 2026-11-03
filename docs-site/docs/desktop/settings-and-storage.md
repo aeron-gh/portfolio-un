@@ -21,6 +21,7 @@ device and is never sent anywhere.
 | `ubuntu.session.v1` | `ubuntu` or `fullscreen`, the last session picked at login | `system/fullscreen.ts` |
 | `ubuntu.welcome.v1` | `1` once the "Welcome to Ubuntu 26.04 LTS" note has been shown | `system/notifications.svelte.ts` |
 | `ubuntu.text-editor.v1` | Text Editor's theme choice and its recent documents | `apps/text-editor/session.svelte.ts` |
+| `ubuntu.files.v1` | Files' view, zoom levels, hidden files and each folder's sort | `apps/files/session.svelte.ts` |
 | `theme` | The **homepage's** theme: `light`, `dark` or `system` | `src/scripts/theme.ts` |
 
 The `.v1` at the end is a version number. If a saved shape ever has to change in a way old data can't fit, the key

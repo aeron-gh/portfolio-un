@@ -25,7 +25,7 @@
     background-clip: content-box; box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 15%, transparent);
   }
   input:checked { box-shadow: inset 0 0 0 2px var(--accent); }
-  input:focus-visible { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: 2px; }
+  :global(:root[data-focus-ring]) input:focus { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: 2px; }
   .follow { background-image: linear-gradient(to bottom right, #fff 49.99%, #202020 50.01%); }
   .light { background-color: #fff; }
   .dark { background-color: #202020; }

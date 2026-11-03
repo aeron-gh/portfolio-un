@@ -96,7 +96,7 @@ help:
 
 ## In apps
 
-Apps have their own shortcuts, for example [Text Editor's](./text-editor.md#shortcuts).
+Apps have their own shortcuts: [Text Editor's](./text-editor.md#shortcuts) and [Files'](./files.md#shortcuts).
 
 ## Embedded on the homepage
 

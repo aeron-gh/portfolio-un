@@ -17,6 +17,7 @@ real thing.** That means no value is guessed. Every size, colour, delay and labe
 | Accent colours | Ubuntu's own patch to GNOME Shell (not upstream GNOME) | 26.04 |
 | Keyboard shortcuts | GNOME Shell and mutter keybinding schemas, plus Ubuntu's overrides | 50 |
 | Dock | The ubuntu-dock extension's defaults as Ubuntu ships them | 26.04 |
+| Files | Nautilus's source with Ubuntu's `debian/patches` applied, `ubuntu-settings`, `xdg-user-dirs-gtk` | 50.2.2 |
 | Desktop icons | Desktop Icons NG (`desktopManager.js`, `askRenamePopup.js`) | 26.04 |
 | Desktop right-click menus | The Yaru GTK3 theme | Yaru commit `7f18973e` |
 | Icons | Yaru icon theme | Yaru commit `7f18973e` |

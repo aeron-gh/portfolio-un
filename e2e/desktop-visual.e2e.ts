@@ -85,6 +85,39 @@ for (const style of ['light', 'dark'] as const) {
     await expect(page).toHaveScreenshot(`text-editor-save-${style}.png`);
   });
 
+  test(`files (${style})`, async ({ page }) => {
+    test.setTimeout(60_000);
+    await prepare(page, style);
+    await page.goto('/desktop/');
+    await page.locator('.gdm-user').click();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.wall.real.show')).toBeVisible();
+    await page.getByRole('button', { name: 'Files', exact: true }).click();
+    const win = page.locator('.window[data-app="files"]');
+    const item = (name: string) => win.getByRole('listbox', { name: 'Content' }).getByRole('option', { name, exact: true });
+    await expect(item('Documents')).toBeVisible();
+    await page.mouse.move(1270, 790);
+    await expect(page).toHaveScreenshot(`files-${style}.png`);
+    await item('Documents').click({ button: 'right' });
+    await page.mouse.move(1270, 790);
+    await expect(page).toHaveScreenshot(`files-menu-${style}.png`);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(3100); // Esc moved the focus: GTK's ring stays 3 seconds, and would show on the next menu
+    await win.getByRole('button', { name: 'View Options' }).click();
+    await page.mouse.move(1270, 790);
+    await expect(page).toHaveScreenshot(`files-view-options-${style}.png`);
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Control+Shift+N');
+    await page.keyboard.type('Reports');
+    await page.mouse.move(1270, 790);
+    await expect(page).toHaveScreenshot(`files-new-folder-${style}.png`);
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Control+1');
+    await page.mouse.move(1270, 790);
+    // The dates are relative to today, so they are left out of the picture.
+    await expect(page).toHaveScreenshot(`files-list-${style}.png`, { mask: [win.locator('.date')] });
+  });
+
   test(`lock screen (${style})`, async ({ page }) => {
     await prepare(page, style);
     await page.goto('/desktop/');

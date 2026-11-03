@@ -69,6 +69,7 @@ const ICONS = [
   '48x48@2x/mimetypes/application-x-executable.png',
   // Text Editor
   '48x48@2x/apps/org.gnome.TextEditor.png',
+  '48x48@2x/apps/org.gnome.Nautilus.png',
   'scalable/actions/open-menu-symbolic.svg',
   'scalable/ui/tab-new-symbolic.svg',
   'scalable/status/info-outline-symbolic.svg',
@@ -186,12 +187,42 @@ for (const [url, to] of [
   [`${TEXT_EDITOR}/data/icons/hicolor/scalable/actions/document-modified-symbolic.svg`, 'src/desktop/apps/text-editor/icons/document-modified-symbolic.svg'],
   [`${YARU}/scalable/apps/org.gnome.TextEditor-symbolic.svg`, 'src/desktop/apps/text-editor/icons/org.gnome.TextEditor-symbolic.svg'],
   [`${LIBADWAITA}/src/stylesheet/assets/check-symbolic.svg`, 'src/desktop/apps/adw/assets/check-symbolic.svg'],
+  [`${LIBADWAITA}/src/stylesheet/assets/bullet-symbolic.svg`, 'src/desktop/apps/adw/assets/bullet-symbolic.svg'],
   [`${LIBADWAITA}/src/icons/adw-external-link.svg`, 'src/desktop/apps/adw/assets/adw-external-link-symbolic.svg'],
   [`${YARU}/scalable/actions/go-previous-symbolic.svg`, 'src/desktop/apps/adw/assets/go-previous-symbolic.svg'],
   [`${YARU}/256x256/apps/org.gnome.TextEditor.png`, 'src/desktop/apps/text-editor/icons/org.gnome.TextEditor.png'],
 ]) {
   await download(url, to);
 }
+// Files: every file icon at both sizes it can be drawn at, and the symbolic icons only its window uses.
+const FILES = 'src/desktop/apps/files/icons';
+for (const rel of [
+  'places/folder', 'places/folder-documents', 'places/folder-download', 'places/folder-music', 'places/folder-pictures',
+  'places/folder-publicshare', 'places/folder-templates', 'places/folder-videos', 'places/user-home', 'places/user-desktop',
+  'places/user-trash', 'status/user-trash-full', 'mimetypes/text-x-generic', 'mimetypes/text-markdown', 'mimetypes/text-x-script',
+  'mimetypes/application-pdf', 'mimetypes/image-x-generic', 'mimetypes/application-json', 'mimetypes/application-javascript',
+  'mimetypes/application-x-desktop', 'mimetypes/application-octet-stream',
+]) {
+  const name = rel.slice(rel.indexOf('/') + 1);
+  await downloadIcon(`48x48@2x/${rel}.png`, `${FILES}/48/${name}.png`);
+  await downloadIcon(`256x256/${rel}.png`, `${FILES}/256/${name}.png`);
+}
+for (const rel of [
+  'places/user-home-symbolic', 'status/starred-symbolic', 'org.gnome.Nautilus/network-computer-symbolic', 'places/user-trash-symbolic',
+  'status/user-trash-full-symbolic', 'places/folder-symbolic', 'places/folder-documents-symbolic', 'places/folder-music-symbolic',
+  'places/folder-pictures-symbolic', 'places/folder-videos-symbolic', 'places/folder-download-symbolic', 'places/folder-remote-symbolic',
+  'devices/drive-harddisk-symbolic', 'actions/edit-find-symbolic', 'actions/sidebar-show-symbolic', 'actions/go-previous-symbolic',
+  'actions/go-next-symbolic', 'actions/view-list-symbolic', 'actions/view-grid-symbolic', 'actions/folder-new-symbolic',
+  'actions/view-more-symbolic', 'actions/zoom-in-symbolic', 'actions/zoom-out-symbolic', 'status/non-starred-symbolic', 'ui/pan-up-symbolic',
+  'ui/pan-down-symbolic',
+]) {
+  await downloadIcon(`scalable/${rel}.svg`, `${FILES}/sym/${rel.slice(rel.indexOf('/') + 1)}.svg`);
+}
+await downloadIcon('16x16@2x/emblems/emblem-unreadable.png', `${FILES}/emblem-unreadable.png`);
+for (const name of ['nautilus-folder-search-symbolic', 'cut-symbolic', 'cut-large-symbolic']) {
+  await download(`https://gitlab.gnome.org/GNOME/nautilus/-/raw/50.2.2/src/resources/icons/scalable/actions/${name}.svg`, `${FILES}/sym/${name}.svg`);
+}
+
 // GTK 4.22's own symbolic format ("grappa") leaves out the SVG namespace and paints with a GTK-only reference;
 // browsers need both fixed. The drawing is unchanged.
 const ext = 'src/desktop/apps/adw/assets/adw-external-link-symbolic.svg';

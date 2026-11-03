@@ -21,8 +21,11 @@ describe('which app opens a file', () => {
 
   test('a type nothing handles opens nothing', () => {
     expect(appFor(file('application/octet-stream'), all)).toBeNull();
-    expect(appFor(file('application/x-desktop'), all)).toBeNull();
+    expect(appFor(file('application/octet-stream'), all)).toBeNull();
     expect(appFor({ kind: 'file' }, all)).toBeNull();
+  });
+  test('a .desktop file is plain text underneath (shared-mime-info), so Text Editor opens it', () => {
+    expect(appFor({ kind: 'file', mime: 'application/x-desktop' }, () => true)).toBe('text-editor');
   });
 
   test('an app that is not installed yet opens nothing', () => {

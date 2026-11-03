@@ -18,16 +18,23 @@ test('Home and the README are on the desktop, Home bottom-right', async ({ page 
   expect(box.y + box.height).toBeGreaterThan(vp.height - 130);
 });
 
-// Files is not built yet, so a folder is still something no installed app opens.
+/** A file of a type nothing opens, on the desktop. */
+const UNKNOWN = '/home/ubuntu/Desktop/data.bin';
+const withUnknownFile = (page: Page) =>
+  page.addInitScript((path) => {
+    localStorage.setItem('ubuntu.fs.v1', JSON.stringify({ [path]: { name: 'data.bin', kind: 'file', mime: 'application/octet-stream', content: '', size: 0, mtime: '2026-01-01T00:00:00.000Z' } }));
+  }, UNKNOWN);
+
 test('click selects; double-click on something no app opens shows the Nautilus no-app dialog', async ({ page }) => {
+  await withUnknownFile(page);
   await session(page);
-  const home = page.locator('.desktop-icon[data-path="/home/ubuntu"]');
-  await home.click();
-  await expect(home).toHaveAttribute('aria-selected', 'true');
-  await home.dblclick();
+  const file = page.locator(`.desktop-icon[data-path="${UNKNOWN}"]`);
+  await file.click();
+  await expect(file).toHaveAttribute('aria-selected', 'true');
+  await file.dblclick();
   const dialog = page.getByRole('alertdialog');
-  await expect(dialog).toContainText('Could Not Display “Home”');
-  await expect(dialog).toContainText('There is no app installed for “Folder” files');
+  await expect(dialog).toContainText('Could Not Display “data.bin”');
+  await expect(dialog).toContainText('The file is of an unknown type');
   await expect(dialog.getByRole('button', { name: 'Select App' })).toBeVisible();
   await expect(dialog.getByRole('button', { name: 'OK' })).toBeFocused();
   await page.keyboard.press('Escape');
@@ -35,8 +42,9 @@ test('click selects; double-click on something no app opens shows the Nautilus n
 });
 
 test('Enter on a focused icon opens the no-app dialog and it stays open', async ({ page }) => {
+  await withUnknownFile(page);
   await session(page);
-  await page.locator('.desktop-icon[data-path="/home/ubuntu"]').focus();
+  await page.locator(`.desktop-icon[data-path="${UNKNOWN}"]`).focus();
   await page.keyboard.press('Enter');
   const dialog = page.getByRole('alertdialog');
   await expect(dialog).toBeVisible();
@@ -86,13 +94,14 @@ test('icons stay on screen in a 1024x640 window', async ({ page }) => {
 });
 
 test('embedded: Esc with the dialog open closes only the dialog', async ({ page }) => {
+  await withUnknownFile(page);
   const HARNESS = `<!doctype html><meta charset="utf-8"><iframe id="d" src="/desktop/?embed=1" style="width:1200px;height:760px;border:0"></iframe><script>window.msgs=[];addEventListener('message',(e)=>{if(e.origin===location.origin)msgs.push(e.data&&e.data.type)});</script>`;
   await page.route('**/__harness', (r) => r.fulfill({ contentType: 'text/html', body: HARNESS }));
   await page.goto('/__harness');
   const d = page.frameLocator('#d');
   await d.locator('.gdm-user').click();
   await page.keyboard.press('Enter');
-  await d.locator('.desktop-icon[data-path="/home/ubuntu"]').dblclick();
+  await d.locator(`.desktop-icon[data-path="${UNKNOWN}"]`).dblclick();
   await expect(d.getByRole('alertdialog')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(d.getByRole('alertdialog')).toHaveCount(0);

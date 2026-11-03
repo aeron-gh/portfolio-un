@@ -42,5 +42,5 @@
   }
   input:checked { box-shadow: none; background: var(--accent); }
   input:checked::after { content: ''; display: block; width: 14px; height: 14px; margin: 3px; background: #fff; mask: var(--check) center / 14px no-repeat; }
-  input:focus-visible { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
+  :global(:root[data-focus-ring]) input:focus { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
 </style>
