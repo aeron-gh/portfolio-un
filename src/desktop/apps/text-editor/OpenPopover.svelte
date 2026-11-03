@@ -105,7 +105,7 @@
   /* listview > row padding 2px + the row grid's margins (3px, end 6px) and its empty indicator column (6px gap). */
   .row { display: flex; align-items: center; gap: 6px; margin: 3px 6px; padding: 5px 8px; border-radius: 6px; outline: none; }
   .row:first-child { margin-top: 6px; }
-  .row:hover, .row:focus-visible { background: color-mix(in srgb, currentColor 10%, transparent); }
+  .row:hover, :global(:root[data-focus-ring]) .row:focus { background: color-mix(in srgb, currentColor 10%, transparent); }
   .titles { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
   .title, .subtitle { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .subtitle { font-size: 82%; line-height: 140%; opacity: .55; }

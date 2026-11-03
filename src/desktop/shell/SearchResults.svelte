@@ -5,6 +5,7 @@
   import { launch } from '../wm/wm.svelte';
   import { iconFor } from './file-icons';
   import { hideOverview, overview } from './overview.svelte';
+  import { openPath } from '../apps/opener';
   import { MAX_ROWS, fileHits, searchApps, searchPanels } from './search';
 
   // Search providers belong to apps: file results need Files, settings panels need Settings.
@@ -20,10 +21,17 @@
     hideOverview();
   }
 
+  /** handle_activate_result (nautilus-shell-search-provider.c): the file's default app, as a double-click does. */
+  function openFile(path: string) {
+    void openPath(path);
+    hideOverview();
+  }
+
   /** Enter in the search entry opens the first result. */
   export function activateFirst(): void {
     if (apps[0]) run(apps[0].id);
-    else if (files[0] || panels[0]) hideOverview();
+    else if (files[0]) openFile(files[0].path);
+    else if (panels[0]) hideOverview();
   }
 </script>
 
@@ -44,12 +52,14 @@
     {/if}
     {#if files.length}
       <section class="search-section-content" aria-label="Files">
-        <div class="provider"><img src={icon('folder')} alt="" width="48" height="48" /><span>Files</span></div>
+        <div class="provider"><img src={icon('org.gnome.Nautilus')} alt="" width="48" height="48" /><span>Files</span></div>
         <ul>
           {#each files as f, i (f.path)}
-            <li class="list-search-result" class:first={!apps.length && i === 0}>
-              <img src={icon(iconFor(f.path, fs().stat(f.path)!))} alt="" width="32" height="32" />
-              <span class="title">{f.name}</span><span class="description">{f.parent}</span>
+            <li>
+              <button class="list-search-result" class:first={!apps.length && i === 0} onclick={() => openFile(f.path)}>
+                <img src={icon(iconFor(f.path, fs().stat(f.path)!))} alt="" width="32" height="32" />
+                <span class="title">{f.name}</span><span class="description">{f.parent}</span>
+              </button>
             </li>
           {/each}
         </ul>

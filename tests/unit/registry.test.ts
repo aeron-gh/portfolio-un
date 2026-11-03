@@ -3,12 +3,12 @@ import { APPS, PINNED_DEFAULT, appById, availableApps, isAvailable, testModeFrom
 
 describe('app registry', () => {
   test('a visitor gets the apps that are built, and only those', () => {
-    expect(availableApps(false).map((a) => a.id)).toEqual(['text-editor']);
+    expect(availableApps(false).map((a) => a.id)).toEqual(['files', 'text-editor']);
     expect(APPS.filter((a) => a.built && !a.testOnly).every((a) => a.load)).toBe(true);
   });
 
   test('the two test apps exist only in test mode', () => {
-    expect(availableApps(true).map((a) => a.id)).toEqual(['text-editor', 'test-window', 'test-utility']);
+    expect(availableApps(true).map((a) => a.id)).toEqual(['files', 'text-editor', 'test-window', 'test-utility']);
     expect(isAvailable(appById('test-window'), false)).toBe(false);
     expect(appById('test-utility').folder).toBe('Utilities');
   });

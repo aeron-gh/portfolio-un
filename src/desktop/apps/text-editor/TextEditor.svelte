@@ -8,8 +8,10 @@
   import AboutDialog from '../adw/AboutDialog.svelte';
   import AlertDialog from '../adw/AlertDialog.svelte';
   import HeaderBar from '../adw/HeaderBar.svelte';
+  import { keepFocus } from '../adw/keep-focus';
   import Popover from '../adw/Popover.svelte';
   import PopoverMenu, { type MenuSection } from '../adw/PopoverMenu.svelte';
+  import Scrollbar from '../adw/Scrollbar.svelte';
   import StatusPage from '../adw/StatusPage.svelte';
   import TabBar from '../adw/TabBar.svelte';
   import type { AppProps } from '../registry';
@@ -295,7 +297,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="app" onkeydown={keys}>
+<div class="app" onkeydown={keys} onmousedown={keepFocus}>
   <HeaderBar flat>
     {#snippet start()}
       <button bind:this={openButton} class="adw-button flat open" title="Recently Used Documents" aria-haspopup="dialog" aria-expanded={openOpen} onclick={() => (openOpen = !openOpen)}>
@@ -349,6 +351,7 @@
             readonly={doc.readonly}
             onscroll={(e) => layer && (layer.scrollTop = e.currentTarget.scrollTop)}
           ></textarea>
+          <Scrollbar target={view} />
         </div>
       {/key}
     {:else}
@@ -471,7 +474,7 @@
   }
   .editor, .layer {
     margin: 0; padding: 12px; border: 0; font: inherit; font-family: var(--font-ubuntu-mono), monospace; line-height: 1.2;
-    tab-size: 8; white-space: pre-wrap; overflow-wrap: break-word; scrollbar-gutter: stable;
+    tab-size: 8; white-space: pre-wrap; overflow-wrap: break-word; scrollbar-width: none;
   }
   .layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
   .editor { flex: 1; min-width: 0; resize: none; outline: none; overflow: auto; background: none; color: inherit; caret-color: var(--gsv-cursor); }

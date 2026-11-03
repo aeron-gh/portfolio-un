@@ -122,8 +122,12 @@ test('embedded: Esc cancels the dialog and stays on the desktop', async ({ page 
 });
 
 test('the "no app" dialog keeps focus inside and gives it back to the icon', async ({ page }) => {
+  const path = '/home/ubuntu/Desktop/data.bin';
+  await page.addInitScript((p) => {
+    localStorage.setItem('ubuntu.fs.v1', JSON.stringify({ [p]: { name: 'data.bin', kind: 'file', mime: 'application/octet-stream', content: '', size: 0, mtime: '2026-01-01T00:00:00.000Z' } }));
+  }, path);
   await session(page);
-  const home = page.locator('.desktop-icon[data-path="/home/ubuntu"]'); // a folder: Files is not built yet
+  const home = page.locator(`.desktop-icon[data-path="${path}"]`);
   await home.focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('alertdialog')).toBeVisible();

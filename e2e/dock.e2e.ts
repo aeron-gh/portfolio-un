@@ -21,7 +21,8 @@ test('a visitor sees the dock with the built apps and Show Apps', async ({ page 
   const box = (await dock.boundingBox())!;
   expect(box.width).toBe(66);
   expect(box.y).toBe(32);
-  await expect(dock.locator('.tile')).toHaveCount(2);
+  await expect(dock.locator('.tile')).toHaveCount(4); // Files, Text Editor, Trash, Show Apps
+  await expect(tile(page, 'files')).toBeVisible();
   await expect(tile(page, 'text-editor')).toBeVisible();
   await expect(dock.getByRole('button', { name: 'Show Apps' })).toBeVisible();
 });

@@ -11,7 +11,7 @@ export function formatClock(now: Date, clock24: boolean | null, locale?: string)
   return { date, time, bar: `${date} ${blank}${time}` };
 }
 
-function uses24h(locale?: string): boolean {
+export function uses24h(locale?: string): boolean {
   const cycle = new Intl.DateTimeFormat(locale, { hour: 'numeric' }).resolvedOptions().hourCycle;
   return cycle === 'h23' || cycle === 'h24';
 }

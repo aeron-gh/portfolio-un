@@ -79,12 +79,12 @@
   }
   button:hover { background-color: color-mix(in srgb, currentColor 15%, transparent); }
   button:active { background-color: color-mix(in srgb, currentColor 30%, transparent); }
-  button:focus-visible { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
+  :global(:root[data-focus-ring]) button:focus { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
   .destructive { color: var(--adw-destructive); background-color: color-mix(in srgb, currentColor 15%, transparent); }
   .destructive:hover { background-color: color-mix(in srgb, currentColor 20%, transparent); }
   .destructive:active { background-color: color-mix(in srgb, currentColor 35%, transparent); }
   .suggested { color: #fff; background-color: var(--accent); }
   .suggested:hover { background-color: var(--accent); background-image: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 10%)); }
   .suggested:active { background-color: var(--accent); background-image: linear-gradient(rgb(0 0 6 / 20%), rgb(0 0 6 / 20%)); }
-  .suggested:focus-visible { outline-offset: 1px; }
+  :global(:root[data-focus-ring]) .suggested:focus { outline-offset: 1px; }
 </style>

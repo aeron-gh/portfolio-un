@@ -16,6 +16,7 @@ title: How it was built
 | **8 Oct 2026** | Moved hosting from GitHub Pages to Cloudflare Workers. Moved the desktop to `/desktop/`. Fixed layering, focus and loading edge cases. |
 | **9 Oct 2026** | Added CI (GitHub Actions) and these docs. Changes now reach `master` only through pull requests. |
 | **12–17 Oct 2026** | The first app, **Text Editor**, and the shared libadwaita kit for the apps that follow. |
+| **Nov 2026** | **Files**: browsing and managing files, in three parts. Overlay scrollbars for every app. |
 
 ## Why rebuild?
 
@@ -79,4 +80,9 @@ Each of these was a real bug. Each one now has a test.
 | An icon from libadwaita was invisible | GTK's newer SVG format leaves out the SVG namespace; a browser then draws nothing | Fix the file when fetching it, and a unit test for every SVG |
 | A menu opened off the bottom of the window | The popover always opened below its button | Open above when there is no room below, as GTK does |
 | Text typed right after opening a file was lost in tests | The keys came before the editor had focus | Real GNOME behaves the same; the tests wait for focus first |
+| A rename or a delete did nothing after its dialog closed | `{@const r = renaming}` is live: clearing `renaming` emptied `r` too, before the next line used it | Copy the value first, then clear |
+| Clicking a window's header stopped its shortcuts working | A browser moves focus to the nearest focusable parent, here the window, outside the app's key handler. GTK headers never take focus | `keepFocus` on the app's root |
+| A new app's dock icon was a blank page | Yaru stores some icons as symlinks, so a raw download saved a line of text. The app's icon had also never been fetched | `downloadIcon` follows links; a unit test checks every built app has a real PNG |
+| A focus ring showed on a menu opened with the mouse | The browser's `:focus-visible` guesses after a script moves focus | [GTK's own rule](./desktop/apps.md#focus-rings-are-not-focus-visible) |
+| An app's empty page swallowed Backspace | With no items there was nothing to focus, so focus fell out of the window | The page itself can hold focus |
 | Esc closed two things at once | Every open menu listened to the same key | A [layer stack](./desktop/architecture.md#overlays-and-the-keyboard): only the top layer acts |
