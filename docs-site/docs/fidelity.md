@@ -18,6 +18,8 @@ real thing.** That means no value is guessed. Every size, colour, delay and labe
 | Keyboard shortcuts | GNOME Shell and mutter keybinding schemas, plus Ubuntu's overrides | 50 |
 | Dock | The ubuntu-dock extension's defaults as Ubuntu ships them | 26.04 |
 | Files | Nautilus's source with Ubuntu's `debian/patches` applied, `ubuntu-settings`, `xdg-user-dirs-gtk` | 50.2.2 |
+| Files search | `localsearch` (what is indexed), `tinysparql` (how words are read and matched), Snowball's English stemmer, SQLite FTS5 (`bm25`, `snippet`) | 3.11.2, 3.11.0, 3.0.1, 3.46.1 |
+| Dragging | Mutter (keys, cursor, a drop that does nothing), GTK (scrolling near an edge), libadwaita (drop colours) | 50.1, 4.22.2, 1.9 |
 | Desktop icons | Desktop Icons NG (`desktopManager.js`, `askRenamePopup.js`) | 26.04 |
 | Desktop right-click menus | The Yaru GTK3 theme | Yaru commit `7f18973e` |
 | Icons | Yaru icon theme | Yaru commit `7f18973e` |
@@ -90,3 +92,8 @@ Then look at every changed image before you commit it.
 | World clocks and weather are hidden in the date menu | Ubuntu hides them too when their apps are not installed |
 | "New Document" is missing from the desktop menu | Ubuntu hides it too when `~/Templates` is empty |
 | Apps show a "no app" dialog | The apps are not built yet, see [Roadmap](./roadmap.md) |
+| Files' search does not read what is inside a PDF | Only text and Markdown files have their text here |
+| Search filters' "Used" and "Created" dates go by when a file last changed, unless Files opened it | A file here keeps one time |
+| When two search engines find the same file, the order of who answers first is fixed | In Ubuntu it depends on which engine is quicker that time |
+| Dragging stays inside the page, and files from your own computer cannot be dropped in | The desktop has no access to your files, and the drag looks like GNOME's whatever the system |
+| Ctrl over the Trash still trashes | What the real Trash does with a copy dropped on it is not confirmed |

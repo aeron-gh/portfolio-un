@@ -7,12 +7,13 @@
 
   // NautilusViewControls (nautilus-view-controls.blp): an AdwSplitButton. The button shows the view it switches to;
   // the arrow opens the view menu.
-  let { mode, zoom, hidden, sort, inTrash, ontoggle, onzoom, onhidden, onsort }: {
+  let { mode, zoom, hidden, sort, inTrash, inRecent, ontoggle, onzoom, onhidden, onsort }: {
     mode: ViewMode;
     zoom: number;
     hidden: boolean;
     sort: Sort;
     inTrash: boolean;
+    inRecent: boolean;
     ontoggle: () => void;
     onzoom: (by: 1 | -1) => void;
     onhidden: () => void;
@@ -25,7 +26,7 @@
   const sizes = $derived(mode === 'list' ? LIST_SIZES : GRID_SIZES);
 
   const sortItems: MenuItem[] = $derived(
-    sortsFor(inTrash).map((s) => ({
+    sortsFor(inTrash, inRecent).map((s) => ({
       label: s.label,
       radio: true,
       checked: s.sort.key === sort.key && s.sort.reversed === sort.reversed,

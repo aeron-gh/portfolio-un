@@ -208,18 +208,18 @@ for (const rel of [
   await downloadIcon(`256x256/${rel}.png`, `${FILES}/256/${name}.png`);
 }
 for (const rel of [
-  'places/user-home-symbolic', 'status/starred-symbolic', 'org.gnome.Nautilus/network-computer-symbolic', 'places/user-trash-symbolic',
+  'places/user-home-symbolic', 'actions/bookmark-new-symbolic', 'status/info-outline-symbolic', 'actions/view-more-horizontal-symbolic', 'devices/camera-video-symbolic', 'mimetypes/audio-x-generic-symbolic', 'mimetypes/x-office-spreadsheet-symbolic', 'places/user-desktop-symbolic', 'places/folder-publicshare-symbolic', 'places/folder-templates-symbolic', 'status/starred-symbolic', 'org.gnome.Nautilus/network-computer-symbolic', 'places/user-trash-symbolic',
   'status/user-trash-full-symbolic', 'places/folder-symbolic', 'places/folder-documents-symbolic', 'places/folder-music-symbolic',
   'places/folder-pictures-symbolic', 'places/folder-videos-symbolic', 'places/folder-download-symbolic', 'places/folder-remote-symbolic',
   'devices/drive-harddisk-symbolic', 'actions/edit-find-symbolic', 'actions/sidebar-show-symbolic', 'actions/go-previous-symbolic',
   'actions/go-next-symbolic', 'actions/view-list-symbolic', 'actions/view-grid-symbolic', 'actions/folder-new-symbolic',
-  'actions/view-more-symbolic', 'actions/zoom-in-symbolic', 'actions/zoom-out-symbolic', 'status/non-starred-symbolic', 'ui/pan-up-symbolic',
+  'actions/view-more-symbolic', 'actions/edit-clear-symbolic', 'actions/zoom-in-symbolic', 'actions/zoom-out-symbolic', 'status/non-starred-symbolic', 'ui/pan-up-symbolic',
   'ui/pan-down-symbolic',
 ]) {
   await downloadIcon(`scalable/${rel}.svg`, `${FILES}/sym/${rel.slice(rel.indexOf('/') + 1)}.svg`);
 }
 await downloadIcon('16x16@2x/emblems/emblem-unreadable.png', `${FILES}/emblem-unreadable.png`);
-for (const name of ['nautilus-folder-search-symbolic', 'cut-symbolic', 'cut-large-symbolic']) {
+for (const name of ['nautilus-folder-search-symbolic', 'nautilus-search-filters-symbolic', 'quotation-symbolic', 'rich-text-symbolic', 'image-print-symbolic', 'paper-symbolic', 'cut-symbolic', 'cut-large-symbolic']) {
   await download(`https://gitlab.gnome.org/GNOME/nautilus/-/raw/50.2.2/src/resources/icons/scalable/actions/${name}.svg`, `${FILES}/sym/${name}.svg`);
 }
 

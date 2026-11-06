@@ -17,11 +17,6 @@ export const LOCATIONS: Place[] = [
   { label: 'Trash', icon: 'user-trash-symbolic', path: TRASH, tooltip: 'Open Trash' },
 ];
 
-/** The bookmarks xdg-user-dirs-gtk writes for a new account (update.c), in its order. */
-export const BOOKMARKS: Place[] = (
-  [['Documents', 'documents'], ['Music', 'music'], ['Pictures', 'pictures'], ['Videos', 'videos'], ['Downloads', 'download']] as const
-).map(([label, icon]) => ({ label, icon: `folder-${icon}-symbolic`, path: `${HOME}/${label}`, tooltip: `${HOME}/${label}` }));
-
 const ONE_BUTTON: Record<string, Segment> = {
   [RECENT]: { label: 'Recent', icon: 'document-open-recent-symbolic', path: RECENT },
   [STARRED]: { label: 'Starred', icon: 'starred-symbolic', path: STARRED },
@@ -59,4 +54,13 @@ export function fromFolder(previous: string, location: string): string | null {
   const prefix = location === '/' ? '/' : `${location}/`;
   if (!previous.startsWith(prefix) || previous === location) return null;
   return prefix + previous.slice(prefix.length).split('/')[0];
+}
+
+/** get_path_text: where an item is, in the dim line under its name. `base` is the folder a search started from; Recent,
+ *  Starred and the Trash count from Home. */
+export function pathLine(dir: string, base: string | null): string | null {
+  if (base !== null && dir === base) return null;
+  if (dir === HOME) return 'Home';
+  const from = base ?? HOME;
+  return from !== '/' && dir.startsWith(`${from}/`) ? `${dir.slice(from.length + 1)}/` : dir;
 }

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { HOME, TRASH } from '../../src/desktop/fs/vfs';
-import { BOOKMARKS, LOCATIONS, NETWORK, RECENT, STARRED, isSpecial, segments, titleFor } from '../../src/desktop/apps/files/places';
+import { LOCATIONS, NETWORK, RECENT, STARRED, isSpecial, pathLine, segments, titleFor } from '../../src/desktop/apps/files/places';
 
 test('the sidebar: built-in places, then the bookmarks a new Ubuntu account gets', () => {
   expect(LOCATIONS.map((p) => [p.label, p.icon])).toEqual([
@@ -10,18 +10,8 @@ test('the sidebar: built-in places, then the bookmarks a new Ubuntu account gets
     ['Network', 'network-computer-symbolic'],
     ['Trash', 'user-trash-symbolic'],
   ]);
-  // xdg-user-dirs-gtk update.c: this order, not the alphabet.
-  expect(BOOKMARKS.map((p) => [p.label, p.icon])).toEqual([
-    ['Documents', 'folder-documents-symbolic'],
-    ['Music', 'folder-music-symbolic'],
-    ['Pictures', 'folder-pictures-symbolic'],
-    ['Videos', 'folder-videos-symbolic'],
-    ['Downloads', 'folder-download-symbolic'],
-  ]);
-  expect(BOOKMARKS[0].path).toBe(`${HOME}/Documents`);
   // nautilus-sidebar.c add_place: each row's tooltip.
   expect(LOCATIONS.map((p) => p.tooltip)).toEqual(['Open Personal Folder', 'Recent Files', 'Starred Files', 'Open Network Locations', 'Open Trash']);
-  expect(BOOKMARKS[0].tooltip).toBe(`${HOME}/Documents`);
 });
 
 describe('path bar segments (nautilus-pathbar.c)', () => {
@@ -67,4 +57,28 @@ test('isSpecial: places that are not folders', () => {
   expect(isSpecial(NETWORK)).toBe(true);
   expect(isSpecial(HOME)).toBe(false);
   expect(isSpecial(TRASH)).toBe(false);
+});
+
+describe('pathLine: the dim line under a name in search, Recent, Starred and the Trash (get_path_text)', () => {
+  test('a search shows nothing for what is straight in the folder searched', () => {
+    expect(pathLine(`${HOME}/Documents`, `${HOME}/Documents`)).toBeNull();
+  });
+  test('below that folder, the path from it, with a slash', () => {
+    expect(pathLine(`${HOME}/Documents/work`, `${HOME}/Documents`)).toBe('work/');
+  });
+  test('Recent, Starred and the Trash count from Home', () => {
+    expect(pathLine(`${HOME}/Documents`, null)).toBe('Documents/');
+    expect(pathLine(`${HOME}/Documents/work`, null)).toBe('Documents/work/');
+  });
+  test('Home itself goes by its name', () => {
+    expect(pathLine(HOME, null)).toBe('Home');
+    expect(pathLine(HOME, `${HOME}/Documents`)).toBe('Home');
+  });
+  test('outside, the whole path', () => {
+    expect(pathLine('/etc/skel', null)).toBe('/etc/skel');
+    expect(pathLine('/etc', `${HOME}/Documents`)).toBe('/etc');
+  });
+  test('searching from the root never counts from it', () => {
+    expect(pathLine('/etc', '/')).toBe('/etc');
+  });
 });

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
-import { SORTS, sortEntries, sortsFor, type Entry, type Sort } from '../../src/desktop/apps/files/sort';
-import type { FsNode } from '../../src/desktop/fs/vfs';
+import { defaultSort, SORTS, sortEntries, sortsFor, type Entry, type Sort } from '../../src/desktop/apps/files/sort';
+import { HOME, TRASH, type FsNode } from '../../src/desktop/fs/vfs';
+import { RECENT } from '../../src/desktop/apps/files/places';
 
 const file = (name: string, size = 0, mtime = '2026-01-01T00:00:00Z', mime = 'text/plain'): Entry => ({
   path: `/home/ubuntu/${name}`,
@@ -89,5 +90,29 @@ describe('by type (compare_by_type)', () => {
     const list = [file('z.txt'), file('a.md', 0, undefined, 'text/markdown'), file('b.txt'), dir('folder')];
     // "Folder" < "Markdown document" < "Plain text document"
     expect(names(list, { key: 'type', reversed: false })).toEqual(['folder', 'a.md', 'b.txt', 'z.txt']);
+  });
+});
+
+describe('defaultSort (nautilus_file_get_default_sort_type)', () => {
+  test('Downloads opens with the newest first', () => {
+    expect(defaultSort(`${HOME}/Downloads`)).toEqual({ key: 'date_modified', reversed: true });
+  });
+  test('the Trash by when things went, Recent by when they were used', () => {
+    expect(defaultSort(TRASH)).toEqual({ key: 'trashed_on', reversed: true });
+    expect(defaultSort(RECENT)).toEqual({ key: 'recency', reversed: true });
+  });
+  test('anything else by name', () => {
+    expect(defaultSort(`${HOME}/Documents`)).toEqual({ key: 'name', reversed: false });
+  });
+});
+
+describe('Recent', () => {
+  const used = (name: string, at: string, dir = false): Entry => ({ ...(dir ? { ...file(name), node: { ...file(name).node, kind: 'dir' as const } } : file(name)), at });
+  const R: Sort = { key: 'recency', reversed: true };
+  test('the last used comes first', () => {
+    expect(sortEntries([used('old', '2026-01-01T00:00:00Z'), used('new', '2026-02-01T00:00:00Z')], R, false).map((e) => e.node.name)).toEqual(['new', 'old']);
+  });
+  test('folders are not put first there (update_sort_directories_first)', () => {
+    expect(sortEntries([used('a-folder', '2026-01-01T00:00:00Z', true), used('new', '2026-02-01T00:00:00Z')], R, false).map((e) => e.node.name)).toEqual(['new', 'a-folder']);
   });
 });

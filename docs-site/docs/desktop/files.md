@@ -19,12 +19,16 @@ Ubuntu is not the same as upstream GNOME here. These come from Ubuntu, not from 
 
 | File | Job |
 | --- | --- |
-| `Files.svelte` | The window: the two panes, where you are, the shortcuts, what the menus do |
-| `FileView.svelte` | The grid and list: selecting, the rubber band, column headers |
+| `Files.svelte` | The window: the two panes, the tabs, where you are, the shortcuts, what the menus and drops do |
+| `FileView.svelte` | The grid and list: selecting, the rubber band, column headers, stars, dragging items |
 | `Sidebar.svelte`, `PathBar.svelte`, `ViewControls.svelte`, `FloatingBar.svelte` | The parts around the view |
-| `NewFolderDialog.svelte`, `RenameFilePopover.svelte` | Naming things |
+| `LocationEntry.svelte` | Typing a path, with completion |
+| `SearchEntry.svelte`, `SearchFilters.svelte` | The search entry and its filters (the filters load when first opened) |
+| `NewFolderDialog.svelte`, `RenameFilePopover.svelte`, `RenameBookmarkPopover.svelte` | Naming things |
+| `slot.svelte.ts` | One tab: its place, history, selection and search |
 | `session.svelte.ts` | What every window shares: settings, and where each window is |
 | `undo.svelte.ts` | The one operation that can be undone or redone, shared by every window |
+| `drag.ts`, `dnd.ts` | Dragging: what each part of a window says about a drop, and the drag itself (`dnd.ts` loads on the first press) |
 
 The rules are plain TypeScript with unit tests:
 
@@ -37,20 +41,27 @@ The rules are plain TypeScript with unit tests:
 | `places.ts` | Sidebar rows, path bar buttons, window titles |
 | `menus.ts` | What each right-click menu holds, and when an item is off |
 | `names.ts` | Whether a name can be used, and where its extension starts |
-| `operations.ts` | Trash, restore, rename, paste, each with its Undo |
+| `operations.ts` | Trash, restore, rename, paste, starring, each with its Undo |
 | `status.ts` | The floating bar's words |
 | `ellipsize.ts` | Cutting a long name in the middle |
+| `tabs.ts` | Where a new tab goes, which tab comes up when one closes |
+| `location.ts` | What a typed path means, and its completions |
+| `bookmarks.ts` | The bookmarks: adding, moving, renaming, following a folder that moves |
+| `query.ts`, `search.ts`, `stem.ts` | What a search finds and in what order (`search.ts` and `stem.ts` load when first needed) |
+| `drop.ts` | What a drop does, and which action the keys pick |
 
 ## What works, and what is greyed out
 
 | Works | Greyed out until its part exists |
 | --- | --- |
-| Sidebar, path bar, Back and Forward (with their right-click lists), Up and Down | **New Tab**, **Open in New Tab**: tabs |
-| Grid and list, sorting, zoom, hidden files, image previews | **Search**, **Recent** and **Starred** pages stay empty |
-| Selecting: click, Ctrl, Shift, keys, rubber band | **Move to…**, **Copy to…**, **Properties**, **About Files** |
-| New Folder, rename, cut, copy, paste, Paste Into Folder | **Open With…**, **Open in Terminal**, **Compress…** |
-| Trash, restore, delete, Empty Trash, Undo and Redo | **Set as Background…**, **Captions…**, **Visible Columns…**, **Preferences**, **Keyboard Shortcuts**, **Help** |
-| The narrow layout below 682 px | **Add to Bookmarks**, **Star Folder**, the star column |
+| Sidebar, path bar, Back and Forward (with their right-click lists), Up and Down | **Move to…**, **Copy to…**, **Properties**, **About Files** |
+| Grid and list, sorting, zoom, hidden files, image previews | **Open With…**, **Open in Terminal**, **Compress…** |
+| Selecting: click, Ctrl, Shift, keys, rubber band | **Set as Background…**, **Captions…**, **Visible Columns…** |
+| New Folder, rename, cut, copy, paste, Paste Into Folder | **Preferences**, **Keyboard Shortcuts**, **Help** |
+| Trash, restore, delete, Empty Trash, Undo and Redo | **Search Settings**, and the filters' **Specific Type** and **Custom Date Range** |
+| Tabs, typing a path, bookmarks, Starred, Recent | **File History Settings…**, **Trash Settings…** |
+| Search, Search Everywhere and the filters; drag and drop | |
+| The narrow layout below 682 px | |
 
 Network shows its real "No Known Connections" page. **Email…** is hidden, as on a real system with no mail app.
 
@@ -74,9 +85,24 @@ Network shows its real "No Known Connections" page. **Email…** is hidden, as o
 - **Ctrl+0** goes to the standard zoom, 96 px: bigger than the 48 px Ubuntu starts at.
 - **A cut file's icon** becomes a dashed outline with scissors. Copying and cutting share one clipboard with the desktop.
 - **Undo** remembers one operation, shared by all windows. A Trash toast's Undo button does the same as Ctrl+Z.
-- **Names that clash when pasting** get Nautilus's "(Copy)" form, so nothing is lost. The real conflict dialog comes with
-  Move to… and Copy to…. Saving over a name in `~/Documents` from Text Editor is a different case: see
-  [Text Editor](./text-editor.md).
+- **Names that clash when pasting or dropping** get Nautilus's "(Copy)" form, so nothing is lost. The real conflict
+  dialog comes with Move to… and Copy to…. Saving over a name in `~/Documents` from Text Editor is a different case:
+  see [Text Editor](./text-editor.md).
+- **Tabs** open after the tab they came from, and its own tabs (AdwTabView's rule). Closing one brings up the one before
+  it if that came from the same tab, or else the next. Opening a folder in a new tab leaves it behind the current one.
+- **Bookmarks** follow their folder when it is renamed or moved. A drop of one folder on the sidebar shows a **New
+  bookmark** row at the top of the bookmarks; a bookmark can be dragged to another place among them.
+- **Recent** lists the files opened from Files, the last first. **Starred** takes items inside Home only.
+- **Search** begins when you type in the view. Four engines look at once, as in the real one: the folder you are in,
+  recent files, an index of Home, and every folder below. The index finds whole words, and the start of the last word
+  typed; words are cut to their English root (Snowball 3.0.1, as `localsearch` runs it), so "reports" finds `report.txt`.
+  It also reads what is inside text and Markdown files, and shows the match in **Full Text Match**. Results are ranked
+  as `nautilus-search-hit.c` ranks them: nearer first, then newer, then the better match (SQLite's bm25).
+- **Search Everywhere** (Ctrl+Shift+F) searches the index only: all of Home but hidden files.
+- **Dragging** moves on the same disk and copies what cannot be removed from where it is. **Shift** moves, **Ctrl**
+  copies (a copy into the same folder is a duplicate), **Esc** cancels and the picture slides back. Holding a drag over a
+  folder, a sidebar row, a path bar button or a tab for half a second opens it. A drop on **Starred** stars, on **Trash**
+  trashes. What arrives in the folder a tab shows is selected there.
 
 ## Shortcuts
 
@@ -84,21 +110,33 @@ Network shows its real "No Known Connections" page. **Email…** is hidden, as o
 | --- | --- |
 | Alt+Left, Alt+Right | Back, Forward |
 | Alt+Up or Backspace, Alt+Down | Up a folder, back down |
+| Alt+Home | Home |
 | Enter or Ctrl+O | Open |
 | F2 | Rename |
 | Ctrl+Shift+N | New Folder |
 | Ctrl+X, Ctrl+C, Ctrl+V | Cut, copy, paste |
 | Delete, Shift+Delete | Move to Trash, delete for good (asks first) |
-| Ctrl+A, Ctrl+Shift+I, Esc | Select all, invert, select nothing |
+| Ctrl+A or Ctrl+/, Ctrl+Shift+A or Ctrl+\\, Ctrl+Shift+I | Select all, select nothing, invert |
 | Ctrl+Z, Ctrl+Shift+Z | Undo, redo |
 | Ctrl+1, Ctrl+2 | List, grid |
 | Ctrl+H | Show hidden files |
 | Ctrl++ / Ctrl+− / Ctrl+0 | Zoom in, out, standard |
+| F5 or Ctrl+R | Reload |
 | Ctrl+N | New window at the same place |
+| Ctrl+T, Ctrl+Shift+T, Ctrl+W | New tab, bring back a closed tab, close the tab |
+| Ctrl+Page Up / Page Down, with Shift | The tab before or after; with Shift, move the tab |
+| Alt+1 … 9 | That tab |
+| Ctrl+L, or / or ~ | Type a path |
+| Ctrl+D | Bookmark the folder |
+| Typing, Ctrl+F | Search this folder |
+| Ctrl+Shift+F | Search everywhere |
+| Esc | Leave the search |
+| Shift, Ctrl, Esc while dragging | Move, copy, cancel |
 | Menu or Shift+F10 | The right-click menu |
 | F9 | Show the sidebar (narrow layout only) |
 
 ## Saved data
 
-`ubuntu.files.v1` holds the view, the two zoom levels, hidden files and each folder's sort. The files themselves live in
-the desktop's [file system](./file-system.md).
+`ubuntu.files.v1` holds the view, the two zoom levels, hidden files, each folder's sort, the bookmarks, the starred items,
+the recent files, and the search filters' date type and text matching. The files themselves live in the desktop's
+[file system](./file-system.md).

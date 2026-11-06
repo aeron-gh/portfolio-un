@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
 import { HOME, TRASH, Vfs, type FsNode } from '../../src/desktop/fs/vfs';
-import { createFolder, deleteFromTrash, emptyTrash, paste, rename, restore, trash } from '../../src/desktop/apps/files/operations';
+import { createFolder, deleteFromTrash, emptyTrash, paste, rename, restore, setStarred, trash } from '../../src/desktop/apps/files/operations';
 
 const T = '2026-10-07T10:00:00.000Z';
 const file = (name: string, content = 'x'): FsNode => ({ name, kind: 'file', mime: 'text/plain', content, size: content.length, mtime: T });
@@ -164,4 +164,65 @@ describe('paste', () => {
     expect(paste(fs, `${D}`, { paths: [D], cut: true })).toBeNull();
     expect(names(HOME)).toContain('Documents');
   });
+});
+
+describe('moving out of the Trash (a cut there, or a drag)', () => {
+  test('it arrives under its own name, an ordinary file again; undo trashes it from where it is now', () => {
+    trash(fs, [`${D}/a.txt`]);
+    fs.write(`${D}/a.txt`, 'second');
+    trash(fs, [`${D}/a.txt`]); // the Trash already has an a.txt, so this one is "a (2).txt" there
+    fs.mkdir(`${HOME}/Box`);
+    const op = paste(fs, `${HOME}/Box`, { paths: [`${TRASH}/a (2).txt`], cut: true })!;
+    expect(op.created).toEqual([`${HOME}/Box/a.txt`]);
+    expect(fs.read(`${HOME}/Box/a.txt`)).toBe('second');
+    expect(fs.stat(`${HOME}/Box/a.txt`)).not.toHaveProperty('origin');
+    expect(fs.stat(`${HOME}/Box/a.txt`)).not.toHaveProperty('trashed');
+    // nautilus-file-operations.c: a move whose first item is in the Trash is a restore, for Undo.
+    expect([op.undoLabel, op.redoLabel]).toEqual(['Undo Restore From Trash', 'Redo Restore From Trash']);
+    op.undo();
+    expect(fs.exists(`${HOME}/Box/a.txt`)).toBe(false);
+    expect(fs.list(TRASH, { hidden: true }).map((n) => n.origin).sort()).toEqual([`${HOME}/Box/a.txt`, `${D}/a.txt`]); // ext_restore_undo_func
+    op.redo();
+    expect(fs.read(`${HOME}/Box/a.txt`)).toBe('second');
+  });
+});
+
+describe('starring (nautilus-file-undo-operations.c)', () => {
+  test('undo and redo; the labels name what was done', () => {
+    const list = { paths: ['/keep'] };
+    const op = setStarred(list, ['/a'], true);
+    expect(list.paths).toEqual(['/keep', '/a']);
+    expect([op.undoLabel, op.redoLabel]).toEqual(['Undo Starring', 'Redo Starring']);
+    op.undo();
+    expect(list.paths).toEqual(['/keep']);
+    op.redo();
+    expect(list.paths).toEqual(['/keep', '/a']);
+  });
+  test('unstarring says so, with the toast only that needs', () => {
+    const list = { paths: ['/a', '/b'] };
+    const one = setStarred(list, ['/a'], false);
+    expect(list.paths).toEqual(['/b']);
+    expect([one.undoLabel, one.toast]).toEqual(['Undo Unstarring', '“a” unstarred']);
+    one.undo();
+    expect(list.paths.sort()).toEqual(['/a', '/b']);
+    expect(setStarred(list, ['/a', '/b'], false).toast).toBe('2 files unstarred');
+  });
+  test('what is already so stays as it is', () => {
+    const list = { paths: ['/a'] };
+    setStarred(list, ['/a'], true);
+    expect(list.paths).toEqual(['/a']);
+  });
+});
+
+test('rename and a cut tell whoever follows a path, including on undo and redo', () => {
+  const moves: string[] = [];
+  const onmove = (a: string, b: string) => moves.push(`${a} > ${b}`);
+  const op = rename(fs, `${D}/a.txt`, 'c.txt', onmove);
+  op.undo();
+  op.redo();
+  expect(moves).toEqual([`${D}/a.txt > ${D}/c.txt`, `${D}/c.txt > ${D}/a.txt`, `${D}/a.txt > ${D}/c.txt`]);
+  moves.length = 0;
+  const cut = paste(fs, P, { paths: [`${D}/b.txt`], cut: true }, onmove)!;
+  cut.undo();
+  expect(moves).toEqual([`${D}/b.txt > ${P}/b.txt`, `${P}/b.txt > ${D}/b.txt`]);
 });
