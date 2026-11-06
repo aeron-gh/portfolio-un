@@ -105,7 +105,7 @@ Speed is a feature. So the sizes that matter have hard limits, and a test fails 
 | Desktop page CSS (gzip) | **20 KB** | `tests/build/desktop-budget.test.ts` |
 | Preloaded Ubuntu Sans font files | **60 KB** | `tests/build/desktop-budget.test.ts` |
 | The file system seed written into the page (gzip) | **15 KB** | `tests/build/desktop-budget.test.ts` |
-| Each surface and app loaded on demand (gzip) | **25 KB**, and in its own file | `e2e/desktop-budget.e2e.ts` |
+| Each surface and app loaded on demand (gzip) | **25 KB** (Files **30 KB**), and in its own file | `e2e/desktop-budget.e2e.ts` |
 | Icons downloaded during boot, login and the first session | **40 KB** | `e2e/desktop-budget.e2e.ts` |
 | Homepage fonts preloaded | at most **2** files | `tests/build/shell.test.ts` |
 

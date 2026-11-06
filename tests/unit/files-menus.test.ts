@@ -1,11 +1,35 @@
 import { describe, expect, test } from 'bun:test';
-import { backgroundMenu, currentFolderMenu, selectionMenu, sidebarRowMenu, type Picked } from '../../src/desktop/apps/files/menus';
+import { backgroundMenu, currentFolderMenu, pathButtonMenu, selectionMenu, sidebarRowMenu, tabMenu, type Picked } from '../../src/desktop/apps/files/menus';
 
 const labels = (sections: { label: string }[][]) => sections.map((s) => s.map((i) => i.label));
 const ids = (sections: { id: string }[][]) => sections.flat().map((i) => i.id);
-const base: Picked = { count: 1, folders: 0, app: null, appReady: true, images: 0, canRename: true, canDelete: true, canTrash: true, inTrash: false, canCreate: true, canPaste: false };
+const base: Picked = { count: 1, folders: 0, app: null, appReady: true, where: null, images: 0, canRename: true, canDelete: true, canTrash: true, inTrash: false, canCreate: true, canPaste: false };
 const file: Picked = { ...base, app: 'Text Editor' };
 const folder: Picked = { ...base, folders: 1 };
+
+describe('a search result', () => {
+  const result: Picked = { ...file, where: 'search' };
+  test('offers its folder, and can be cut, renamed and trashed like any other', () => {
+    expect(labels(selectionMenu(result))).toEqual([
+      ['Open With Text Editor', 'Open With…', 'Open Item Location'],
+      ['Cut', 'Copy', 'Move to…', 'Copy to…'],
+      ['Rename…', 'Compress…', 'Move to Trash'],
+      ['Properties'],
+    ]);
+    expect(selectionMenu(result).flat().find((i) => i.id === 'cut')?.disabled).toBeFalsy();
+  });
+  test('more than one has no single folder to offer', () => {
+    expect(ids(selectionMenu({ ...result, count: 2 }))).not.toContain('open-location');
+  });
+  test('the background of results: a search folder is not editable', () => {
+    const place = { canCreate: false, canPaste: true, inTrash: false, special: true, trashHasItems: false, mode: 'list' as const };
+    const items = backgroundMenu(place).flat();
+    expect(items.find((i) => i.id === 'new-folder')?.disabled).toBe(true);
+    expect(items.find((i) => i.id === 'paste')?.disabled).toBe(true);
+    expect(ids(backgroundMenu(place))).not.toContain('properties');
+    expect(ids(backgroundMenu(place))).not.toContain('terminal');
+  });
+});
 
 describe('the selection menu (update_selection_menu, nautilus_files_view_update_actions_state)', () => {
   test('a file: Open With its app, then Open With…; no Open submenu', () => {
@@ -76,13 +100,13 @@ describe('the selection menu (update_selection_menu, nautilus_files_view_update_
     const items = selectionMenu(folder).flat();
     for (const id of ['move-to', 'copy-to', 'compress', 'properties']) expect(items.find((i) => i.id === id)?.disabled).toBe(true);
     const sub = selectionMenu(folder)[0][0].submenu!.flat();
-    for (const id of ['open-tab', 'open-with', 'terminal']) expect(sub.find((i) => i.id === id)?.disabled).toBe(true);
-    expect(sub.find((i) => i.id === 'open-window')?.disabled).toBeFalsy();
+    for (const id of ['open-with', 'terminal']) expect(sub.find((i) => i.id === id)?.disabled).toBe(true);
+    for (const id of ['open-tab', 'open-window']) expect(sub.find((i) => i.id === id)?.disabled).toBeFalsy();
   });
 });
 
 describe('the background menu', () => {
-  const ctx = { canCreate: true, canPaste: false, inTrash: false, trashHasItems: false, mode: 'grid' as const };
+  const ctx = { canCreate: true, canPaste: false, inTrash: false, special: false, trashHasItems: false, mode: 'grid' as const };
   test('a normal folder', () => {
     expect(labels(backgroundMenu(ctx))).toEqual([
       ['New Folder…', 'Open With…', 'Open in Terminal'],
@@ -102,6 +126,12 @@ describe('the background menu', () => {
   test('a folder that cannot be written: New Folder is off', () => {
     expect(backgroundMenu({ ...ctx, canCreate: false }).flat().find((i) => i.id === 'new-folder')?.disabled).toBe(true);
   });
+  test('Recent and Starred: no terminal and no properties', () => {
+    expect(labels(backgroundMenu({ ...ctx, canCreate: false, special: true }))).toEqual([
+      ['New Folder…', 'Open With…'],
+      ['Paste', 'Select All', 'Captions…'],
+    ]);
+  });
   test('the Trash has Empty Trash…, on only when it holds something', () => {
     const empty = backgroundMenu({ ...ctx, canCreate: false, inTrash: true }).flat().find((i) => i.id === 'empty-trash')!;
     expect(empty.label).toBe('Empty Trash…');
@@ -111,14 +141,49 @@ describe('the background menu', () => {
   });
 });
 
-test('the path bar\'s menu (nautilus-pathbar-context-menu.ui, current-view-menu)', () => {
-  const ctx = { canCreate: true, canPaste: false, inTrash: false, trashHasItems: false, mode: 'grid' as const };
-  expect(labels(currentFolderMenu(ctx))).toEqual([
-    ['New Folder…', 'Open With…', 'Open in Terminal'],
-    ['Reload', 'Add to Bookmarks', 'Star Folder', 'Copy Location'],
-    ['Paste', 'Select All'],
-    ['Properties'],
-  ]);
+describe('the path bar\'s menu (nautilus-pathbar-context-menu.ui, current-view-menu)', () => {
+  const ctx = { canCreate: true, canPaste: false, inTrash: false, special: false, trashHasItems: false, mode: 'grid' as const, bookmark: 'add' as const, star: 'star' as const };
+  test('a folder that is neither bookmarked nor starred', () => {
+    expect(labels(currentFolderMenu(ctx))).toEqual([
+      ['New Folder…', 'Open With…', 'Open in Terminal'],
+      ['Reload', 'Add to Bookmarks', 'Star Folder', 'Copy Location'],
+      ['Paste', 'Select All'],
+      ['Properties'],
+    ]);
+  });
+  test('it offers the opposite when it is', () => {
+    expect(labels(currentFolderMenu({ ...ctx, bookmark: 'remove', star: 'unstar' }))[1]).toEqual(['Reload', 'Remove from Bookmarks', 'Unstar Folder', 'Copy Location']);
+  });
+  test('Home can be neither, so neither shows', () => {
+    expect(labels(currentFolderMenu({ ...ctx, bookmark: null, star: null }))[1]).toEqual(['Reload', 'Copy Location']);
+  });
+  test('Copy Location is off in the places that are not folders', () => {
+    expect(currentFolderMenu({ ...ctx, special: true, bookmark: null, star: null }).flat().find((i) => i.id === 'copy-location')?.disabled).toBe(true);
+  });
+});
+
+describe('the selection menu in Recent and Starred', () => {
+  const recent: Picked = { ...file, where: 'recent', canCreate: false, canRename: false, canTrash: false };
+  const starred: Picked = { ...file, where: 'starred', canCreate: false };
+  test('Recent: where it is, and Remove From Recent in place of Move to Trash', () => {
+    expect(labels(selectionMenu(recent))).toEqual([
+      ['Open With Text Editor', 'Open With…', 'Open Item Location'],
+      ['Cut', 'Copy', 'Move to…', 'Copy to…'],
+      ['Rename…', 'Remove From Recent'],
+      ['Properties'],
+    ]);
+    expect(selectionMenu(recent).flat().find((i) => i.id === 'cut')?.disabled).toBe(true);
+  });
+  test('Starred: Unstar as well as Move to Trash', () => {
+    expect(labels(selectionMenu(starred))[2]).toEqual(['Rename…', 'Move to Trash', 'Unstar']);
+    expect(selectionMenu(starred).flat().find((i) => i.id === 'cut')?.disabled).toBe(true);
+  });
+  test('Open Item Location needs exactly one', () => {
+    expect(ids(selectionMenu({ ...recent, count: 2 }))).not.toContain('open-location');
+  });
+  test('no New Folder with Selection there', () => {
+    expect(ids(selectionMenu({ ...starred, count: 2, canCreate: true }))).not.toContain('new-folder-with-selection');
+  });
 });
 
 test('a sidebar row\'s menu (nautilus-sidebar.c)', () => {
@@ -131,4 +196,24 @@ test('a sidebar row\'s menu (nautilus-sidebar.c)', () => {
   const empty = (o: object) => sidebarRowMenu({ bookmark: false, recent: false, trash: true, trashHasItems: false, ...o }).flat().find((i) => i.id === 'empty-trash')!;
   expect(empty({}).disabled).toBe(true);
   expect(empty({ trashHasItems: true }).disabled).toBeFalsy();
+});
+
+test('a tab\'s menu (nautilus-window.blp tab_menu_model)', () => {
+  const ctx = { position: 1, count: 3, canRestore: false };
+  expect(labels(tabMenu(ctx))).toEqual([
+    ['New Tab', 'Restore Closed Tab'],
+    ['Move Tab to New Window', 'Move Tab Left', 'Move Tab Right'],
+    ['Close Tab', 'Close Other Tabs'],
+  ]);
+  const off = (c: typeof ctx, id: string) => tabMenu(c).flat().find((i) => i.id === id)?.disabled;
+  expect(off(ctx, 'restore-tab')).toBe(true);
+  expect(off({ ...ctx, canRestore: true }, 'restore-tab')).toBe(false);
+  expect(off({ ...ctx, position: 0 }, 'tab-left')).toBe(true);
+  expect(off({ ...ctx, position: 2 }, 'tab-right')).toBe(true);
+  expect(off(ctx, 'tab-left')).toBe(false);
+  expect(off(ctx, 'tab-right')).toBe(false);
+});
+
+test('a path bar button\'s menu (nautilus-pathbar-context-menu.ui button-menu)', () => {
+  expect(labels(pathButtonMenu())).toEqual([['Open in New Window', 'Open in New Tab', 'Properties']]);
 });

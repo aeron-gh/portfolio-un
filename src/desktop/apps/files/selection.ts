@@ -55,3 +55,12 @@ export const selectAll = (order: string[]): Selection => ({ selected: [...order]
 export function invert(order: string[], sel: Selection): Selection {
   return { ...sel, selected: order.filter((p) => !sel.selected.includes(p)) };
 }
+
+/** update_autoscroll (gtklistbase.c), for the rubber band and a drag: within 30px of an edge, or past it, the list scrolls
+ *  each frame by a third of how far in the pointer is. */
+export function edgeDelta(at: number, size: number): number {
+  const EDGE = 30;
+  if (at < EDGE) return -(EDGE - at) / 3;
+  if (size - at < EDGE) return (EDGE - (size - at)) / 3;
+  return 0;
+}

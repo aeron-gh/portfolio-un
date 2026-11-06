@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const HOME = '/home/ubuntu';
 
@@ -319,7 +319,7 @@ test('the focus ring shows when a key moves the focus, and goes after 3 seconds 
   expect(await ring('Documents')).toBe('none');
 });
 
-test('the keyboard: arrows, Shift, Ctrl+A, Enter and Esc', async ({ page }) => {
+test('the keyboard: arrows, Shift, select all and none, Enter; Esc is not one of them', async ({ page }) => {
   await openHome(page);
   await item(page, 'Desktop').click();
   await page.keyboard.press('ArrowRight');
@@ -333,7 +333,13 @@ test('the keyboard: arrows, Shift, Ctrl+A, Enter and Esc', async ({ page }) => {
   await page.keyboard.press('Control+Shift+I');
   await expect(content(page).locator('[aria-selected="true"]')).toHaveCount(0);
   await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape'); // GtkListBase binds nothing to it
+  await expect(content(page).locator('[aria-selected="true"]')).toHaveCount(1);
+  await page.keyboard.press('Control+\\');
+  await expect(content(page).locator('[aria-selected="true"]')).toHaveCount(0);
+  await page.keyboard.press('Control+/');
+  await expect(content(page).locator('[aria-selected="true"]')).toHaveCount(11);
+  await page.keyboard.press('Control+Shift+A');
   await expect(content(page).locator('[aria-selected="true"]')).toHaveCount(0);
   await item(page, 'Documents').click();
   await page.keyboard.press('Enter');
@@ -659,7 +665,7 @@ test('the path bar\'s menu', async ({ page }) => {
   await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
   await place(page, 'Documents').click();
   await files(page).getByRole('button', { name: 'Current Folder Menu' }).click();
-  expect(await labels(page)).toEqual(['New Folder…', 'Open With…', 'Open in Terminal', 'Reload', 'Add to Bookmarks', 'Star Folder', 'Copy Location', 'Paste', 'Select All', 'Properties']);
+  expect(await labels(page)).toEqual(['New Folder…', 'Open With…', 'Open in Terminal', 'Reload', 'Remove from Bookmarks', 'Star Folder', 'Copy Location', 'Paste', 'Select All', 'Properties']);
   await menuItem(page, 'Copy Location').click();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(`${HOME}/Documents`);
   await files(page).getByRole('button', { name: 'Current Folder Menu' }).click();
@@ -958,4 +964,1066 @@ test('Tab reaches the view even with nothing selected', async ({ page }) => {
   await openHome(page);
   await expect(item(page, 'Desktop')).toHaveAttribute('tabindex', '0');
   await expect(item(page, 'Documents')).toHaveAttribute('tabindex', '-1');
+});
+
+// ---- tabs ------------------------------------------------------------------
+
+const tabs = (page: Page) => files(page).getByRole('tab');
+const tab = (page: Page, name: string) => files(page).getByRole('tab', { name, exact: true });
+
+test('Ctrl+T: a new tab at the same place; the bar shows only with two or more; Ctrl+W closes, and the last closes the window', async ({ page }) => {
+  await openHome(page);
+  await expect(tabs(page)).toHaveCount(0);
+  await page.keyboard.press('Control+t');
+  await expect(tabs(page)).toHaveText(['Home', 'Home']);
+  await expect(tabs(page).nth(1)).toHaveAttribute('aria-selected', 'true');
+  await expect(tabs(page).nth(0)).toHaveAttribute('title', HOME);
+  await expect(item(page, 'Documents')).toBeVisible();
+  await page.keyboard.press('Control+w');
+  await expect(tabs(page)).toHaveCount(0);
+  await expect(item(page, 'Documents')).toBeVisible();
+  await page.keyboard.press('Control+w');
+  await expect(files(page)).toHaveCount(0);
+});
+
+test('the Main Menu opens a tab too', async ({ page }) => {
+  await openHome(page);
+  await files(page).getByRole('button', { name: 'Main Menu' }).click();
+  await menuItem(page, 'New Tab').click();
+  await expect(tabs(page)).toHaveCount(2);
+});
+
+test('each tab has its own place, history, selection and scroll; the window takes the title of the tab in front', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await page.keyboard.press('Control+=');
+  await item(page, 'Pictures').click();
+  await files(page).locator('.view').evaluate((v) => v.scrollTo(0, 80));
+  await page.keyboard.press('Control+t');
+  await expect(tabs(page)).toHaveCount(2);
+  await place(page, 'Documents').click();
+  await expect(tab(page, 'Documents')).toHaveAttribute('aria-selected', 'true');
+  await expect(files(page)).toHaveAttribute('aria-label', 'Documents');
+  await item(page, 'about.md').click();
+  await tab(page, 'Home').click();
+  await expect(files(page)).toHaveAttribute('aria-label', 'Home');
+  await expect(item(page, 'Pictures')).toHaveAttribute('aria-selected', 'true');
+  await expect(files(page).getByRole('button', { name: 'Back' })).toBeDisabled();
+  await expect.poll(() => files(page).locator('.view').evaluate((v) => v.scrollTop)).toBe(80);
+  await tab(page, 'Documents').click();
+  await expect(item(page, 'about.md')).toHaveAttribute('aria-selected', 'true');
+  await expect(files(page).getByRole('button', { name: 'Back' })).toBeEnabled();
+  await page.keyboard.press('Alt+ArrowLeft');
+  await expect(tabs(page)).toHaveText(['Home', 'Home']);
+});
+
+test('Open in New Tab opens behind, after the tabs already opened from that one', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+t');
+  await tabs(page).nth(0).click();
+  await item(page, 'Documents').click({ button: 'right' });
+  await menuItem(page, 'Open').click();
+  await menuItem(page, 'Open in New Tab').click();
+  await expect(tabs(page)).toHaveText(['Home', 'Home', 'Documents']); // after what the first tab has already opened
+  await expect(tabs(page).nth(0)).toHaveAttribute('aria-selected', 'true');
+  await expect(files(page)).toHaveAttribute('aria-label', 'Home');
+});
+
+test('a middle-click on a folder opens it in a new tab behind', async ({ page }) => {
+  await openHome(page);
+  await item(page, 'Pictures').click({ button: 'middle' });
+  await expect(tabs(page)).toHaveText(['Home', 'Pictures']);
+  await expect(tabs(page).nth(0)).toHaveAttribute('aria-selected', 'true');
+});
+
+test('the sidebar and the path bar open tabs too', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Music').click({ button: 'right' });
+  await menuItem(page, 'Open in New Tab').click();
+  await expect(tabs(page)).toHaveText(['Home', 'Music']);
+  await tab(page, 'Music').click();
+  await path(page).getByRole('button', { name: 'Home' }).click({ button: 'right' });
+  expect(await labels(page)).toEqual(['Open in New Window', 'Open in New Tab', 'Properties']);
+  await menuItem(page, 'Open in New Tab').click();
+  await expect(tabs(page)).toHaveText(['Home', 'Music', 'Home']);
+  await path(page).getByRole('button', { name: 'Home' }).click({ button: 'middle' });
+  await expect(tabs(page)).toHaveCount(4);
+});
+
+test('closing the tab in front brings back the one it came from', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+t');
+  await page.keyboard.press('Control+t');
+  await expect(tabs(page)).toHaveCount(3);
+  await tabs(page).nth(2).getByRole('button', { name: 'Close' }).click();
+  await expect(tabs(page).nth(1)).toHaveAttribute('aria-selected', 'true');
+});
+
+test('the tab menu: move, close others, and bring a closed tab back with its history', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+t');
+  await place(page, 'Documents').click();
+  await page.keyboard.press('Control+t');
+  await place(page, 'Music').click();
+  await expect(tabs(page)).toHaveText(['Home', 'Documents', 'Music']);
+
+  await tab(page, 'Documents').click({ button: 'right' });
+  expect(await labels(page)).toEqual(['New Tab', 'Restore Closed Tab', 'Move Tab to New Window', 'Move Tab Left', 'Move Tab Right', 'Close Tab', 'Close Other Tabs']);
+  await expect(menuItem(page, 'Restore Closed Tab')).toBeDisabled();
+  await menuItem(page, 'Move Tab Left').click();
+  await expect(tabs(page)).toHaveText(['Documents', 'Home', 'Music']);
+
+  await tab(page, 'Documents').click({ button: 'right' });
+  await expect(menuItem(page, 'Move Tab Left')).toBeDisabled();
+  await menuItem(page, 'Close Other Tabs').click();
+  await expect(tabs(page)).toHaveCount(0);
+  await expect(files(page)).toHaveAttribute('aria-label', 'Documents');
+
+  // Closing others goes from the last tab backwards, and Restore takes the last one closed.
+  await page.keyboard.press('Control+Shift+T');
+  await expect(tabs(page)).toHaveText(['Documents', 'Home']);
+  await expect(files(page).getByRole('button', { name: 'Back' })).toBeDisabled();
+  await page.keyboard.press('Control+Shift+T');
+  await expect(tab(page, 'Music')).toHaveAttribute('aria-selected', 'true');
+  await expect(files(page).getByRole('button', { name: 'Back' })).toBeEnabled(); // it had come from Home
+});
+
+test('Move Tab to New Window takes its history along', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+t');
+  await place(page, 'Documents').click();
+  await tab(page, 'Documents').click({ button: 'right' });
+  await menuItem(page, 'Move Tab to New Window').click();
+  await expect(files(page)).toHaveCount(2);
+  const moved = page.getByRole('dialog', { name: 'Documents' });
+  await expect(moved).toBeVisible();
+  await expect(moved.getByRole('tab')).toHaveCount(0);
+  await expect(moved.getByRole('button', { name: 'Back' })).toBeEnabled();
+  await expect(page.getByRole('dialog', { name: 'Home' }).getByRole('tab')).toHaveCount(0);
+});
+
+test('the tab keys', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+t');
+  await place(page, 'Documents').click();
+  await page.keyboard.press('Control+t');
+  await place(page, 'Music').click();
+  const front = () => files(page).getAttribute('aria-label');
+  await page.keyboard.press('Alt+1');
+  await expect.poll(front).toBe('Home');
+  await page.keyboard.press('Alt+3');
+  await expect.poll(front).toBe('Music');
+  await page.keyboard.press('Control+PageDown');
+  await expect.poll(front).toBe('Home');
+  await page.keyboard.press('Control+PageUp');
+  await expect.poll(front).toBe('Music');
+  await page.keyboard.press('Control+Shift+PageUp');
+  await expect(tabs(page)).toHaveText(['Home', 'Music', 'Documents']);
+});
+
+test('opening a folder from outside finds it in a background tab', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+t');
+  await place(page, 'Documents').click();
+  await expect(tab(page, 'Documents')).toHaveAttribute('aria-selected', 'true');
+  await homeIcon(page).dblclick();
+  await expect(files(page)).toHaveCount(1);
+  await expect(files(page)).toHaveAttribute('aria-label', 'Home');
+  await expect(tab(page, 'Home')).toHaveAttribute('aria-selected', 'true');
+});
+
+test('going back up scrolls to the folder it selects', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await page.keyboard.press('Control+=');
+  await item(page, 'Videos').dblclick();
+  await expect(files(page).getByRole('heading', { name: 'Folder is Empty' })).toBeVisible();
+  await page.keyboard.press('Backspace');
+  await expect(item(page, 'Videos')).toHaveAttribute('aria-selected', 'true');
+  await expect(item(page, 'Videos')).toBeInViewport();
+});
+
+// ---- typing a path ---------------------------------------------------------
+
+const locationEntry = (page: Page) => files(page).getByRole('textbox', { name: 'Location' });
+/** A file opens in a window on top of Files; a person closes it to get back. */
+const closeEditor = (page: Page) => page.locator('.window[data-app="text-editor"]').getByRole('button', { name: 'Close', exact: true }).first().click();
+
+test('Ctrl+L swaps the path bar for an entry with the whole path selected; Esc puts it back', async ({ page }) => {
+  await openHome(page);
+  await item(page, 'Documents').click();
+  await page.keyboard.press('Control+l');
+  await expect(locationEntry(page)).toBeFocused();
+  await expect(locationEntry(page)).toHaveValue(HOME);
+  expect(await locationEntry(page).evaluate((e: HTMLInputElement) => [e.selectionStart, e.selectionEnd])).toEqual([0, HOME.length]);
+  await expect(path(page)).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect(path(page)).toBeVisible();
+  await expect(item(page, 'Documents')).toBeFocused();
+});
+
+test('clicking the current folder in the path bar opens the entry; Enter goes there', async ({ page }) => {
+  await openHome(page);
+  await path(page).getByRole('button', { name: 'Home' }).click();
+  await expect(locationEntry(page)).toBeFocused();
+  await page.keyboard.type('/etc');
+  await page.keyboard.press('Enter');
+  await expect(path(page).getByRole('button')).toHaveText(['Ubuntu', 'etc']);
+  await expect(item(page, 'hostname')).toBeVisible();
+  await expect(locationEntry(page)).toHaveCount(0);
+});
+
+test('typing / or ~ in the view starts a path with it', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('/');
+  await expect(locationEntry(page)).toBeFocused();
+  await expect(locationEntry(page)).toHaveValue('/');
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('~');
+  await expect(locationEntry(page)).toHaveValue('~/');
+  await page.keyboard.type('Documents');
+  await page.keyboard.press('Enter');
+  await expect(item(page, 'about.md')).toBeVisible();
+});
+
+test('a path that does not exist, or is a file, says so, and you stay where you were', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+l');
+  await page.keyboard.type('/nowhere');
+  await page.keyboard.press('Enter');
+  const dialog = page.getByRole('alertdialog', { name: 'Oops! Something went wrong.' });
+  await expect(dialog).toContainText('Unable to find “/nowhere”. Please check the spelling and try again.');
+  await dialog.getByRole('button', { name: 'OK' }).click();
+  await expect(path(page).getByRole('button')).toHaveText(['Home']);
+  await page.keyboard.press('Control+l');
+  await page.keyboard.type('/etc/hostname');
+  await page.keyboard.press('Enter');
+  await expect(dialog).toContainText('This location doesn’t appear to be a folder.');
+});
+
+test('completions: a list under the entry; the shared start is filled in, and Tab accepts it', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('~');
+  await page.keyboard.type('Do');
+  const rows = files(page).getByRole('listbox', { name: 'Completions' }).getByRole('option');
+  await expect(rows).toHaveText(['~/Documents/', '~/Downloads/']);
+  await page.keyboard.type('c');
+  await expect(rows).toHaveText(['~/Documents/']);
+  await expect(locationEntry(page)).toHaveValue('~/Documents/'); // the rest is filled in and selected
+  expect(await locationEntry(page).evaluate((e: HTMLInputElement) => [e.selectionStart, e.selectionEnd])).toEqual([5, 12]);
+  await page.keyboard.press('Tab');
+  await expect(locationEntry(page)).toBeFocused();
+  expect(await locationEntry(page).evaluate((e: HTMLInputElement) => [e.selectionStart, e.selectionEnd])).toEqual([12, 12]);
+  await page.keyboard.press('Enter');
+  await expect(item(page, 'about.md')).toBeVisible();
+});
+
+test('completions: choosing one with the mouse', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('/');
+  await page.keyboard.type('e');
+  await files(page).getByRole('listbox', { name: 'Completions' }).getByRole('option', { name: '/etc/' }).click();
+  await expect(locationEntry(page)).toHaveValue('/etc/');
+  await expect(locationEntry(page)).toBeFocused();
+});
+
+test('the entry\'s buttons: Clear while it shows where you are, Go once it does not; Cancel closes', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+l');
+  await files(page).getByRole('button', { name: 'Clear Entry' }).click();
+  await expect(locationEntry(page)).toHaveValue('');
+  await page.keyboard.type('~/Music');
+  await files(page).getByRole('button', { name: 'Go to Location' }).click();
+  await expect(path(page).getByRole('button')).toHaveText(['Home', 'Music']);
+  await page.keyboard.press('Control+l');
+  await files(page).getByRole('button', { name: 'Cancel' }).click();
+  await expect(path(page)).toBeVisible();
+});
+
+test('clicking away closes the entry', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+l');
+  await files(page).locator('.view').click({ position: { x: 300, y: 400 } });
+  await expect(locationEntry(page)).toHaveCount(0);
+  await expect(path(page)).toBeVisible();
+});
+
+// ---- bookmarks, Starred and Recent ------------------------------------------
+
+test('Ctrl+D and the path bar\'s menu bookmark a folder; it joins the sidebar, and is remembered', async ({ page }) => {
+  await openHome(page);
+  await item(page, 'Projects').dblclick();
+  await page.keyboard.press('Control+d');
+  await expect(place(page, 'Projects')).toHaveAttribute('aria-selected', 'true');
+  await expect(sidebar(page).getByRole('option').last()).toHaveText('Projects');
+  await page.reload();
+  await page.locator('.gdm-user').click();
+  await page.keyboard.press('Enter');
+  await page.getByRole('button', { name: 'Files', exact: true }).click();
+  await expect(place(page, 'Projects')).toBeVisible();
+  await place(page, 'Projects').click();
+  await files(page).getByRole('button', { name: 'Current Folder Menu' }).click();
+  await menuItem(page, 'Remove from Bookmarks').click();
+  await expect(place(page, 'Projects')).toHaveCount(0);
+  await files(page).getByRole('button', { name: 'Current Folder Menu' }).click();
+  await menuItem(page, 'Add to Bookmarks').click();
+  await expect(place(page, 'Projects')).toBeVisible();
+});
+
+test('Home cannot be bookmarked or starred, so its menu offers neither', async ({ page }) => {
+  await openHome(page);
+  await files(page).getByRole('button', { name: 'Current Folder Menu' }).click();
+  const list = await labels(page);
+  for (const label of ['Add to Bookmarks', 'Remove from Bookmarks', 'Star Folder', 'Unstar Folder']) expect(list).not.toContain(label);
+});
+
+test('a bookmark can be renamed and removed from its row', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Music').click({ button: 'right' });
+  await menuItem(page, 'Rename').click();
+  const pop = page.getByRole('dialog', { name: 'Rename' });
+  const entry = pop.getByRole('textbox');
+  await expect(entry).toHaveValue('Music');
+  await entry.fill('Pictures');
+  await expect(pop.getByRole('button', { name: 'Rename' })).toBeDisabled(); // another bookmark has that name
+  await entry.fill('Songs');
+  await page.keyboard.press('Enter');
+  await expect(place(page, 'Songs')).toBeVisible();
+  await place(page, 'Songs').click();
+  await expect(item(page, 'Songs')).toHaveCount(0);
+  await expect(path(page).getByRole('button')).toHaveText(['Home', 'Music']); // the folder keeps its own name
+  await place(page, 'Songs').click({ button: 'right' });
+  await menuItem(page, 'Remove from Bookmarks').click();
+  await expect(place(page, 'Songs')).toHaveCount(0);
+});
+
+test('the list\'s star: click to star, and it is on the Starred page with where it is', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Documents').click();
+  const star = item(page, 'about.md').getByRole('button', { name: 'Star', exact: true });
+  await star.click();
+  await expect(item(page, 'about.md').getByRole('button', { name: 'Unstar', exact: true })).toBeVisible();
+  await expect(item(page, 'about.md')).toHaveAttribute('aria-selected', 'false'); // the star does not select
+  await place(page, 'Starred').click();
+  await expect(item(page, 'about.md')).toBeVisible();
+  await expect(item(page, 'about.md').locator('.path')).toHaveText('Documents/');
+  await expect(files(page).getByRole('columnheader')).toHaveText(['Name', 'Size', 'Modified', '']);
+});
+
+test('Unstar on the Starred page, with a toast whose Undo brings it back', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Documents').click();
+  await item(page, 'about.md').getByRole('button', { name: 'Star', exact: true }).click();
+  await place(page, 'Starred').click();
+  await item(page, 'about.md').click({ button: 'right' });
+  await menuItem(page, 'Unstar').click();
+  await expect(item(page, 'about.md')).toHaveCount(0);
+  await expect(files(page).getByRole('heading', { name: 'No Starred Files' })).toBeVisible();
+  await expect(toast(page)).toContainText('“about.md” unstarred');
+  await toast(page).getByRole('button', { name: 'Undo' }).click();
+  await expect(item(page, 'about.md')).toBeVisible();
+});
+
+test('a starred item shows its star in the grid; a folder can be starred from the path bar', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await files(page).getByRole('button', { name: 'Current Folder Menu' }).click();
+  await menuItem(page, 'Star Folder').click();
+  await place(page, 'Home').click();
+  await expect(item(page, 'Documents').locator('.emblem-star')).toBeVisible();
+  await expect(item(page, 'Downloads').locator('.emblem-star')).toHaveCount(0);
+  await place(page, 'Starred').click();
+  await item(page, 'Documents').dblclick();
+  await expect(item(page, 'about.md')).toBeVisible();
+  await expect(path(page).getByRole('button')).toHaveText(['Home', 'Documents']);
+});
+
+test('outside Home there is no star column', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await expect(files(page).getByRole('columnheader')).toHaveCount(4);
+  await page.keyboard.press('Control+l');
+  await page.keyboard.type('/etc');
+  await page.keyboard.press('Enter');
+  await expect(files(page).getByRole('columnheader')).toHaveText(['Name', 'Size', 'Modified']);
+  await expect(item(page, 'hostname').getByRole('button', { name: 'Star' })).toHaveCount(0);
+});
+
+test('opening a file from Files puts it on the Recent page, last used first', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await item(page, 'about.md').dblclick();
+  await expect(page.getByRole('dialog', { name: 'about.md (~/Documents) - Text Editor' })).toBeVisible();
+  await closeEditor(page);
+  await place(page, 'Documents').click();
+  await item(page, 'skills.md').dblclick();
+  await closeEditor(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Recent').click();
+  await expect(content(page).getByRole('option').first()).toHaveAttribute('aria-label', 'skills.md');
+  await expect(content(page).getByRole('option')).toHaveCount(2);
+  await expect(files(page).getByRole('columnheader')).toHaveText(['Name', 'Size', 'Recency']);
+  await expect(files(page).getByRole('columnheader', { name: 'Recency' })).toHaveAttribute('aria-sort', 'descending');
+  await expect(item(page, 'about.md').locator('.path')).toHaveText('Documents/');
+  await expect(item(page, 'about.md').locator('.date')).toHaveText(/^Today, /);
+});
+
+test('Recent: Open Item Location goes there with it selected; Remove From Recent takes it off the list only', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await item(page, 'about.md').dblclick();
+  await expect(page.getByRole('dialog', { name: 'about.md (~/Documents) - Text Editor' })).toBeVisible();
+  await closeEditor(page);
+  await place(page, 'Recent').click();
+  await item(page, 'about.md').click({ button: 'right' });
+  expect(await labels(page)).toEqual(['Open With Text Editor', 'Open With…', 'Open Item Location', 'Cut', 'Copy', 'Move to…', 'Copy to…', 'Rename…', 'Remove From Recent', 'Properties']);
+  await menuItem(page, 'Open Item Location').click();
+  await expect(path(page).getByRole('button')).toHaveText(['Home', 'Documents']);
+  await expect(item(page, 'about.md')).toHaveAttribute('aria-selected', 'true');
+  await place(page, 'Recent').click();
+  await item(page, 'about.md').click({ button: 'right' });
+  await menuItem(page, 'Remove From Recent').click();
+  await expect(files(page).getByRole('heading', { name: 'No Recent Files' })).toBeVisible();
+  await place(page, 'Documents').click();
+  await expect(item(page, 'about.md')).toBeVisible();
+});
+
+test('a file deleted for good leaves Recent and Starred', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Documents').click();
+  await item(page, 'about.md').getByRole('button', { name: 'Star', exact: true }).click();
+  await item(page, 'about.md').dblclick();
+  await expect(page.getByRole('dialog', { name: 'about.md (~/Documents) - Text Editor' })).toBeVisible();
+  await page.getByRole('dialog', { name: 'about.md (~/Documents) - Text Editor' }).getByRole('button', { name: 'Close' }).click();
+  await item(page, 'about.md').click();
+  await page.keyboard.press('Delete');
+  await place(page, 'Trash').click();
+  await item(page, 'about.md').click();
+  await page.keyboard.press('Delete');
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click();
+  await place(page, 'Recent').click();
+  await expect(files(page).getByRole('heading', { name: 'No Recent Files' })).toBeVisible();
+  await place(page, 'Starred').click();
+  await expect(files(page).getByRole('heading', { name: 'No Starred Files' })).toBeVisible();
+});
+
+test('the Trash list says where each thing came from', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Documents').click();
+  await item(page, 'about.md').click();
+  await page.keyboard.press('Delete');
+  await place(page, 'Trash').click();
+  await expect(item(page, 'about.md').locator('.path')).toHaveText('Documents/');
+});
+
+test('Downloads opens with the newest first', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Downloads').click();
+  await page.keyboard.press('Control+Shift+N');
+  await page.keyboard.type('old');
+  await page.keyboard.press('Enter');
+  await expect(item(page, 'old')).toBeVisible();
+  await expect(files(page).getByRole('columnheader', { name: 'Modified' })).toHaveAttribute('aria-sort', 'descending');
+});
+
+// ---- search ------------------------------------------------------------------
+const searchBox = (page: Page) => files(page).getByRole('searchbox');
+const filterButton = (page: Page) => files(page).getByRole('button', { name: 'Filter Search Results' });
+const filters = (page: Page) => page.getByRole('dialog', { name: 'Filter Search Results' });
+const searchButton = (page: Page) => files(page).getByRole('button', { name: 'Search Current Folder' });
+const everywhere = (page: Page) => files(page).locator('.sidebar').getByRole('button', { name: 'Search Everywhere' });
+
+test('Ctrl+F puts the search entry where the path bar was; Esc puts the path bar back', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+f');
+  await expect(searchBox(page)).toBeFocused();
+  await expect(searchBox(page)).toHaveAttribute('placeholder', 'Search current folder');
+  await expect(path(page)).toHaveCount(0);
+  await expect(searchButton(page)).toHaveAttribute('aria-pressed', 'true');
+  await expect(item(page, 'Documents')).toBeVisible(); // nothing typed: still the folder
+  await expect(files(page).getByRole('button', { name: 'Clear Entry' })).toBeHidden();
+  await page.keyboard.press('Escape');
+  await expect(searchBox(page)).toHaveCount(0);
+  await expect(path(page).getByRole('button')).toHaveText(['Home']);
+  await expect(searchButton(page)).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('the Search Current Folder button opens and closes it', async ({ page }) => {
+  await openHome(page);
+  await searchButton(page).click();
+  await expect(searchBox(page)).toBeFocused();
+  await searchButton(page).click();
+  await expect(searchBox(page)).toHaveCount(0);
+});
+
+test('typing in the view starts a search: every folder below, the best first and selected, under a new title', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await page.keyboard.type('about');
+  await expect(searchBox(page)).toBeFocused();
+  await expect(searchBox(page)).toHaveValue('about');
+  await expect(page.getByRole('dialog', { name: 'Search for “about”' })).toBeVisible();
+  const first = content(page).getByRole('option').first();
+  await expect(first).toHaveAttribute('aria-label', 'about.md');
+  await expect(first).toHaveAttribute('aria-selected', 'true');
+  await expect(first.locator('.path')).toHaveText('Documents/');
+  await expect(sidebar(page).locator('[aria-selected="true"]')).toHaveCount(0);
+  await expect(bar(page)).toContainText('“about.md” selected');
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('dialog', { name: 'about.md (~/Documents) - Text Editor' })).toBeVisible();
+});
+
+test('a space, an arrow or a shortcut does not start one', async ({ page }) => {
+  await openHome(page);
+  for (const key of ['Space', 'ArrowDown', 'Control+h']) {
+    await page.keyboard.press(key);
+    await expect(searchBox(page)).toHaveCount(0);
+  }
+});
+
+test('with the view focused, letters and Backspace still go to the entry', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.type('docu');
+  await page.keyboard.press('ArrowDown');
+  await expect(searchBox(page)).not.toBeFocused();
+  await page.keyboard.type('m');
+  await expect(searchBox(page)).toHaveValue('docum');
+  await page.keyboard.press('Backspace');
+  await expect(searchBox(page)).toHaveValue('docu');
+  await expect(path(page)).toHaveCount(0); // it did not go up a folder
+});
+
+test('Down from the entry goes to the results', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.type('about');
+  await page.keyboard.press('ArrowDown');
+  await expect(item(page, 'about.md')).toBeFocused();
+});
+
+test('emptying the entry ends the search; so does its clear icon', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.type('ab');
+  await page.keyboard.press('Backspace');
+  await page.keyboard.press('Backspace');
+  await expect(searchBox(page)).toHaveCount(0);
+  await expect(item(page, 'Documents')).toBeVisible();
+  await page.keyboard.type('ab');
+  await files(page).getByRole('button', { name: 'Clear Entry' }).click();
+  await expect(searchBox(page)).toHaveCount(0);
+});
+
+test('Esc: the result stays selected if it is in the folder you were in', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await page.keyboard.type('skills');
+  await expect(item(page, 'skills.md')).toHaveAttribute('aria-selected', 'true');
+  await page.keyboard.press('Escape');
+  await expect(path(page).getByRole('button')).toHaveText(['Home', 'Documents']);
+  await expect(item(page, 'skills.md')).toHaveAttribute('aria-selected', 'true');
+  await expect(item(page, 'about.md')).toBeVisible();
+});
+
+test('Back from a search leaves the search, not the folder', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await page.keyboard.type('skills');
+  await page.keyboard.press('Alt+ArrowLeft');
+  await expect(searchBox(page)).toHaveCount(0);
+  await expect(path(page).getByRole('button')).toHaveText(['Home', 'Documents']);
+});
+
+test('opening a folder from the results goes there and ends the search; a search is not in the history', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.type('wallpapers');
+  await item(page, 'Wallpapers').dblclick();
+  await expect(searchBox(page)).toHaveCount(0);
+  await expect(path(page).getByRole('button')).toHaveText(['Home', 'Pictures', 'Wallpapers']);
+  await files(page).getByRole('button', { name: 'Back' }).first().click();
+  await expect(path(page).getByRole('button')).toHaveText(['Home']);
+});
+
+test('No Results Found: where it looked, and Search Everywhere keeps the words', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await page.keyboard.type('wallpapers');
+  await expect(files(page).getByRole('heading', { name: 'No Results Found' })).toBeVisible();
+  await expect(files(page).getByText('No matches in “Documents”')).toBeVisible();
+  await files(page).getByRole('button', { name: 'Search Everywhere' }).last().click();
+  await expect(searchBox(page)).toHaveValue('wallpapers');
+  await expect(searchBox(page)).toHaveAttribute('placeholder', 'Search everywhere');
+  await expect(item(page, 'Wallpapers')).toBeVisible();
+});
+
+test('Search Everywhere: its own page, no history or search buttons, and Esc leaves it', async ({ page }) => {
+  await openHome(page);
+  await everywhere(page).click();
+  await expect(everywhere(page)).toHaveAttribute('aria-pressed', 'true');
+  await expect(searchBox(page)).toBeFocused();
+  await expect(files(page).getByRole('heading', { name: 'Search Everywhere' })).toBeVisible();
+  await expect(files(page).getByText('Find files and folders in all search locations')).toBeVisible();
+  await expect(files(page).getByRole('button', { name: 'Search Settings' })).toBeDisabled();
+  await expect(sidebar(page).locator('[aria-selected="true"]')).toHaveCount(0);
+  await expect(searchButton(page)).toBeHidden();
+  await expect(files(page).getByRole('button', { name: 'Back' }).first()).toBeHidden();
+  await page.keyboard.press('Escape');
+  await expect(everywhere(page)).toHaveAttribute('aria-pressed', 'false');
+  await expect(item(page, 'Documents')).toBeVisible();
+  await expect(place(page, 'Home')).toHaveAttribute('aria-selected', 'true');
+});
+
+test('Ctrl+Shift+F turns it on and off; across Home a word is found by its start, not its middle', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Network').click();
+  await page.keyboard.press('Control+Shift+F');
+  await page.keyboard.type('bout');
+  await expect(files(page).getByRole('heading', { name: 'No Results Found' })).toBeVisible();
+  await expect(files(page).getByText('More locations can be added to search in the settings')).toBeVisible();
+  await page.keyboard.press('Control+a');
+  await page.keyboard.type('abou');
+  await expect(item(page, 'about.md')).toBeVisible();
+  await page.keyboard.press('Control+Shift+F');
+  await expect(searchBox(page)).toHaveCount(0);
+});
+
+test('outside Home the entry says it is not a search location', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+l');
+  await page.keyboard.type('/etc');
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Control+f');
+  await files(page).getByRole('button', { name: 'Search Information' }).click();
+  const info = page.getByRole('dialog', { name: 'Search Information' });
+  await expect(info.getByRole('heading', { name: 'Folder Not in Search Locations' })).toBeVisible();
+  await expect(info.getByText('Search may be slow and will not include file contents')).toBeVisible();
+});
+
+test('inside Home there is nothing to say', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+f');
+  await expect(files(page).getByRole('button', { name: 'Search Information' })).toHaveCount(0);
+});
+
+test('what is inside a text file is found too, with the words it matched', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await page.keyboard.type('computer');
+  const row = item(page, 'README.md');
+  await expect(row.locator('.path')).toHaveText('Desktop/');
+  await row.getByRole('button', { name: 'Full Text Match' }).click();
+  const pop = page.getByRole('dialog', { name: 'Full Text Match' });
+  await expect(pop.locator('b')).toHaveText(['computer']);
+  await page.keyboard.press('Escape');
+  await filterButton(page).click();
+  await filters(page).getByRole('button', { name: 'Only Filename' }).click();
+  await page.keyboard.press('Escape');
+  await expect(files(page).getByRole('heading', { name: 'No Results Found' })).toBeVisible();
+  await expect(filterButton(page)).toHaveClass(/accent/);
+});
+
+test('the filters: file types add up, with no text they list what they match, and leaving the search resets them', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await page.keyboard.press('Control+f');
+  await filterButton(page).click();
+  await expect(filters(page).getByRole('checkbox')).toHaveText(['Audio', 'Documents', 'Folders', 'Images', 'PDF', 'Spreadsheets', 'Text', 'Videos']);
+  await filters(page).getByRole('checkbox', { name: 'Documents' }).click();
+  await expect(filters(page).getByRole('checkbox', { name: 'Documents' })).toHaveAttribute('aria-checked', 'true');
+  await expect(filters(page)).toBeVisible();
+  await expect(item(page, 'about.md')).toBeVisible();
+  await expect(item(page, 'Documents')).toHaveCount(0);
+  await expect(filterButton(page)).toHaveClass(/accent/);
+  await filters(page).getByRole('checkbox', { name: 'Folders' }).click();
+  await expect(item(page, 'about.md')).toBeVisible();
+  await expect(item(page, 'Documents')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(filters(page)).toHaveCount(0);
+  await expect(searchBox(page)).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(searchBox(page)).toHaveCount(0);
+  await page.keyboard.press('Control+f');
+  await filterButton(page).click();
+  await expect(filters(page).getByRole('checkbox', { name: 'Documents' })).toHaveAttribute('aria-checked', 'false');
+});
+
+test('turning the last filter off with no text ends the search', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+f');
+  await filterButton(page).click();
+  await filters(page).getByRole('checkbox', { name: 'PDF' }).click();
+  await filters(page).getByRole('checkbox', { name: 'PDF' }).click();
+  await expect(searchBox(page)).toHaveCount(0);
+});
+
+test('the date filter: one at a time, and Modified can become Used or Created, remembered', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+f');
+  await filterButton(page).click();
+  const dates = filters(page).getByRole('group', { name: 'Date' });
+  await expect(filters(page).getByRole('heading', { name: 'Date Modified' })).toBeVisible();
+  await expect(dates.getByRole('button')).toHaveText(['Today', 'Yesterday', 'Past Week', 'Past Month', 'Past Year', '']);
+  await dates.getByRole('button', { name: 'Today' }).click();
+  await expect(dates.getByRole('button', { name: 'Today' })).toHaveClass(/accent/);
+  await dates.getByRole('button', { name: 'Past Week' }).click();
+  await expect(dates.getByRole('button', { name: 'Today' })).not.toHaveClass(/accent/);
+  await expect(dates.getByRole('button', { name: 'Past Week' })).toHaveClass(/accent/);
+  await filters(page).getByRole('button', { name: 'Date Type' }).click();
+  await expect(page.getByRole('menuitemradio', { name: 'Modified' })).toHaveAttribute('aria-checked', 'true');
+  await page.getByRole('menuitemradio', { name: 'Created' }).click();
+  await expect(filters(page).getByRole('heading', { name: 'Date Created' })).toBeVisible();
+  await page.reload();
+  await openHome(page);
+  await page.keyboard.press('Control+f');
+  await filterButton(page).click();
+  await expect(filters(page).getByRole('heading', { name: 'Date Created' })).toBeVisible();
+});
+
+test('a result: Open Item Location, and it can be renamed and trashed from there', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.type('skills');
+  await item(page, 'skills.md').click({ button: 'right' });
+  expect(await labels(page)).toContain('Open Item Location');
+  await menuItem(page, 'Open Item Location').click();
+  await expect(searchBox(page)).toHaveCount(0);
+  await expect(path(page).getByRole('button')).toHaveText(['Home', 'Documents']);
+  await expect(item(page, 'skills.md')).toHaveAttribute('aria-selected', 'true');
+  await page.keyboard.type('skills');
+  await item(page, 'skills.md').click({ button: 'right' });
+  await menuItem(page, 'Move to Trash').click();
+  await expect(files(page).getByRole('heading', { name: 'No Results Found' })).toBeVisible();
+});
+
+test('the background of results: New Folder and Paste are off, and there are no Properties', async ({ page }) => {
+  await openHome(page);
+  await item(page, 'Documents').click({ button: 'right' });
+  await menuItem(page, 'Copy').click();
+  await page.keyboard.type('md');
+  await files(page).locator('.page').click({ button: 'right', position: { x: 5, y: 400 } });
+  await expect(menuItem(page, 'New Folder…')).toBeDisabled();
+  await expect(menuItem(page, 'Paste')).toBeDisabled();
+  await expect(menuItem(page, 'Select All')).toBeEnabled();
+  expect(await labels(page)).not.toContain('Properties');
+});
+
+test('a new tab from a search opens Home, and closing a searching tab brings the search back on restore', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await page.keyboard.type('skills');
+  await page.keyboard.press('Control+t');
+  await expect(tabs(page)).toHaveCount(2);
+  await expect(tabs(page).nth(1)).toHaveText('Home');
+  await expect(searchBox(page)).toHaveCount(0);
+  await tabs(page).nth(0).click();
+  await expect(searchBox(page)).toHaveValue('skills');
+  await expect(searchBox(page)).toBeFocused();
+  await page.keyboard.press('Control+w');
+  await expect(tabs(page)).toHaveCount(0);
+  await page.keyboard.press('Control+Shift+T');
+  await expect(searchBox(page)).toHaveValue('skills');
+  await expect(item(page, 'skills.md')).toBeVisible();
+});
+
+test('each tab has its own search', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+t');
+  await page.keyboard.type('about');
+  await tabs(page).nth(0).click();
+  await expect(searchBox(page)).toHaveCount(0);
+  await tabs(page).nth(1).click();
+  await expect(searchBox(page)).toHaveValue('about');
+});
+
+test('sorting a search by a column, then leaving: the folder keeps its own sort', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await page.keyboard.type('md');
+  await expect(files(page).getByRole('columnheader', { name: 'Name' })).not.toHaveAttribute('aria-sort');
+  await files(page).getByRole('columnheader', { name: 'Name' }).click();
+  await expect(files(page).getByRole('columnheader', { name: 'Name' })).toHaveAttribute('aria-sort', 'ascending');
+  await page.keyboard.press('Escape');
+  await page.keyboard.type('md');
+  await expect(files(page).getByRole('columnheader', { name: 'Name' })).not.toHaveAttribute('aria-sort');
+});
+
+test('after the Full Text Match popover the keyboard still works, however it was closed', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await page.keyboard.type('computer');
+  const button = item(page, 'README.md').getByRole('button', { name: 'Full Text Match' });
+  const pop = page.getByRole('dialog', { name: 'Full Text Match' });
+  await button.click();
+  await expect(pop).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(pop).toHaveCount(0);
+  await button.click();
+  await expect(pop).toBeVisible();
+  await files(page).getByRole('columnheader', { name: 'Size' }).hover();
+  await page.mouse.down(); // a click away
+  await page.mouse.up();
+  await expect(pop).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect(searchBox(page)).toHaveCount(0);
+});
+
+test('a menu closed by clicking away leaves the keyboard with the view', async ({ page }) => {
+  await openHome(page);
+  await item(page, 'Documents').click({ button: 'right' });
+  await expect(menuItem(page, 'Cut')).toBeVisible();
+  await files(page).locator('.sidebar .title').click();
+  await expect(menuItem(page, 'Cut')).toHaveCount(0);
+  await page.keyboard.press('Control+h');
+  await expect(item(page, '.bashrc')).toBeVisible();
+});
+
+test('clicking the place you are in: an empty entry stays, a search ends, and so does Search Everywhere', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+f');
+  await place(page, 'Home').click();
+  await expect(searchBox(page)).toBeFocused();
+  await page.keyboard.type('about');
+  await expect(item(page, 'about.md')).toBeVisible();
+  await place(page, 'Home').click();
+  await expect(searchBox(page)).toHaveCount(0);
+  await expect(item(page, 'Documents')).toBeVisible();
+  await expect(content(page).locator('[aria-selected="true"]')).toHaveCount(0);
+  await everywhere(page).click();
+  await place(page, 'Home').click();
+  await expect(everywhere(page)).toHaveAttribute('aria-pressed', 'false');
+  await expect(searchBox(page)).toHaveCount(0);
+});
+
+// ---- drag and drop -------------------------------------------------------------
+const center = async (l: Locator) => {
+  const b = (await l.boundingBox())!;
+  return { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+};
+/** Press on `from`, go past the drag threshold, on to `to`, and wait there `hold` ms; then release unless told not to. */
+async function drag(page: Page, from: Locator, to: Locator | { x: number; y: number }, { release = true, hold = 0 } = {}) {
+  const a = await center(from);
+  await page.mouse.move(a.x, a.y);
+  await page.mouse.down();
+  await page.mouse.move(a.x + 12, a.y + 12, { steps: 3 });
+  const b = 'x' in to ? to : await center(to);
+  await page.mouse.move(b.x - 12, b.y, { steps: 6 });
+  await page.mouse.move(b.x, b.y, { steps: 3 }); // some way in: a folder in the view opens only then
+  if (hold) await page.waitForTimeout(hold);
+  if (release) await page.mouse.up();
+}
+const picture = (page: Page) => page.locator('.dnd-picture');
+const dragCursor = (page: Page) => page.evaluate(() => document.documentElement.style.getPropertyValue('--dnd-cursor'));
+const below = async (page: Page) => {
+  const last = (await content(page).getByRole('option').last().boundingBox())!;
+  return { x: last.x + 40, y: last.y + last.height + 60 };
+};
+
+test('a file dropped on a folder moves there; while over it, the folder is the target and the cursor says move', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await drag(page, item(page, 'Public'), item(page, 'Music'), { release: false });
+  await expect(picture(page).locator('img')).toHaveCount(1);
+  await expect(item(page, 'Music')).toHaveClass(/drop-active/);
+  expect(await dragCursor(page)).toBe('move');
+  await page.mouse.up();
+  await expect(item(page, 'Public')).toHaveCount(0);
+  await expect(picture(page)).toHaveCount(0); // a drop that did something: the picture just goes
+  await page.keyboard.press('Control+z');
+  await expect(item(page, 'Public')).toBeVisible();
+});
+
+test('a drop on the folder it is already in does nothing; with Ctrl it duplicates, and the copy is selected', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Documents').click();
+  await drag(page, item(page, 'about.md'), await below(page));
+  await expect(content(page).getByRole('option')).toHaveCount(3);
+  await page.keyboard.down('Control');
+  await drag(page, item(page, 'about.md'), await below(page), { release: false });
+  expect(await dragCursor(page)).toBe('copy');
+  await page.mouse.up();
+  await page.keyboard.up('Control');
+  await expect(item(page, 'about (Copy).md')).toHaveAttribute('aria-selected', 'true');
+});
+
+test('Escape cancels: nothing moves, and the picture slides back and fades', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' }); // the slide back is an animation
+  await openHome(page);
+  await drag(page, item(page, 'Public'), item(page, 'Music'), { release: false });
+  await page.keyboard.press('Escape');
+  await expect(picture(page)).toHaveCount(1); // DRAG_FAILED_DURATION: still on its way back
+  await expect(picture(page)).toHaveCount(0);
+  await page.mouse.up();
+  await expect(item(page, 'Public')).toBeVisible();
+  await expect(searchBox(page)).toHaveCount(0); // the keys went to the drag, not to the window
+});
+
+test('held over a folder the drag opens it; the drop then goes to the folder shown, and what arrives is selected', async ({ page }) => {
+  await openHome(page);
+  await drag(page, item(page, 'Public'), item(page, 'Music'), { release: false, hold: 800 });
+  await expect(path(page).getByRole('button')).toHaveText(['Home', 'Music']);
+  const view = (await files(page).locator('.page').boundingBox())!; // Music is empty: the status page takes drops too
+  await page.mouse.move(view.x + view.width / 2, view.y + view.height / 2, { steps: 4 });
+  await page.mouse.up();
+  await expect(item(page, 'Public')).toHaveAttribute('aria-selected', 'true');
+});
+
+test('over the sidebar, places a drop cannot go to are dimmed; a drop on a bookmark moves it there, selecting nothing', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Documents').click();
+  await drag(page, item(page, 'about.md'), place(page, 'Music'), { release: false });
+  await expect(place(page, 'Recent')).toHaveClass(/insensitive/);
+  await expect(place(page, 'Network')).toHaveClass(/insensitive/);
+  await expect(place(page, 'Home')).not.toHaveClass(/insensitive/);
+  await expect(place(page, 'Music')).toHaveClass(/drop-active/);
+  await page.mouse.up();
+  await expect(place(page, 'Recent')).not.toHaveClass(/insensitive/);
+  await expect(item(page, 'about.md')).toHaveCount(0);
+  await place(page, 'Music').click();
+  await expect(item(page, 'about.md')).toHaveAttribute('aria-selected', 'false');
+});
+
+test('the Trash row trashes, with its toast; the Starred row stars', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Documents').click();
+  await drag(page, item(page, 'skills.md'), place(page, 'Trash'));
+  await expect(toast(page)).toContainText('“skills.md” moved to trash');
+  await drag(page, item(page, 'about.md'), place(page, 'Starred'));
+  await expect(item(page, 'about.md').getByRole('button', { name: 'Unstar', exact: true })).toBeVisible();
+  await expect(item(page, 'about.md')).toBeVisible(); // starring leaves it where it is
+});
+
+test('Recent takes nothing: the cursor says so, and the drop slides back', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await openHome(page);
+  await drag(page, item(page, 'Public'), place(page, 'Recent'), { release: false });
+  expect(await dragCursor(page)).toBe('no-drop');
+  await expect(place(page, 'Recent')).not.toHaveClass(/drop-active/);
+  await page.mouse.up();
+  await expect(picture(page)).toHaveCount(1);
+  await expect(item(page, 'Public')).toBeVisible();
+});
+
+test('a lone folder brings out New bookmark above the bookmarks, and a drop there adds it first', async ({ page }) => {
+  await openHome(page);
+  const newRow = sidebar(page).getByRole('option', { name: 'New bookmark' });
+  await drag(page, item(page, 'Public'), place(page, 'Documents'), { release: false });
+  await expect(newRow).toBeVisible();
+  await expect(newRow).toHaveAttribute('title', 'Add a new bookmark');
+  await page.mouse.move(...Object.values(await center(newRow)) as [number, number], { steps: 4 });
+  await page.mouse.up();
+  await expect(newRow).toHaveCount(0);
+  await expect(sidebar(page).getByRole('option')).toHaveText(['Home', 'Recent', 'Starred', 'Network', 'Trash', 'Public', 'Documents', 'Music', 'Pictures', 'Videos', 'Downloads']);
+});
+
+test('two items, or a file, bring no New bookmark row', async ({ page }) => {
+  await openHome(page);
+  await item(page, 'Public').click();
+  await item(page, 'Videos').click({ modifiers: ['Control'] });
+  await drag(page, item(page, 'Public'), place(page, 'Documents'), { release: false });
+  await expect(sidebar(page).getByRole('option', { name: 'New bookmark' })).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await page.mouse.up();
+});
+
+test('a bookmark can be dragged to another place among them; a line shows where', async ({ page }) => {
+  await openHome(page);
+  const music = (await place(page, 'Music').boundingBox())!;
+  await drag(page, place(page, 'Videos'), { x: music.x + 40, y: music.y + 4 }, { release: false });
+  await expect(sidebar(page).locator('.placeholder')).toHaveCount(1);
+  await expect(place(page, 'Videos')).toBeHidden();
+  await expect(picture(page)).toContainText('Videos');
+  await page.mouse.up();
+  await expect(sidebar(page).getByRole('option')).toHaveText(['Home', 'Recent', 'Starred', 'Network', 'Trash', 'Documents', 'Videos', 'Music', 'Pictures', 'Downloads']);
+  await expect(path(page).getByRole('button')).toHaveText(['Home']); // the release was not a click on the row
+});
+
+test('a path bar button takes a drop into its folder; held there, the drag goes to it', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Documents').click();
+  await drag(page, item(page, 'about.md'), path(page).getByRole('button', { name: 'Home' }), { release: false });
+  await expect(path(page).getByRole('button', { name: 'Home' })).toHaveClass(/drop-active/);
+  await page.mouse.up();
+  await expect(item(page, 'about.md')).toHaveCount(0);
+  await drag(page, item(page, 'skills.md'), path(page).getByRole('button', { name: 'Home' }), { release: false, hold: 800 });
+  await expect(path(page).getByRole('button')).toHaveText(['Home']);
+  await page.mouse.up();
+  await expect(item(page, 'skills.md')).toHaveAttribute('aria-selected', 'true');
+});
+
+test('a drop on a tab goes to the folder it shows; held there, the tab comes to the front', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Documents').click();
+  await page.keyboard.press('Control+t');
+  await place(page, 'Music').click();
+  await tabs(page).nth(0).click();
+  await drag(page, item(page, 'about.md'), tabs(page).nth(1));
+  await expect(item(page, 'about.md')).toHaveCount(0);
+  await drag(page, item(page, 'skills.md'), tabs(page).nth(1), { release: false, hold: 800 });
+  await expect(tabs(page).nth(1)).toHaveAttribute('aria-selected', 'true');
+  await page.mouse.up();
+  await expect(item(page, 'about.md')).toBeVisible();
+});
+
+test('several items make a pile of 64px icons; the first is on top', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Documents').click();
+  await page.keyboard.press('Control+a');
+  await drag(page, item(page, 'about.md'), place(page, 'Music'), { release: false });
+  const icons = picture(page).locator('img');
+  await expect(icons).toHaveCount(3);
+  expect((await icons.last().boundingBox())!.width).toBe(64);
+  await page.keyboard.press('Escape');
+  await page.mouse.up();
+});
+
+test('what cannot be moved from where it is is copied, Shift or not', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await page.keyboard.press('Control+l');
+  await page.keyboard.type('/etc');
+  await page.keyboard.press('Enter');
+  await page.keyboard.down('Shift');
+  await drag(page, item(page, 'hostname'), place(page, 'Documents'), { release: false });
+  expect(await dragCursor(page)).toBe('copy');
+  await page.mouse.up();
+  await page.keyboard.up('Shift');
+  await expect(item(page, 'hostname')).toBeVisible();
+  await place(page, 'Documents').click();
+  await expect(item(page, 'hostname')).toBeVisible();
+});
+
+test('dragged out of the Trash, a file is restored where it is dropped, and Undo says so', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await place(page, 'Documents').click();
+  await item(page, 'contact.md').click();
+  await page.keyboard.press('Delete');
+  await place(page, 'Trash').click();
+  await drag(page, item(page, 'contact.md'), place(page, 'Music'));
+  await expect(files(page).getByRole('heading', { name: 'Trash is Empty' })).toBeVisible();
+  await files(page).getByRole('button', { name: 'Main Menu' }).click();
+  await expect(menuItem(page, 'Undo Restore From Trash')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await place(page, 'Music').click();
+  await expect(item(page, 'contact.md')).toBeVisible();
+});
+
+test('after Escape, letting go on the row the drag began on does not open it', async ({ page }) => {
+  await openHome(page);
+  const videos = await center(place(page, 'Videos'));
+  await page.mouse.move(videos.x, videos.y);
+  await page.mouse.down();
+  await page.mouse.move(videos.x + 12, videos.y + 12, { steps: 3 });
+  await page.keyboard.press('Escape');
+  await page.mouse.move(videos.x, videos.y, { steps: 3 });
+  await page.mouse.up();
+  await expect(path(page).getByRole('button')).toHaveText(['Home']);
 });

@@ -41,7 +41,8 @@
     const centre = r.left + r.width / 2;
     const x = Math.max(0, Math.min(align === 'start' ? r.left : centre - w / 2, innerWidth - w));
     const tip = Math.max(RADIUS + TAIL / 2, Math.min(centre - x, w - RADIUS - TAIL / 2));
-    const win = anchor.closest<HTMLElement>('.window');
+    // Over its window, or over the popover it was opened from, which is not inside the window any more.
+    const win = anchor.closest<HTMLElement>('.popover, .window');
     // GDK_ANCHOR_FLIP_Y: with no room below the button, the popover opens above it, its arrow pointing down.
     const gap = arrow ? 12 : 0;
     const h = box!.offsetHeight + gap;
@@ -50,16 +51,22 @@
   }
 
   onMount(() => {
+    const before = document.activeElement as HTMLElement | null;
     place();
     (box!.querySelector<HTMLElement>('[role="menuitem"]:not(:disabled), input, button:not(:disabled)') ?? box!).focus({ preventScroll: true });
     const away = (e: PointerEvent) => {
       const t = e.target as Node;
-      if (!box!.contains(t) && !anchor.contains(t)) onclose();
+      if (box!.contains(t) || anchor.contains(t)) return;
+      if (!layer.top() && (t as Element).closest?.('.popover')) return; // in one opened from this one: a child popover
+      onclose();
     };
     addEventListener('pointerdown', away, true);
     return () => {
       layer.close();
       removeEventListener('pointerdown', away, true);
+      // gtk_popover_unmap: the keyboard goes back to where it was, unless something has taken it since.
+      const now = document.activeElement;
+      if (!now || now === document.body || box?.contains(now)) before?.focus({ preventScroll: true });
     };
   });
 
@@ -68,9 +75,10 @@
     if (e.key !== 'Escape' || !layer.top()) return;
     e.preventDefault();
     e.stopPropagation();
+    const button = anchor; // closing clears what the anchor is read from
     onclose();
     if (refocus) refocus();
-    else anchor.focus();
+    else button.focus();
   }
 </script>
 

@@ -3,6 +3,8 @@ import { basename, dirname, TRASH, type Vfs } from '../../fs/vfs';
 import { copyName } from '../../shell/desktop-menu';
 
 export type Op = { kind: 'trash' | 'other'; undoLabel: string; redoLabel: string; undo(): void; redo(): void };
+/** So what follows a file by its path (stars, bookmarks, Recent) can keep up, whichever way it goes. */
+export type OnMove = (from: string, to: string) => void;
 
 const labels = (word: string, n = 1) => {
   const what = n === 1 ? word : `${word} ${n} items`;
@@ -71,10 +73,30 @@ export function emptyTrash(fs: Vfs): void {
   for (const n of fs.list(TRASH, { hidden: true })) fs.remove(`${TRASH}/${n.name}`);
 }
 
-export function rename(fs: Vfs, path: string, name: string): Op & { to: string } {
+export function rename(fs: Vfs, path: string, name: string, onmove?: OnMove): Op & { to: string } {
   const to = `${dirname(path) === '/' ? '' : dirname(path)}/${name}`;
-  fs.move(path, to);
-  return { kind: 'other', ...labels('Rename'), to, undo: () => fs.move(to, path), redo: () => fs.move(path, to) };
+  const go = (a: string, b: string) => {
+    fs.move(a, b);
+    onmove?.(a, b);
+  };
+  go(path, to);
+  return { kind: 'other', ...labels('Rename'), to, undo: () => go(to, path), redo: () => go(path, to) };
+}
+
+/** nautilus_tag_manager_star_files and unstar_files. Only what changes is undone. */
+export function setStarred(list: { paths: string[] }, paths: string[], on: boolean): Op & { toast: string } {
+  const changing = paths.filter((p) => list.paths.includes(p) !== on);
+  const apply = (star: boolean) => {
+    list.paths = star ? [...list.paths, ...changing] : list.paths.filter((p) => !changing.includes(p));
+  };
+  apply(on);
+  return {
+    kind: 'other',
+    ...labels(on ? 'Starring' : 'Unstarring'),
+    toast: paths.length === 1 ? `“${basename(paths[0])}” unstarred` : `${paths.length} files unstarred`,
+    undo: () => apply(!on),
+    redo: () => apply(on),
+  };
 }
 
 export function createFolder(fs: Vfs, dir: string, name: string): Op & { path: string } {
@@ -83,34 +105,44 @@ export function createFolder(fs: Vfs, dir: string, name: string): Op & { path: s
   return { kind: 'other', ...labels('Create Folder'), path, undo: () => fs.remove(path), redo: () => fs.mkdir(path) };
 }
 
-export function paste(fs: Vfs, dir: string, clip: { paths: string[]; cut: boolean }): (Op & { created: string[] }) | null {
+export function paste(fs: Vfs, dir: string, clip: { paths: string[]; cut: boolean }, onmove?: OnMove): (Op & { created: string[] }) | null {
   const sources = clip.paths.filter((p) => {
     if (!fs.exists(p) || dir === p || dir.startsWith(`${p}/`)) return false; // gone, or a folder into itself
     return !(clip.cut && dirname(p) === dir); // a cut into the folder it is in does nothing
   });
   if (!sources.length) return null;
   const base = dir === '/' ? '' : dir;
-  const created = sources.map((p) => {
-    const to = `${base}/${freeName(fs, dir, fs.stat(p)!)}`;
-    if (clip.cut) fs.move(p, to);
+  // What leaves the Trash goes under its own name and stops being trash; undoing that trashes it again.
+  const fromTrash = sources.map((p) => clip.cut && !!fs.stat(p)?.origin);
+  const created = sources.map((p, i) => {
+    const node = fs.stat(p)!;
+    const to = `${base}/${freeName(fs, dir, fromTrash[i] ? { name: basename(node.origin!), kind: node.kind } : node)}`;
+    if (fromTrash[i]) fs.restore(p, to);
+    else if (clip.cut) fs.move(p, to);
     else fs.copy(p, to);
+    if (clip.cut) onmove?.(p, to);
     return to;
   });
   const word = clip.cut ? 'Move' : sources.every((p) => dirname(p) === dir) ? 'Duplicate' : 'Copy';
   return {
     kind: 'other',
-    ...labels(word, sources.length),
+    // A move whose first item came out of the Trash is a restore (NAUTILUS_FILE_UNDO_OP_RESTORE_FROM_TRASH).
+    ...(fromTrash[0] ? { undoLabel: 'Undo Restore From Trash', redoLabel: 'Redo Restore From Trash' } : labels(word, sources.length)),
     created,
     undo() {
       created.forEach((to, i) => {
-        if (clip.cut) fs.move(to, sources[i]);
+        if (fromTrash[i]) sources[i] = fs.trash(to);
+        else if (clip.cut) fs.move(to, sources[i]);
         else fs.remove(to);
+        if (clip.cut) onmove?.(to, sources[i]);
       });
     },
     redo() {
       created.forEach((to, i) => {
-        if (clip.cut) fs.move(sources[i], to);
+        if (fromTrash[i]) fs.restore(sources[i], to);
+        else if (clip.cut) fs.move(sources[i], to);
         else fs.copy(sources[i], to);
+        if (clip.cut) onmove?.(sources[i], to);
       });
     },
   };

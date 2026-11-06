@@ -30,6 +30,7 @@
       aria-selected={tab.id === selected}
       aria-label={tab.title}
       title={tab.tooltip}
+      data-tab={tab.id}
       onclick={() => onselect(tab.id)}
       onauxclick={(e) => e.button === 1 && onclose(tab.id)}
       oncontextmenu={(e) => {
@@ -59,6 +60,8 @@
   .tab:active { background: color-mix(in srgb, currentColor 16%, transparent); }
   .tab.selected { background: color-mix(in srgb, currentColor 10%, transparent); }
   .tab.selected:hover { background: color-mix(in srgb, currentColor 13%, transparent); }
+  /* A tab its owner has made a drop target (adw_tab_bar_setup_extra_drop_target): :drop(active), libadwaita's line. */
+  .tab:global(.drop-active) { box-shadow: inset 0 0 0 1px var(--accent); }
   :global(:root[data-focus-ring]) .tab:focus { outline: 2px solid color-mix(in srgb, var(--adw-accent) 50%, transparent); outline-offset: -2px; }
   /* The separator in the 5px gap before each tab: gone beside the selected or hovered one. */
   .tab + .tab::before {
