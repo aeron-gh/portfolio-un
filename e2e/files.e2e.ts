@@ -986,6 +986,23 @@ test('Ctrl+T: a new tab at the same place; the bar shows only with two or more; 
   await expect(files(page)).toHaveCount(0);
 });
 
+test('a tab keeps where it had scrolled to, even when left before the scroll is reported', async ({ page }) => {
+  await openHome(page);
+  await page.keyboard.press('Control+1');
+  await page.keyboard.press('Control+=');
+  // Scroll and Ctrl+T at once: the scroll event, which comes a frame later, cannot have arrived.
+  await files(page).locator('.view').evaluate((v) => {
+    v.scrollTo(0, 80);
+    v.dispatchEvent(new KeyboardEvent('keydown', { key: 't', ctrlKey: true, bubbles: true }));
+  });
+  await expect(tabs(page)).toHaveCount(2);
+  await files(page).locator('.view').evaluate((v) => v.scrollTo(0, 40));
+  await tabs(page).nth(0).click();
+  await expect.poll(() => files(page).locator('.view').evaluate((v) => v.scrollTop)).toBe(80);
+  await tabs(page).nth(1).click();
+  await expect.poll(() => files(page).locator('.view').evaluate((v) => v.scrollTop)).toBe(40);
+});
+
 test('the Main Menu opens a tab too', async ({ page }) => {
   await openHome(page);
   await files(page).getByRole('button', { name: 'Main Menu' }).click();

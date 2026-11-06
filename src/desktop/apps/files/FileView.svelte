@@ -254,6 +254,8 @@
   });
 
   export const element = (path: string) => elementFor(path);
+  /** How far it is scrolled now, before any scroll event says so. */
+  export const scrollPosition = () => root?.scrollTop ?? 0;
   /** The view, or an item in it, has the keyboard. */
   export const hasFocus = () => !!root?.contains(document.activeElement);
   /** A view that has just been filled starts at the top. */
@@ -300,6 +302,8 @@
   bind:this={root}
   class={['view', mode]}
   onscroll={(e) => {
+    // A scroll event comes a frame later: by then this view may have gone, and with it the tab it belonged to.
+    if (!e.currentTarget.isConnected) return;
     scrolled = e.currentTarget.scrollTop > 0;
     onscrolled(e.currentTarget.scrollTop);
   }}

@@ -290,6 +290,8 @@
   // ---- tabs -----------------------------------------------------------------
   /** A tab comes to the front with its keyboard: its entry if it has one open. */
   function show(id: string) {
+    // The tab being left keeps where it is now: its last scroll event may not have arrived yet.
+    if (id !== activeId && fileView) slot.scrollTop = fileView.scrollPosition();
     activeId = id;
     if (slot.searchOpen) void tick().then(() => searchEntry?.focus());
     else refocus();
