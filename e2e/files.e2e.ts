@@ -1869,12 +1869,37 @@ test('Escape cancels: nothing moves, and the picture slides back and fades', asy
   await page.emulateMedia({ reducedMotion: 'no-preference' }); // the slide back is an animation
   await openHome(page);
   await drag(page, item(page, 'Public'), item(page, 'Music'), { release: false });
+  // Measured in the page, so a slow machine cannot miss the 500ms it is on screen: the picture's slide back, how long
+  // it lasted, and that it is gone afterwards (DRAG_FAILED_DURATION).
+  await page.evaluate(() => {
+    const animate = Element.prototype.animate;
+    const slides: Promise<{ duration: unknown; lasted: number; gone: boolean }>[] = [];
+    Object.assign(window, { slides });
+    Element.prototype.animate = function (keyframes, options) {
+      const animation = animate.call(this, keyframes, options);
+      if (this.classList.contains('dnd-picture')) {
+        const start = performance.now();
+        const el = this;
+        slides.push(
+          animation.finished.then(
+            () => new Promise((done) => requestAnimationFrame(() => done({ duration: (options as KeyframeAnimationOptions).duration, lasted: performance.now() - start, gone: !el.isConnected })))
+          ),
+        );
+      }
+      return animation;
+    };
+  });
   await page.keyboard.press('Escape');
-  await expect(picture(page)).toHaveCount(1); // DRAG_FAILED_DURATION: still on its way back
-  await expect(picture(page)).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => (window as unknown as { slides: unknown[] }).slides.length)).toBe(1);
+  const slide = await page.evaluate(() => (window as unknown as { slides: Promise<{ duration: unknown; lasted: number; gone: boolean }>[] }).slides[0]);
+  expect(slide.duration).toBe(500);
+  expect(slide.lasted).toBeGreaterThanOrEqual(490);
+  expect(slide.gone).toBe(true);
   await page.mouse.up();
-  await expect(item(page, 'Public')).toBeVisible();
   await expect(searchBox(page)).toHaveCount(0); // the keys went to the drag, not to the window
+  // Held over Music for half a second on a slow machine, the drag opens it; either way Public is still in Home.
+  await page.keyboard.press('Alt+Home');
+  await expect(item(page, 'Public')).toBeVisible();
 });
 
 test('held over a folder the drag opens it; the drop then goes to the folder shown, and what arrives is selected', async ({ page }) => {
