@@ -93,7 +93,12 @@ Then look at every changed image before you commit it.
 | "New Document" is missing from the desktop menu | Ubuntu hides it too when `~/Templates` is empty |
 | Apps show a "no app" dialog | The apps are not built yet, see [Roadmap](./roadmap.md) |
 | Files' search does not read what is inside a PDF | Only text and Markdown files have their text here |
-| Search filters' "Used" and "Created" dates go by when a file last changed, unless Files opened it | A file here keeps one time |
+| Search filters' "Used" and "Created" dates, and Properties' "Accessed" and "Created", go by when a file last changed, unless Files opened it | A file here keeps one time |
+| Properties' access menus, "Executable as Program" and "Change Permissions for Enclosed Files…" are greyed out | Changing permissions comes with Terminal |
+| Who owns what in Properties: files 644, folders 755, Home 750; the system belongs to root | The desktop keeps no real permissions; these are Ubuntu's usual values |
+| The disk in Properties is 64 GiB, with 11 GB used by Ubuntu | There is no real disk; the values are chosen for this desktop |
+| Properties of the Trash folder itself is not offered | What Nautilus shows for `trash:///` is not confirmed |
+| **Set Custom Icon** in Properties is greyed out | It needs the file chooser, which comes next |
 | When two search engines find the same file, the order of who answers first is fixed | In Ubuntu it depends on which engine is quicker that time |
 | Dragging stays inside the page, and files from your own computer cannot be dropped in | The desktop has no access to your files, and the drag looks like GNOME's whatever the system |
 | Ctrl over the Trash still trashes | What the real Trash does with a copy dropped on it is not confirmed |

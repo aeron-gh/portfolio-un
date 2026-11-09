@@ -194,6 +194,8 @@ for (const [url, to] of [
 ]) {
   await download(url, to);
 }
+// In Yaru this one is a link to filemanager-app.png, which downloadIcon follows.
+await downloadIcon('256x256/apps/org.gnome.Nautilus.png', 'src/desktop/apps/files/icons/org.gnome.Nautilus.png');
 // Files: every file icon at both sizes it can be drawn at, and the symbolic icons only its window uses.
 const FILES = 'src/desktop/apps/files/icons';
 for (const rel of [
@@ -214,7 +216,7 @@ for (const rel of [
   'devices/drive-harddisk-symbolic', 'actions/edit-find-symbolic', 'actions/sidebar-show-symbolic', 'actions/go-previous-symbolic',
   'actions/go-next-symbolic', 'actions/view-list-symbolic', 'actions/view-grid-symbolic', 'actions/folder-new-symbolic',
   'actions/view-more-symbolic', 'actions/edit-clear-symbolic', 'actions/zoom-in-symbolic', 'actions/zoom-out-symbolic', 'status/non-starred-symbolic', 'ui/pan-up-symbolic',
-  'ui/pan-down-symbolic',
+  'ui/pan-down-symbolic', 'emblems/external-link-symbolic', 'status/folder-open-symbolic', 'actions/document-edit-symbolic',
 ]) {
   await downloadIcon(`scalable/${rel}.svg`, `${FILES}/sym/${rel.slice(rel.indexOf('/') + 1)}.svg`);
 }

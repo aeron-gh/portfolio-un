@@ -60,7 +60,7 @@ export function selectionMenu(p: Picked): Item[][] {
   if (p.where === 'starred') actions.push({ id: 'unstar', label: 'Unstar' });
   sections.push(actions);
 
-  sections.push([off('properties', 'Properties')]);
+  sections.push([{ id: 'properties', label: 'Properties' }]);
   return sections;
 }
 
@@ -69,7 +69,9 @@ const creating = (p: Place): Item[] => {
   return p.inTrash || p.special ? items : [...items, off('terminal', 'Open in Terminal')];
 };
 const paste = (p: Place): Item => ({ id: 'paste', label: 'Paste', disabled: !p.canPaste || !p.canCreate });
-const properties = (p: Place): Item[][] => (p.special ? [] : [[off('properties', 'Properties')]]);
+/** current-directory-properties: the folder itself, whatever is selected. Not for the Trash itself here: what it
+ *  says about trash:/// is not confirmed. */
+const properties = (p: Place): Item[][] => (p.special || p.inTrash ? [] : [[{ id: 'folder-properties', label: 'Properties' }]]);
 const emptyTrash = (p: Place): Item[][] => (p.inTrash ? [[{ id: 'empty-trash', label: 'Empty Trash…', disabled: !p.trashHasItems }]] : []);
 
 export function backgroundMenu(p: Place): Item[][] {
@@ -92,11 +94,12 @@ export function currentFolderMenu(p: Place & { bookmark: 'add' | 'remove' | null
   return [creating(p), here, [paste(p), { id: 'select-all', label: 'Select All' }], ...emptyTrash(p), ...properties(p)];
 }
 
-export function sidebarRowMenu(r: { bookmark: boolean; recent: boolean; trash: boolean; trashHasItems: boolean }): Item[][] {
+export function sidebarRowMenu(r: { bookmark: boolean; recent: boolean; trash: boolean; trashHasItems: boolean; properties: boolean }): Item[][] {
   const sections: Item[][] = [[{ id: 'open', label: 'Open' }, { id: 'open-tab', label: 'Open in New Tab' }, { id: 'open-window', label: 'Open in New Window' }]];
   if (r.bookmark) sections.push([{ id: 'remove-bookmark', label: 'Remove from Bookmarks' }, { id: 'rename-bookmark', label: 'Rename' }]);
   if (r.recent) sections.push([off('settings', 'File History Settings…')]);
   if (r.trash) sections.push([off('settings', 'Trash Settings…')], [{ id: 'empty-trash', label: 'Empty Trash…', disabled: !r.trashHasItems }]);
+  if (r.properties) sections.push([{ id: 'properties', label: 'Properties' }]); // show_properties
   return sections;
 }
 
@@ -115,5 +118,5 @@ export function tabMenu(t: { position: number; count: number; canRestore: boolea
 
 /** nautilus-pathbar-context-menu.ui button-menu */
 export function pathButtonMenu(): Item[][] {
-  return [[{ id: 'open-window', label: 'Open in New Window' }, { id: 'open-tab', label: 'Open in New Tab' }, off('properties', 'Properties')]];
+  return [[{ id: 'open-window', label: 'Open in New Window' }, { id: 'open-tab', label: 'Open in New Tab' }, { id: 'properties', label: 'Properties' }]];
 }

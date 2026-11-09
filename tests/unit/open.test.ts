@@ -7,7 +7,7 @@ const file = (mime: string) => ({ kind: 'file' as const, mime });
 
 describe('which app opens a file', () => {
   test('text opens in Text Editor: plain text, Markdown, scripts, JSON', () => {
-    for (const mime of ['text/plain', 'text/markdown', 'text/x-shellscript', 'text/javascript', 'application/json']) {
+    for (const mime of ['text/plain', 'text/markdown', 'application/x-shellscript', 'text/javascript', 'application/json']) {
       expect(appFor(file(mime), all)).toBe('text-editor');
     }
   });

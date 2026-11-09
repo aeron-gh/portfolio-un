@@ -67,7 +67,12 @@ export function fileMenu(o: { count: number; special: boolean; folders: number; 
       { kind: 'item', id: 'new-folder-with', label: `New Folder with ${n} item${n === 1 ? '' : 's'}` },
     );
   }
-  items.push(sep, off('properties', many ? 'Common Properties' : 'Properties'), sep, off('show-in-files', many ? 'Show All in Files' : 'Show in Files'));
+  items.push(
+    sep,
+    { kind: 'item', id: 'properties', label: many ? 'Common Properties' : 'Properties' },
+    sep,
+    { kind: 'item', id: 'show-in-files', label: many ? 'Show All in Files' : 'Show in Files' },
+  );
   if (o.folders === 1 && !many) items.push(off('terminal', 'Open in Terminal'));
   return items;
 }

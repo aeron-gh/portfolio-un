@@ -65,7 +65,7 @@ test('Copy and Paste make "README (Copy).md"; Move to Trash removes it', async (
 test('Home cannot be cut, copied or trashed; two icons get the "All" wording', async ({ page }) => {
   await session(page);
   await icon(page, '').click({ button: 'right' });
-  expect(await texts(page, 'Icon menu')).toEqual(['Open', 'Open With Other Application(x)', '|', 'Cut(x)', 'Copy(x)', '|', 'Move to Trash(x)', '|', 'Properties(x)', '|', 'Show in Files(x)', 'Open in Terminal(x)']);
+  expect(await texts(page, 'Icon menu')).toEqual(['Open', 'Open With Other Application(x)', '|', 'Cut(x)', 'Copy(x)', '|', 'Move to Trash(x)', '|', 'Properties', '|', 'Show in Files', 'Open in Terminal(x)']);
   await page.keyboard.press('Escape');
   await page.keyboard.press('Control+KeyA');
   await icon(page, 'README.md').click({ button: 'right' });
@@ -82,4 +82,37 @@ test('Arrange By: the sort order is checked and remembered', async ({ page }) =>
   await page.mouse.click(500, 400, { button: 'right' });
   await page.getByRole('menuitem', { name: 'Arrange By...' }).hover();
   await expect(page.getByRole('menuitemradio', { name: 'Sort by Name', exact: true })).toHaveAttribute('aria-checked', 'true');
+});
+
+const filesWindows = (page: Page) => page.locator('.window[data-app="files"]');
+
+test('Properties on a desktop icon: Files shows a Properties window of its own, as tall as its content', async ({ page }) => {
+  await session(page);
+  await icon(page, 'README.md').click({ button: 'right' });
+  await page.getByRole('menu', { name: 'Icon menu' }).getByRole('menuitem', { name: 'Properties' }).click();
+  await expect(filesWindows(page)).toHaveCount(1);
+  const win = filesWindows(page);
+  await expect(win.getByRole('heading', { name: 'README.md' })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'Properties' })).toHaveCount(0); // a window, not a dialog
+  const box = (await win.boundingBox())!;
+  expect(box.width).toBe(480);
+  const content = await win.locator('.scroll').evaluate((s) => s.scrollHeight);
+  expect(box.height).toBeGreaterThan(content);
+  await page.keyboard.press('Escape');
+  await expect(filesWindows(page)).toHaveCount(0);
+});
+
+test('Show in Files: the Desktop folder with the icon selected, in the window already showing it', async ({ page }) => {
+  await session(page);
+  await icon(page, 'README.md').click({ button: 'right' });
+  await page.getByRole('menu', { name: 'Icon menu' }).getByRole('menuitem', { name: 'Show in Files' }).click();
+  const readme = filesWindows(page).getByRole('listbox', { name: 'Content' }).getByRole('option', { name: 'README.md', exact: true });
+  await expect(readme).toHaveAttribute('aria-selected', 'true');
+  await expect(filesWindows(page)).toHaveAttribute('aria-label', 'Desktop');
+  await readme.click({ modifiers: ['Control'] }); // unselect it, then ask again
+  await expect(readme).toHaveAttribute('aria-selected', 'false');
+  await icon(page, 'README.md').click({ button: 'right' });
+  await page.getByRole('menu', { name: 'Icon menu' }).getByRole('menuitem', { name: 'Show in Files' }).click();
+  await expect(filesWindows(page)).toHaveCount(1);
+  await expect(readme).toHaveAttribute('aria-selected', 'true');
 });

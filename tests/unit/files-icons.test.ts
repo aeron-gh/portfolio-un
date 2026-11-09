@@ -27,7 +27,7 @@ describe('iconFor: the icon a real Ubuntu shows', () => {
     expect(iconFor('/a', file('text/markdown'))).toBe('text-markdown');
     expect(iconFor('/a', file('application/pdf'))).toBe('application-pdf');
     expect(iconFor('/a', file('image/avif'))).toBe('image-x-generic');
-    expect(iconFor('/a', file('text/x-shellscript'))).toBe('text-x-script');
+    expect(iconFor('/a', file('application/x-shellscript'))).toBe('text-x-script');
     expect(iconFor('/a', file('text/javascript'))).toBe('application-javascript');
     expect(iconFor('/a', file('application/json'))).toBe('application-json');
     expect(iconFor('/a', file('application/x-desktop'))).toBe('application-x-desktop');

@@ -69,7 +69,7 @@ export function byteLength(s: string): number {
 const MIME: Record<string, string> = {
   md: 'text/markdown',
   txt: 'text/plain',
-  sh: 'text/x-shellscript',
+  sh: 'application/x-shellscript',
   ts: 'text/plain',
   js: 'text/javascript',
   json: 'application/json',

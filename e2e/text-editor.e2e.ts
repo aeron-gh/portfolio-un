@@ -261,6 +261,7 @@ test('About Text Editor: name, developer and version, the real links, and the Cr
   await expect(about.getByRole('button', { name: '50.1' })).toBeVisible();
   await expect(about.getByRole('link', { name: 'Website' })).toHaveAttribute('href', 'https://gitlab.gnome.org/GNOME/gnome-text-editor');
   await expect(about.getByRole('link', { name: 'Report an Issue' })).toHaveAttribute('href', 'https://bugs.launchpad.net/ubuntu/+source/gnome-text-editor/+filebug?no-redirect');
+  await expect(about.getByRole('link', { name: 'Support Questions' })).toHaveCount(0); // Text Editor sets no support-url
   await expect(about.getByRole('button', { name: 'Troubleshooting' })).toBeDisabled();
 
   await about.getByRole('button', { name: 'Credits' }).click();
@@ -342,6 +343,7 @@ test('closing a file puts it in the list; Remove takes it out; an empty list say
 });
 
 test('Markdown is coloured as the Adwaita scheme does, and the colours stay exactly under the text', async ({ page }) => {
+  test.setTimeout(60_000); // some 280 key presses: on a busy machine this passes 30s
   await page.emulateMedia({ colorScheme: 'light' });
   await session(page);
   await openReadme(page);

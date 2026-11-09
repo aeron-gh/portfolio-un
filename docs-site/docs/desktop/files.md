@@ -25,6 +25,8 @@ Ubuntu is not the same as upstream GNOME here. These come from Ubuntu, not from 
 | `LocationEntry.svelte` | Typing a path, with completion |
 | `SearchEntry.svelte`, `SearchFilters.svelte` | The search entry and its filters (the filters load when first opened) |
 | `NewFolderDialog.svelte`, `RenameFilePopover.svelte`, `RenameBookmarkPopover.svelte` | Naming things |
+| `Properties.svelte`, `PropertiesDialog.svelte`, `PropertiesWindow.svelte` | Properties: its pages, in a dialog over the window or in a window of its own (loaded when first opened) |
+| `AboutFiles.svelte` | About Files (loaded when opened) |
 | `slot.svelte.ts` | One tab: its place, history, selection and search |
 | `session.svelte.ts` | What every window shares: settings, and where each window is |
 | `undo.svelte.ts` | The one operation that can be undone or redone, shared by every window |
@@ -49,18 +51,20 @@ The rules are plain TypeScript with unit tests:
 | `bookmarks.ts` | The bookmarks: adding, moving, renaming, following a folder that moves |
 | `query.ts`, `search.ts`, `stem.ts` | What a search finds and in what order (`search.ts` and `stem.ts` load when first needed) |
 | `drop.ts` | What a drop does, and which action the keys pick |
+| `properties.ts` | What Properties says about the items, and which lines it shows |
 
 ## What works, and what is greyed out
 
 | Works | Greyed out until its part exists |
 | --- | --- |
-| Sidebar, path bar, Back and Forward (with their right-click lists), Up and Down | **Move to…**, **Copy to…**, **Properties**, **About Files** |
+| Sidebar, path bar, Back and Forward (with their right-click lists), Up and Down | **Move to…**, **Copy to…** |
 | Grid and list, sorting, zoom, hidden files, image previews | **Open With…**, **Open in Terminal**, **Compress…** |
 | Selecting: click, Ctrl, Shift, keys, rubber band | **Set as Background…**, **Captions…**, **Visible Columns…** |
 | New Folder, rename, cut, copy, paste, Paste Into Folder | **Preferences**, **Keyboard Shortcuts**, **Help** |
 | Trash, restore, delete, Empty Trash, Undo and Redo | **Search Settings**, and the filters' **Specific Type** and **Custom Date Range** |
 | Tabs, typing a path, bookmarks, Starred, Recent | **File History Settings…**, **Trash Settings…** |
-| Search, Search Everywhere and the filters; drag and drop | |
+| Search, Search Everywhere and the filters; drag and drop | In Properties: changing permissions, **Set Custom Icon**, **Open in Disks** |
+| Properties, and its own window; About Files | |
 | The narrow layout below 682 px | |
 
 Network shows its real "No Known Connections" page. **Email…** is hidden, as on a real system with no mail app.
@@ -98,6 +102,11 @@ Network shows its real "No Known Connections" page. **Email…** is hidden, as o
   typed; words are cut to their English root (Snowball 3.0.1, as `localsearch` runs it), so "reports" finds `report.txt`.
   It also reads what is inside text and Markdown files, and shows the match in **Full Text Match**. Results are ranked
   as `nautilus-search-hit.c` ranks them: nearer first, then newer, then the better match (SQLite's bm25).
+- **Properties** is a dialog over the window, 480 px wide, as in Nautilus 50. Its button at the top right moves it into
+  a window of its own, as tall as what it shows; desktop icons open that window directly. A folder's contents are
+  counted all the way down, as `g_format_size` writes them. Free space comes from the desktop's disk: 64 GiB, of which
+  Ubuntu takes 11 GB (values chosen for this desktop). Home belongs to `ubuntu`; the system and anything that cannot be
+  opened belong to `root`. **/** is shown as the computer, named Ubuntu, with its disk.
 - **Search Everywhere** (Ctrl+Shift+F) searches the index only: all of Home but hidden files.
 - **Dragging** moves on the same disk and copies what cannot be removed from where it is. **Shift** moves, **Ctrl**
   copies (a copy into the same folder is a duplicate), **Esc** cancels and the picture slides back. Holding a drag over a
@@ -128,6 +137,7 @@ Network shows its real "No Known Connections" page. **Email…** is hidden, as o
 | Alt+1 … 9 | That tab |
 | Ctrl+L, or / or ~ | Type a path |
 | Ctrl+D | Bookmark the folder |
+| Ctrl+I or Alt+Enter | Properties of the selection, or of the folder |
 | Typing, Ctrl+F | Search this folder |
 | Ctrl+Shift+F | Search everywhere |
 | Esc | Leave the search |

@@ -802,7 +802,7 @@ test('right-clicking a sidebar row: its real menu', async ({ page }) => {
   expect(await labels(page)).toEqual(['Open', 'Open in New Tab', 'Open in New Window', 'File History Settings…']);
   await page.keyboard.press('Escape');
   await place(page, 'Documents').click({ button: 'right' });
-  expect(await labels(page)).toEqual(['Open', 'Open in New Tab', 'Open in New Window', 'Remove from Bookmarks', 'Rename']);
+  expect(await labels(page)).toEqual(['Open', 'Open in New Tab', 'Open in New Window', 'Remove from Bookmarks', 'Rename', 'Properties']);
   await menuItem(page, 'Open in New Window').click();
   await expect(files(page)).toHaveCount(2);
   await expect(page.getByRole('dialog', { name: 'Documents' })).toBeVisible();
@@ -1869,12 +1869,37 @@ test('Escape cancels: nothing moves, and the picture slides back and fades', asy
   await page.emulateMedia({ reducedMotion: 'no-preference' }); // the slide back is an animation
   await openHome(page);
   await drag(page, item(page, 'Public'), item(page, 'Music'), { release: false });
+  // Measured in the page, so a slow machine cannot miss the 500ms it is on screen: the picture's slide back, how long
+  // it lasted, and that it is gone afterwards (DRAG_FAILED_DURATION).
+  await page.evaluate(() => {
+    const animate = Element.prototype.animate;
+    const slides: Promise<{ duration: unknown; lasted: number; gone: boolean }>[] = [];
+    Object.assign(window, { slides });
+    Element.prototype.animate = function (keyframes, options) {
+      const animation = animate.call(this, keyframes, options);
+      if (this.classList.contains('dnd-picture')) {
+        const start = performance.now();
+        const el = this;
+        slides.push(
+          animation.finished.then(
+            () => new Promise((done) => requestAnimationFrame(() => done({ duration: (options as KeyframeAnimationOptions).duration, lasted: performance.now() - start, gone: !el.isConnected })))
+          ),
+        );
+      }
+      return animation;
+    };
+  });
   await page.keyboard.press('Escape');
-  await expect(picture(page)).toHaveCount(1); // DRAG_FAILED_DURATION: still on its way back
-  await expect(picture(page)).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => (window as unknown as { slides: unknown[] }).slides.length)).toBe(1);
+  const slide = await page.evaluate(() => (window as unknown as { slides: Promise<{ duration: unknown; lasted: number; gone: boolean }>[] }).slides[0]);
+  expect(slide.duration).toBe(500);
+  expect(slide.lasted).toBeGreaterThanOrEqual(490);
+  expect(slide.gone).toBe(true);
   await page.mouse.up();
-  await expect(item(page, 'Public')).toBeVisible();
   await expect(searchBox(page)).toHaveCount(0); // the keys went to the drag, not to the window
+  // Held over Music for half a second on a slow machine, the drag opens it; either way Public is still in Home.
+  await page.keyboard.press('Alt+Home');
+  await expect(item(page, 'Public')).toBeVisible();
 });
 
 test('held over a folder the drag opens it; the drop then goes to the folder shown, and what arrives is selected', async ({ page }) => {
@@ -2043,4 +2068,191 @@ test('after Escape, letting go on the row the drag began on does not open it', a
   await page.mouse.move(videos.x, videos.y, { steps: 3 });
   await page.mouse.up();
   await expect(path(page).getByRole('button')).toHaveText(['Home']);
+});
+
+test('About Files: the values Files and its metainfo give, with Support Questions, and the GNOME Project in every credit', async ({ page }) => {
+  await openHome(page);
+  await files(page).getByRole('button', { name: 'Main Menu' }).click();
+  await menuItem(page, 'About Files').click();
+  const about = page.getByRole('dialog', { name: 'About' });
+  await expect(about.getByRole('heading', { name: 'Files' })).toBeVisible();
+  await expect(about).toContainText('The GNOME Project');
+  await expect(about.getByRole('button', { name: '50.2.2' })).toBeVisible();
+  await expect(about.getByRole('link', { name: 'Website' })).toHaveAttribute('href', 'https://apps.gnome.org/Nautilus/');
+  await expect(about.getByRole('link', { name: 'Support Questions' })).toHaveAttribute('href', 'https://discourse.gnome.org/tag/nautilus');
+  await expect(about.getByRole('link', { name: 'Report an Issue' })).toHaveAttribute('href', 'https://gitlab.gnome.org/GNOME/nautilus/issues');
+  await expect(about.getByRole('button', { name: 'Troubleshooting' })).toBeDisabled();
+
+  await about.getByRole('button', { name: 'Credits' }).click();
+  await expect(about.getByRole('heading')).toHaveText(['Code by', 'Design by', 'Documentation by']);
+  await expect(about.locator('.adw-group').nth(2)).toContainText('Sun Microsystems');
+  await about.getByRole('button', { name: 'Back' }).click();
+  await about.getByRole('button', { name: 'Legal' }).click();
+  await expect(about).toContainText('© 1999 The Files Authors');
+  await expect(about.getByRole('link', { name: 'GNU General Public License, version 3 or later' })).toHaveAttribute('href', 'https://www.gnu.org/licenses/gpl-3.0.html');
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape');
+  await expect(about).toHaveCount(0);
+});
+
+
+const props = (page: Page) => page.getByRole('dialog', { name: 'Properties' });
+const FULL_DATE = /^\d{1,2}\/\d{1,2}\/\d{4}, \d{1,2}:\d{2}:\d{2} [AP]M$/;
+const row = (page: Page, title: string) => props(page).locator('.adw-row', { hasText: title });
+
+test('Properties of a file: name, type, size, its folder, three dates and your access; Esc closes', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await item(page, 'about.md').click({ button: 'right' });
+  await menuItem(page, 'Properties').click();
+  await expect(props(page).getByRole('heading', { name: 'about.md' })).toBeVisible();
+  await expect(props(page)).toContainText('Markdown document');
+  await expect(props(page).locator('.caption').first()).toHaveText(/^\d+(\.\d)? (bytes|kB)$/);
+  await expect(props(page).locator('.caption').first()).toHaveAttribute('title', /^[\d,]+ bytes$/);
+  await expect(row(page, 'Parent Folder').locator('.subtitle')).toHaveText('/home/ubuntu/Documents/');
+  for (const title of ['Accessed', 'Modified', 'Created']) await expect(row(page, title).locator('.subtitle')).toHaveText(FULL_DATE);
+  await expect(props(page).getByRole('button', { name: /^Permissions/ })).toContainText('Read and Write');
+  await expect(props(page).getByRole('switch', { name: 'Executable as Program' })).toHaveAttribute('aria-checked', 'false');
+  await page.keyboard.press('Escape');
+  await expect(props(page)).toHaveCount(0);
+  await expect(item(page, 'about.md')).toBeFocused();
+});
+
+test('Ctrl+I with nothing selected: the folder itself, everything in it counted, and the free space', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await content(page).focus();
+  await page.keyboard.press('Control+i');
+  await expect(props(page).getByRole('heading', { name: 'Documents' })).toBeVisible();
+  await expect(props(page).locator('.contents')).toHaveText(/^\d+ items, totalling [\d.]+ (bytes|kB|MB)$/);
+  await expect(props(page)).toContainText(/\d+\.\d GB Free/);
+  await expect(props(page).locator('.labels p', { hasText: /^Folder$/ })).toHaveCount(0); // no type for one folder
+  await expect(row(page, 'Accessed')).toHaveCount(0);
+});
+
+test('Alt+Enter on two files: their names, the shared type, no dates', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await item(page, 'about.md').click();
+  await item(page, 'skills.md').click({ modifiers: ['Control'] });
+  await page.keyboard.press('Alt+Enter');
+  await expect(props(page).getByRole('heading')).toHaveText(/^(about\.md, skills\.md|skills\.md, about\.md)$/);
+  await expect(props(page)).toContainText('Markdown document');
+  await expect(props(page).locator('.contents')).toHaveText(/^2 items, totalling /);
+  await expect(row(page, 'Modified')).toHaveCount(0);
+});
+
+test('Set Custom Permissions: owner, group and others; nothing to change yet; Esc goes back first', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await item(page, 'about.md').click();
+  await page.keyboard.press('Control+i');
+  await props(page).getByRole('button', { name: /^Permissions/ }).click();
+  await expect(props(page)).toContainText('Set Custom Permissions');
+  await expect(props(page)).not.toContainText('Only the owner can edit these permissions');
+  const combos = props(page).locator('.combo');
+  await expect(combos.locator('.titles')).toHaveText(['Owner', 'Access', 'Group', 'Access', 'Access']);
+  await expect(combos.locator('.value')).toHaveText(['ubuntu', 'Read and Write', 'ubuntu', 'Read-Only', 'Read-Only']);
+  for (const combo of await combos.all()) await expect(combo).toBeDisabled();
+  await expect(props(page).getByRole('heading', { name: 'Other Users' })).toBeVisible();
+  await expect(row(page, 'Security Context').locator('.subtitle')).toHaveText('Unknown');
+  await page.keyboard.press('Escape');
+  await expect(props(page).getByRole('heading', { name: 'about.md' })).toBeVisible();
+  await expect(props(page).getByRole('button', { name: /^Permissions/ })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(props(page)).toHaveCount(0);
+});
+
+test('what root owns says so, and only root may change it', async ({ page }) => {
+  await openHome(page);
+  await files(page).getByRole('button', { name: 'Main Menu' }).focus();
+  await page.keyboard.press('Control+l');
+  await page.keyboard.type('/etc/');
+  await page.keyboard.press('Enter');
+  await item(page, 'hostname').click();
+  await page.keyboard.press('Control+i');
+  await expect(props(page).getByRole('button', { name: /^Permissions/ })).toContainText('Read-Only');
+  await expect(props(page).getByRole('button', { name: 'Star' })).toHaveCount(0);
+  await props(page).getByRole('button', { name: /^Permissions/ }).click();
+  await expect(props(page)).toContainText('Only the owner can edit these permissions');
+  await expect(props(page).locator('.combo .value').first()).toHaveText('root');
+});
+
+test('the star in Properties stars and unstars with no Undo; a screen reader hears it', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await item(page, 'about.md').click();
+  await page.keyboard.press('Control+i');
+  await props(page).getByRole('button', { name: 'Star' }).click();
+  await expect(props(page).getByRole('button', { name: 'Unstar' })).toBeVisible();
+  await expect(props(page).locator('[aria-live]')).toHaveText('starred');
+  await page.keyboard.press('Escape');
+  await place(page, 'Starred').click();
+  await expect(item(page, 'about.md')).toBeVisible();
+  await files(page).getByRole('button', { name: 'Main Menu' }).click();
+  await expect(undoRow(page)).toBeDisabled();
+});
+
+test('Open Parent Folder: a new window there, with the item selected', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await item(page, 'about.md').click();
+  await page.keyboard.press('Control+i');
+  await props(page).getByRole('button', { name: 'Open Parent Folder', exact: true }).click();
+  await expect(files(page)).toHaveCount(2);
+  const other = files(page).last().getByRole('listbox', { name: 'Content' });
+  await expect(other.getByRole('option', { name: 'about.md', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await expect(files(page).last()).toHaveAttribute('aria-label', 'Documents');
+});
+
+test('Properties from a sidebar row and from a path bar button; not for Recent or the Trash', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Pictures').click({ button: 'right' });
+  await menuItem(page, 'Properties').click();
+  await expect(props(page).getByRole('heading', { name: 'Pictures' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await place(page, 'Recent').click({ button: 'right' });
+  expect(await labels(page)).not.toContain('Properties');
+  await page.keyboard.press('Escape');
+  await place(page, 'Documents').click();
+  await path(page).getByRole('button', { name: 'Home' }).click({ button: 'right' });
+  await menuItem(page, 'Properties').click();
+  await expect(props(page).getByRole('heading', { name: 'ubuntu' })).toBeVisible();
+});
+
+test('/ is the computer: named Ubuntu, with the disk', async ({ page }) => {
+  await openHome(page);
+  await files(page).getByRole('button', { name: 'Main Menu' }).focus();
+  await page.keyboard.press('Control+l');
+  await page.keyboard.type('/');
+  await page.keyboard.press('Enter');
+  await expect(item(page, 'home')).toHaveAttribute('aria-selected', 'true'); // the folder it came from
+  await page.keyboard.press('Control+Shift+a');
+  await page.keyboard.press('Control+i');
+  await expect(props(page).getByRole('heading', { name: 'Ubuntu' })).toBeVisible();
+  await expect(props(page)).toContainText('68.7 GB total');
+  await expect(props(page).getByRole('meter', { name: 'Disk usage' })).toBeVisible();
+  await expect(props(page).getByRole('button', { name: 'Open in Disks' })).toBeDisabled();
+});
+
+test('the pop-out button: Properties leaves the dialog for a Files window of its own, as tall as it is; Esc closes it', async ({ page }) => {
+  await openHome(page);
+  await place(page, 'Documents').click();
+  await item(page, 'about.md').click();
+  await page.keyboard.press('Control+i');
+  const height = await props(page).locator('.scroll').evaluate((s) => s.scrollHeight);
+  await props(page).getByRole('button', { name: 'Open in Window' }).click();
+  await expect(props(page)).toHaveCount(0);
+  await expect(files(page)).toHaveCount(2);
+  const own = files(page).last();
+  await expect(own.getByRole('heading', { name: 'about.md' })).toBeVisible();
+  await expect(own.getByRole('button', { name: 'Open in Window' })).toHaveCount(0);
+  const box = (await own.boundingBox())!;
+  expect(box.width).toBe(480);
+  expect(box.height).toBeGreaterThan(height);
+  await own.getByRole('button', { name: /^Permissions/ }).click();
+  await page.keyboard.press('Escape');
+  await expect(own.getByRole('heading', { name: 'about.md' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(files(page)).toHaveCount(1);
 });
