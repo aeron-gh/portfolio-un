@@ -35,7 +35,7 @@
   import { GRID_SIZES, GRID_STANDARD, LIST_SIZES, LIST_STANDARD, zoomed, type ViewMode } from './prefs';
   import { none, selectAll } from './selection';
   import RenameFilePopover from './RenameFilePopover.svelte';
-  import { locations, prefs, savePrefs, showTab } from './session.svelte';
+  import { canHoldStars, locations, prefs, savePrefs, showTab, starredList } from './session.svelte';
   import Sidebar from './Sidebar.svelte';
   import { Slot, type SavedSearch } from './slot.svelte';
   import { defaultSort, SEARCH_SORT, sortEntries, type Entry, type Sort } from './sort';
@@ -48,10 +48,15 @@
   let { winId, args }: AppProps = $props();
 
   const w = useWindow();
-  const opening = args as { path?: string; history?: History; saved?: SavedSearch } | undefined;
+  /** `select`: what to select there, as Open Parent Folder and Show in Files ask. */
+  const opening = args as { path?: string; history?: History; saved?: SavedSearch; select?: string[] } | undefined;
 
   // The tabs (an AdwTabView of NautilusWindowSlot). Most of this window works on the slot in front.
   const firstSlot = new Slot(opening?.history ?? startAt(opening?.path ?? HOME), opening?.saved);
+  if (opening?.select?.length) {
+    const s = opening.select;
+    firstSlot.selection = { selected: s, anchor: s[0], cursor: s[s.length - 1] };
+  }
   const slotById = new Map([[firstSlot.id, firstSlot]]);
   let tabs = $state.raw<Tab[]>([{ id: firstSlot.id, parent: null }]);
   let activeId = $state(firstSlot.id);
@@ -85,9 +90,14 @@
     locations[winId] = tabs.map((t) => slotById.get(t.id)!.history.current);
     w.win.title = titleOf(slot);
   });
-  showTab[winId] = (path) => {
+  showTab[winId] = (path, select) => {
     const tab = tabs.find((t) => slotById.get(t.id)!.history.current === path);
-    if (tab) show(tab.id);
+    if (!tab) return;
+    show(tab.id);
+    if (select?.length) {
+      slotById.get(tab.id)!.selection = { selected: select, anchor: select[0], cursor: select[select.length - 1] };
+      refocus(true);
+    }
   };
   onDestroy(() => {
     delete locations[winId];
@@ -411,18 +421,8 @@
     prefs.bookmarks = prefs.bookmarks.map((b) => ({ ...b, path: followMove(b.path, from, to) }));
     savePrefs();
   }
-  const starredList = {
-    get paths() {
-      return prefs.starred;
-    },
-    set paths(next: string[]) {
-      prefs.starred = next;
-      savePrefs();
-    },
-  };
   const isStarred = (path: string) => prefs.starred.includes(path);
-  /** nautilus_tag_manager_can_star_contents: inside Home, and not in the Trash. */
-  const inHome = (path: string) => (path === HOME || path.startsWith(`${HOME}/`)) && path !== TRASH && !path.startsWith(`${TRASH}/`);
+  const inHome = canHoldStars;
   const starable = $derived(!slot.searchGlobal && (location === STARRED || inHome(location)));
   function toggleStar(paths: string[]) {
     const on = !paths.every(isStarred);
@@ -441,6 +441,27 @@
   let renamingBookmark = $state<{ path: string; anchor: HTMLElement } | null>(null);
   /** It loads apart from Files, from when a bookmark's menu opens. */
   let bookmarkPopover: Promise<typeof import('./RenameBookmarkPopover.svelte')> | null = null;
+  // Properties loads when it is first asked for. From Recent it says less: those are not file system items.
+  let properties = $state<{ paths: string[]; recent: boolean } | null>(null);
+  let propertiesUi: Promise<typeof import('./PropertiesDialog.svelte')> | null = null;
+  function showProperties(paths: string[]) {
+    propertiesUi ??= import('./PropertiesDialog.svelte');
+    properties = { paths, recent: location === RECENT };
+  }
+  /** view.properties (Ctrl+I, Alt+Enter): the selection, or else the folder, when it is a real one. */
+  function viewProperties() {
+    if (chosen.length) showProperties(chosen.map((e) => e.path));
+    else if (!searching && !isSpecial(location) && !inTrash) showProperties([location]);
+  }
+  /** popout_window_clicked: the dialog goes, and a window of its own comes, as tall as its content (480 wide, at
+   *  least 360 by 294, no title: nautilus-properties-window.blp). */
+  async function popOut(what: { paths: string[]; recent: boolean }, height: number) {
+    properties = null;
+    const { default: view } = await import('./PropertiesWindow.svelte');
+    void launch('files', what, { view, size: { w: 480, h: Math.max(294, height), minW: 360, minH: 294 }, title: '' });
+  }
+  /** About Files loads when it is asked for. */
+  let about = $state<Promise<typeof import('./AboutFiles.svelte')> | null>(null);
   $effect(() => {
     if (menu?.kind === 'row' && menu.bookmark) bookmarkPopover ??= import('./RenameBookmarkPopover.svelte');
   });
@@ -620,6 +641,8 @@
     else if (id === 'new-folder') return void (creating = true);
     else if (id === 'paste') pasteInto(location, true);
     else if (id === 'select-all') slot.selection = selectAll(entries.map((e) => e.path));
+    else if (id === 'properties') showProperties(paths);
+    else if (id === 'folder-properties') showProperties([location]);
     else if (id === 'copy-location') void navigator.clipboard?.writeText(location).catch(() => {});
     else if (id === 'open-location' && paths[0]) {
       // action_open_item_location: its folder, with it selected.
@@ -687,7 +710,7 @@
       { label: 'Preferences', accel: 'Ctrl+,', disabled: true },
       { label: 'Keyboard Shortcuts', disabled: true },
       { label: 'Help', accel: 'F1', disabled: true },
-      { label: 'About Files', disabled: true },
+      { label: 'About Files', onactivate: () => (about = import('./AboutFiles.svelte')) },
     ],
   ]);
   /** The sidebar's own actions: on the row that was clicked, not on the selection. */
@@ -697,6 +720,7 @@
     else if (id === 'open-tab') openTabBehind(place.path);
     else if (id === 'empty-trash') act('empty-trash');
     else if (id === 'remove-bookmark') setBookmarks(removeBookmark(prefs.bookmarks, place.path));
+    else if (id === 'properties') showProperties([place.path]);
     else if (id === 'rename-bookmark') renamingBookmark = { path: place.path, anchor };
   }
 
@@ -704,7 +728,7 @@
     if (menu?.kind === 'main') return mainSections;
     if (menu?.kind === 'row') {
       const { place, anchor } = menu; // choosing a row closes the menu first
-      const items = sidebarRowMenu({ bookmark: menu.bookmark, recent: place.path === RECENT, trash: place.path === TRASH, trashHasItems });
+      const items = sidebarRowMenu({ bookmark: menu.bookmark, recent: place.path === RECENT, trash: place.path === TRASH, trashHasItems, properties: !isSpecial(place.path) && place.path !== TRASH });
       return items.map((section) => section.map((i): MenuItem => ({ label: i.label, disabled: i.disabled, onactivate: () => actOnRow(i.id, place, anchor) })));
     }
     if (menu?.kind === 'history') {
@@ -721,7 +745,7 @@
     if (menu?.kind === 'path') {
       const path = menu.path;
       return pathButtonMenu().map((section) =>
-        section.map((i): MenuItem => ({ label: i.label, disabled: i.disabled, onactivate: () => (i.id === 'open-tab' ? openTabBehind(path) : openWindow(path)) })),
+        section.map((i): MenuItem => ({ label: i.label, disabled: i.disabled, onactivate: () => (i.id === 'open-tab' ? openTabBehind(path) : i.id === 'properties' ? showProperties([path]) : openWindow(path)) })),
       );
     }
     if (menu?.kind === 'selection') return toSections(selectionMenu(pickedForMenu));
@@ -790,6 +814,7 @@
       else if (e.key === 'ArrowUp') up();
       else if (e.key === 'ArrowDown') down();
       else if (e.key === 'Home') go(HOME); // slot.open-location
+      else if (e.key === 'Enter') viewProperties();
       else if (/^[1-9]$/.test(e.key)) {
         const tab = tabs[Number(e.key) - 1]; // win.go-to-tab
         if (tab) show(tab.id);
@@ -813,6 +838,7 @@
       } else if (e.shiftKey && k === 'z') doRedo();
       else if (e.shiftKey) return;
       else if (k === 'n') void launch('files', { path: location });
+      else if (k === 'i') viewProperties();
       else if (k === 'z') doUndo();
       else if (k === 'x' && chosen.length) {
         if (pickedForMenu.canDelete && !pickedForMenu.where) act('cut');
@@ -1073,6 +1099,22 @@
     {#key toast.id}
       <Toast title={toast.title} button="Undo" onbutton={doUndo} ondismiss={() => (toast = null)} />
     {/key}
+  {/if}
+  {#if properties && propertiesUi}
+    {#await propertiesUi then { default: PropertiesDialog }}
+      <PropertiesDialog
+        paths={properties.paths}
+        recent={properties.recent}
+        onpopout={(height) => popOut(properties!, height)}
+        onclose={() => {
+          properties = null;
+          refocus(); // the dialog goes back to the window it was over
+        }}
+      />
+    {/await}
+  {/if}
+  {#if about}
+    {#await about then { default: AboutFiles }}<AboutFiles onclose={() => (about = null)} />{/await}
   {/if}
   {#if creating}
     <NewFolderDialog

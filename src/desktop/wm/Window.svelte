@@ -2,7 +2,7 @@
   import { layers } from '../system/layers.svelte';
   import { snapFor, TOP_HOLD_MS } from './tiling';
   import { grabFromMaximized, moveWin, resizeRect, setRect, type Edge, type Win } from './windows';
-  import { dockIcons, drag, focus, phases, tile, toggleMaximize, views, wm } from './wm.svelte';
+  import { dockIcons, drag, focus, ownViews, phases, tile, toggleMaximize, views, wm } from './wm.svelte';
   import { provideWindow } from './window-context';
   import { motion, overview, slots } from '../shell/overview.svelte';
   import { ACCENTS } from '../system/settings';
@@ -15,7 +15,7 @@
   let dragging = false;
   const focused = $derived(wm.focused === win.id);
   const phase = $derived(phases[win.id]);
-  const View = $derived(views[win.app]);
+  const View = $derived(ownViews[win.id] ?? views[win.app]);
   const maximized = $derived(win.state === 'maximized');
   // In the Overview the real window moves into its picker slot (GNOME's window picker shows live windows).
   const slot = $derived(slots.map[win.id]);

@@ -3,7 +3,7 @@ import type { FsNode } from '../fs/vfs';
 import { appById, isAvailable, type AppId } from './registry';
 
 /** shared-mime-info makes these sub-classes of text/plain, so they open with the text editor too. */
-const TEXT = new Set(['application/json', 'application/x-desktop']);
+const TEXT = new Set(['application/json', 'application/x-desktop', 'application/x-shellscript']);
 
 /** The app that opens `node`, or null when nothing installed handles it (the caller shows GNOME's "no app" dialog). */
 export function appFor(

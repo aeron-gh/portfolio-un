@@ -22,19 +22,19 @@ describe('Desktop Icons NG menus and arranging', () => {
   test('the icon menu: one file, two files, a folder, Home', () => {
     expect(labels(fileMenu({ count: 1, special: false, folders: 0, canRename: true }))).toEqual([
       'Open', 'Open With Other Application(x)', '|', 'Cut', 'Copy', 'Rename…', '|', 'Move to Trash', '|',
-      'Send to...(x)', 'Compress 1 file(x)', 'New Folder with 1 item', '|', 'Properties(x)', '|', 'Show in Files(x)',
+      'Send to...(x)', 'Compress 1 file(x)', 'New Folder with 1 item', '|', 'Properties', '|', 'Show in Files',
     ]);
     const two = labels(fileMenu({ count: 2, special: false, folders: 0, canRename: true }));
     expect(two).toContain('Open All...');
     expect(two).not.toContain('Rename…');
     expect(two).toContain('Compress 2 files(x)');
-    expect(two).toContain('Show All in Files(x)');
+    expect(two).toContain('Show All in Files');
     const folder = labels(fileMenu({ count: 1, special: false, folders: 1, canRename: true }));
     expect(folder).not.toContain('Send to...(x)');
     expect(folder).toContain('Compress 1 folder(x)');
     expect(folder.at(-1)).toBe('Open in Terminal(x)');
     expect(labels(fileMenu({ count: 1, special: true, folders: 1, canRename: false }))).toEqual([
-      'Open', 'Open With Other Application(x)', '|', 'Cut(x)', 'Copy(x)', '|', 'Move to Trash(x)', '|', 'Properties(x)', '|', 'Show in Files(x)', 'Open in Terminal(x)',
+      'Open', 'Open With Other Application(x)', '|', 'Cut(x)', 'Copy(x)', '|', 'Move to Trash(x)', '|', 'Properties', '|', 'Show in Files', 'Open in Terminal(x)',
     ]);
   });
 

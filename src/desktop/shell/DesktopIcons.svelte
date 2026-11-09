@@ -182,6 +182,9 @@
     else if (id === 'keep-arranged') setArrange({ keepArranged: !arrange.keepArranged }, !arrange.keepArranged);
     else if (id === 'sort-special') setArrange({ sortSpecial: !arrange.sortSpecial }, false);
     else if (id.startsWith('order:')) setArrange({ order: id.slice(6) as SortOrder }, true); // DING re-arranges at once
+    // ShowItemPropertiesRemote and ShowItemsRemote: Files does both, over org.freedesktop.FileManager1.
+    else if (id === 'properties') void import('../apps/files/session.svelte').then((m) => m.showItemProperties(selected));
+    else if (id === 'show-in-files') void import('../apps/files/session.svelte').then((m) => m.showItems(selected));
   }
 
   async function showMenu(x: number, y: number, files: boolean) {

@@ -11,12 +11,14 @@
   // AdwAboutDialog (libadwaita 1.9, adw-about-dialog.ui): a 360px dialog over its window. The main page shows the
   // icon, name, developer and version, then rows; Credits and Legal are pages of an AdwNavigationView (Esc or Alt+Left
   // goes back, Esc on the main page closes). Rows for things this desktop cannot show are insensitive.
-  let { name, appIcon, developer, version, website, issueUrl, credits, copyright, license, onclose }: {
+  let { name, appIcon, developer, version, website, supportUrl, issueUrl, credits, copyright, license, onclose }: {
     name: string;
     appIcon: string;
     developer: string;
     version: string;
     website: string;
+    /** Adds Support Questions, as support-url does. */
+    supportUrl?: string;
     issueUrl: string;
     credits: { title: string; people: string[] }[];
     copyright: string;
@@ -83,6 +85,9 @@
               <a class="adw-row activatable" href={website} target="_blank" rel="noreferrer"><span class="titles">Website</span><span class="sym" style:--icon={`url(${external})`}></span></a>
             </div>
             <div class="adw-boxed-list">
+              {#if supportUrl}
+                <a class="adw-row activatable" href={supportUrl} target="_blank" rel="noreferrer"><span class="titles">Support Questions</span><span class="sym" style:--icon={`url(${external})`}></span></a>
+              {/if}
               <a class="adw-row activatable" href={issueUrl} target="_blank" rel="noreferrer"><span class="titles">Report an Issue</span><span class="sym" style:--icon={`url(${external})`}></span></a>
               <button class="adw-row" disabled><span class="titles">Troubleshooting</span><span class="sym" style:--icon={`url(${themed('go-next-symbolic')})`}></span></button>
             </div>

@@ -150,6 +150,15 @@ export function unmaximizeWin(wm: Wm, id: string): void {
   moveWin(wm, id, win.rect.x, win.rect.y);
 }
 
+/** A window just opened takes the height its content wants, and is centred again as openWin would place it. */
+export function fitWin(wm: Wm, id: string, h: number): void {
+  const win = find(wm, id);
+  if (!win) return;
+  const a = wm.area;
+  win.rect.h = Math.min(Math.max(Math.round(h), win.minH), a.h);
+  win.rect.y = Math.round(a.y + (a.h - win.rect.h) / 2);
+}
+
 export function moveWin(wm: Wm, id: string, x: number, y: number): void {
   const win = find(wm, id);
   if (!win || win.state !== 'normal') return;

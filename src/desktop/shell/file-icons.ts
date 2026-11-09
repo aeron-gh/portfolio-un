@@ -16,7 +16,7 @@ const SPECIAL: Record<string, string> = {
 /** The icon GIO finds for a type: the type's own name, or the generic-icon shared-mime-info gives it. */
 const TYPE_ICONS: Record<string, string> = {
   'text/markdown': 'text-markdown',
-  'text/x-shellscript': 'text-x-script',
+  'application/x-shellscript': 'text-x-script',
   'text/javascript': 'application-javascript',
   'application/json': 'application-json',
   'application/pdf': 'application-pdf',
@@ -35,7 +35,7 @@ export function iconFor(path: string, node: FsNode): string {
 const TYPE_NAMES: Record<string, string> = {
   'text/plain': 'Plain text document',
   'text/markdown': 'Markdown document',
-  'text/x-shellscript': 'Shell script',
+  'application/x-shellscript': 'Shell script',
   'text/javascript': 'JavaScript program',
   'application/json': 'JSON document',
   'application/pdf': 'PDF document',

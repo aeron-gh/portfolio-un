@@ -14,6 +14,9 @@ export const wm: W.Wm = $state(W.createWm(browser ? workArea(innerWidth, innerHe
 export const phases: Record<string, Phase> = $state({});
 /** Loaded app components (functions are stored as they are, not proxied). */
 export const views: Record<string, Component<AppProps>> = $state({});
+/** By window id: a window that shows something else of its app (a Files Properties window). */
+export const ownViews: Record<string, Component<AppProps>> = $state({});
+export type OwnWindow = { view: Component<AppProps>; size: { w: number; h: number; minW: number; minH: number }; title: string };
 export const drag: { id: string | null; snap: Snap } = $state({ id: null, snap: null });
 export const tiling: { popup: { tile: W.Tile; tiledId: string } | null } = $state({ popup: null });
 /** Where each app's dock icon is on screen: minimise flies the window into it. Filled by the dock. */
@@ -31,7 +34,8 @@ const find = (id: string) => wm.wins.find((w) => w.id === id);
 
 const starting = new Set<AppId>();
 
-export async function launch(app: AppId, args?: unknown): Promise<string | null> {
+/** `own`: open it with a view, size and title of its own instead of the app's main window. */
+export async function launch(app: AppId, args?: unknown, own?: OwnWindow): Promise<string | null> {
   const entry = appById(app);
   if (!isAvailable(entry) || !entry.load) return null;
   if (!views[app]) {
@@ -43,13 +47,17 @@ export async function launch(app: AppId, args?: unknown): Promise<string | null>
       starting.delete(app);
     }
   }
-  const id = W.openWin(wm, app, entry.window, entry.name, args);
+  const id = W.openWin(wm, app, own?.size ?? entry.window, own?.title ?? entry.name, args);
+  if (own) ownViews[id] = own.view;
   phases[id] = 'opening';
   after(TIMES.open, () => {
     if (phases[id] === 'opening') delete phases[id];
   });
   return id;
 }
+
+/** Its natural height, for a window that knows it only once drawn (GTK sizes an AdwWindow to its content). */
+export const fitHeight = (id: string, h: number) => W.fitWin(wm, id, h);
 
 export function focus(id: string): void {
   const win = find(id);
@@ -79,6 +87,7 @@ export function close(id: string, force = false): void {
   after(TIMES.close, () => {
     W.closeWin(wm, id);
     delete phases[id];
+    delete ownViews[id];
   });
 }
 
@@ -130,6 +139,7 @@ export function quitAll(): void {
   Object.assign(wm, W.createWm(wm.area), { seq: wm.seq }); // ids keep counting: a late timer never meets a new window
   beforeDesktop = [];
   for (const id of Object.keys(phases)) delete phases[id];
+  for (const id of Object.keys(ownViews)) delete ownViews[id];
   drag.id = null;
   drag.snap = null;
   tiling.popup = null;

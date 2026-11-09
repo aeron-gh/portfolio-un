@@ -99,6 +99,10 @@ Ubuntu's default order is **Sort by Name Descending** (Ubuntu overrides DING's d
 
 ## Opening
 
-The real apps (Files, Text Editor, Document Viewer …) are not built yet. For now, opening any icon shows a small
-dialog that says no app can open it. It looks like GNOME's own dialog. It keeps keyboard focus inside itself, and Esc
-gives focus back to the icon.
+Folders open in [Files](./files.md) and text in [Text Editor](./text-editor.md). A file whose app is not built yet
+shows a small dialog that says no app can open it. It looks like GNOME's own dialog. It keeps keyboard focus inside
+itself, and Esc gives focus back to the icon.
+
+**Show in Files** opens the icon's folder in Files with the icon selected, in a window already showing it if there is
+one. **Properties** opens Files' Properties in a window of its own. Both are what Files does when DING asks it over
+`org.freedesktop.FileManager1`.

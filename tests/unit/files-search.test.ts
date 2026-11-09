@@ -23,7 +23,7 @@ const vfs = new Vfs(
           file('notes.md', 'The quarterly Report is due on Friday, so please read it before then.', OLD, 'text/markdown'),
           file('photo.png', undefined, OLD, 'image/png'),
           file('photo.webp', undefined, OLD, 'image/webp'),
-          file('run.sh', 'echo quarterly', OLD, 'text/x-shellscript'),
+          file('run.sh', 'echo quarterly', OLD, 'application/x-shellscript'),
           dir('reports', [file('deep.txt', 'x')]),
         ]),
         dir('Code', [dir('.git'), file('app.txt', 'quarterly numbers')]), // a folder the index leaves out the contents of

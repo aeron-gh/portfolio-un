@@ -26,7 +26,9 @@ describe('a search result', () => {
     const items = backgroundMenu(place).flat();
     expect(items.find((i) => i.id === 'new-folder')?.disabled).toBe(true);
     expect(items.find((i) => i.id === 'paste')?.disabled).toBe(true);
-    expect(ids(backgroundMenu(place))).not.toContain('properties');
+    expect(ids(backgroundMenu(place))).not.toContain('folder-properties');
+    expect(ids(backgroundMenu({ ...place, special: false, inTrash: true }))).not.toContain('folder-properties');
+    expect(ids(backgroundMenu({ ...place, special: false }))).toContain('folder-properties');
     expect(ids(backgroundMenu(place))).not.toContain('terminal');
   });
 });
@@ -98,7 +100,8 @@ describe('the selection menu (update_selection_menu, nautilus_files_view_update_
   });
   test('what is not built yet is shown but off', () => {
     const items = selectionMenu(folder).flat();
-    for (const id of ['move-to', 'copy-to', 'compress', 'properties']) expect(items.find((i) => i.id === id)?.disabled).toBe(true);
+    for (const id of ['move-to', 'copy-to', 'compress']) expect(items.find((i) => i.id === id)?.disabled).toBe(true);
+    expect(items.find((i) => i.id === 'properties')?.disabled).toBeFalsy();
     const sub = selectionMenu(folder)[0][0].submenu!.flat();
     for (const id of ['open-with', 'terminal']) expect(sub.find((i) => i.id === id)?.disabled).toBe(true);
     for (const id of ['open-tab', 'open-window']) expect(sub.find((i) => i.id === id)?.disabled).toBeFalsy();
@@ -187,13 +190,14 @@ describe('the selection menu in Recent and Starred', () => {
 });
 
 test('a sidebar row\'s menu (nautilus-sidebar.c)', () => {
-  const row = (o: object) => labels(sidebarRowMenu({ bookmark: false, recent: false, trash: false, trashHasItems: false, ...o }));
+  const row = (o: object) => labels(sidebarRowMenu({ bookmark: false, recent: false, trash: false, trashHasItems: false, properties: false, ...o }));
   const open = ['Open', 'Open in New Tab', 'Open in New Window'];
   expect(row({})).toEqual([open]);
   expect(row({ bookmark: true })).toEqual([open, ['Remove from Bookmarks', 'Rename']]);
   expect(row({ recent: true })).toEqual([open, ['File History Settings…']]);
   expect(row({ trash: true })).toEqual([open, ['Trash Settings…'], ['Empty Trash…']]);
-  const empty = (o: object) => sidebarRowMenu({ bookmark: false, recent: false, trash: true, trashHasItems: false, ...o }).flat().find((i) => i.id === 'empty-trash')!;
+  expect(row({ bookmark: true, properties: true })).toEqual([open, ['Remove from Bookmarks', 'Rename'], ['Properties']]);
+  const empty = (o: object) => sidebarRowMenu({ bookmark: false, recent: false, trash: true, trashHasItems: false, properties: false, ...o }).flat().find((i) => i.id === 'empty-trash')!;
   expect(empty({}).disabled).toBe(true);
   expect(empty({ trashHasItems: true }).disabled).toBeFalsy();
 });
